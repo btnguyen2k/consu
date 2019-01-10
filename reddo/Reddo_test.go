@@ -1,3 +1,4 @@
+// Package reddo provides utilities to convert values using Golang's reflect.
 package reddo
 
 import (
@@ -53,7 +54,7 @@ func TestToBool(t *testing.T) {
 	}
 
 	var i = 0
-	var p1 *int = nil
+	var p1 *int
 	var p2 = &i
 	inputList = []interface{}{p1, p2}
 	expectedList = []bool{false, true}

@@ -12,7 +12,6 @@ import (
 const (
 	// Version defines version number of this package
 	Version = "0.1.0"
-	Author  = "Thanh Nguyen <btnguyen2k@gmail.com>"
 )
 
 // ToBool converts a value to bool. The output is guaranteed to ad-here to type assertion .(bool)
@@ -170,14 +169,13 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 		if vV.Type().Name() == tV.Type().Name() {
 			// same type, just cast it
 			return vV.Interface(), nil
-		} else {
-			// difference type, look into fields
-			for i, n := 0, vV.NumField(); i < n; i++ {
-				f := vV.Field(i)
-				if f.Kind() == reflect.Struct {
-					if f.Type().Name() == tV.Type().Name() {
-						return f.Interface(), nil
-					}
+		}
+		// difference type, look into fields
+		for i, n := 0, vV.NumField(); i < n; i++ {
+			f := vV.Field(i)
+			if f.Kind() == reflect.Struct {
+				if f.Type().Name() == tV.Type().Name() {
+					return f.Interface(), nil
 				}
 			}
 		}
