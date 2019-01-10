@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	// Version defines version number of this package
 	Version = "0.1.0"
 	Author  = "Thanh Nguyen <btnguyen2k@gmail.com>"
 )
@@ -40,8 +41,9 @@ func ToBool(v interface{}) (interface{}, error) {
 	switch vV.Kind() {
 	case reflect.Bool:
 		return vV.Bool(), nil
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8,
-		reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return vV.Int() != 0, nil
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return vV.Uint() != 0, nil
 	case reflect.Float32, reflect.Float64:
 		return vV.Float() != 0.0, nil
@@ -67,9 +69,8 @@ func ToInt(v interface{}) (interface{}, error) {
 	case reflect.Bool:
 		if vV.Bool() {
 			return int64(1), nil
-		} else {
-			return int64(0), nil
 		}
+		return int64(0), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return vV.Int(), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -94,9 +95,8 @@ func ToUint(v interface{}) (interface{}, error) {
 	case reflect.Bool:
 		if vV.Bool() {
 			return uint64(1), nil
-		} else {
-			return uint64(0), nil
 		}
+		return uint64(0), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return uint64(vV.Int()), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -121,9 +121,8 @@ func ToFloat(v interface{}) (interface{}, error) {
 	case reflect.Bool:
 		if vV.Bool() {
 			return float64(1.0), nil
-		} else {
-			return float64(0.0), nil
 		}
+		return float64(0.0), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return float64(vV.Int()), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -260,6 +259,17 @@ func ToPointer(v interface{}, t interface{}) (interface{}, error) {
 	return nil, nil
 }
 
+// Convert converts a value (v) to specified type (t):
+//
+//   - If t is a bool: see ToBool(interface{}) (interface{}, error)
+//   - If t is an integer (int, int8, int16, int32, int64): see ToInt(interface{}) (interface{}, error)
+//   - If t is an unsigned-integer (uint, uint8, uint16, uint32, uint64, uintptr): see ToUint(interface{}) (interface{}, error)
+//   - If t is a float (float32, float64): see ToFloat(interface{}) (interface{}, error)
+//   - If t is a string: see ToString(interface{}) (interface{}, error)
+//   - If t is a struct: see ToStruct(interface{}, interface{}) (interface{}, error)
+//   - If t is an array or a slice: see ToSlice(v interface{}, interface{}) (interface{}, error)
+//   - If t is a map: see ToMap(interface{}, interface{}) (interface{}, error)
+//   - If t is a pointer: see ToPointer(interface{}, interface{}) (interface{}, error)
 func Convert(v interface{}, t interface{}) (interface{}, error) {
 	if v == nil || t == nil {
 		return nil, nil
@@ -284,13 +294,6 @@ func Convert(v interface{}, t interface{}) (interface{}, error) {
 		return ToMap(v, t)
 	case reflect.Ptr:
 		return ToPointer(v, t)
-		// case reflect.Complex64:
-		// case reflect.Complex128:
-		// case reflect.Chan:
-		// case reflect.Func:
-		// case reflect.Interface:
-
-		// case reflect.UnsafePointer:
 	}
 	return v, nil
 }
