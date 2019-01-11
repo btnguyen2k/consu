@@ -66,15 +66,15 @@ func ToBool(v interface{}) (interface{}, error) {
 //   - If v is a string: return result from strconv.ParseFloat(string).
 //   - Otherwise, return error
 //
-//  Examples:
+// Examples:
 //
-//    ToFloat(true)       returns 1.0,  nil
-//    ToFloat(false)      returns 0.0,  nil
-//    ToFloat(0)          returns 0.0,  nil
-//    ToFloat(1.2)        returns 1.2,  nil
-//    ToFloat("-3.4")     returns -3.4, nil
-//    ToFloat("blabla")   returns _,     error
-//    ToFloat(struct{}{}) returns _,     error
+//   ToFloat(true)       returns 1.0,  nil
+//   ToFloat(false)      returns 0.0,  nil
+//   ToFloat(0)          returns 0.0,  nil
+//   ToFloat(1.2)        returns 1.2,  nil
+//   ToFloat("-3.4")     returns -3.4, nil
+//   ToFloat("blabla")   returns _,     error
+//   ToFloat(struct{}{}) returns _,     error
 func ToFloat(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -105,16 +105,16 @@ func ToFloat(v interface{}) (interface{}, error) {
 //   - If v is a string: return result from strconv.ParseInt(string).
 //   - Otherwise, return error
 //
-//  Examples:
+// Examples:
 //
-//    ToInt(true)       returns 1,  nil
-//    ToInt(false)      returns 0,  nil
-//    ToInt(0)          returns 0,  nil
-//    ToInt(1.2)        returns 1,  nil
-//    ToInt("-3")       returns -3, nil
-//    ToInt("4.5")      returns _,  error
-//    ToInt("blabla")   returns _,  error
-//    ToInt(struct{}{}) returns _,  error
+//   ToInt(true)       returns 1,  nil
+//   ToInt(false)      returns 0,  nil
+//   ToInt(0)          returns 0,  nil
+//   ToInt(1.2)        returns 1,  nil
+//   ToInt("-3")       returns -3, nil
+//   ToInt("4.5")      returns _,  error
+//   ToInt("blabla")   returns _,  error
+//   ToInt(struct{}{}) returns _,  error
 func ToInt(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -142,17 +142,17 @@ func ToInt(v interface{}) (interface{}, error) {
 //   - If v is a string: return result from strconv.ParseUint(string).
 //   - Otherwise, return error
 //
-//  Examples:
+// Examples:
 //
-//    ToUint(true)       returns 1,  nil
-//    ToUint(false)      returns 0,  nil
-//    ToUint(0)          returns 0,  nil
-//    ToUint(1.2)        returns 1,  nil
-//    ToUint(-1)         returns 18446744073709551615,  nil /* be caution with negative numbers! */
-//    ToUint("-3")       returns _,  error
-//    ToUint("4.5")      returns _,  error
-//    ToUint("blabla")   returns _,  error
-//    ToUint(struct{}{}) returns _,  error
+//   ToUint(true)       returns 1,  nil
+//   ToUint(false)      returns 0,  nil
+//   ToUint(0)          returns 0,  nil
+//   ToUint(1.2)        returns 1,  nil
+//   ToUint(-1)         returns 18446744073709551615,  nil /* be caution with negative numbers! */
+//   ToUint("-3")       returns _,  error
+//   ToUint("4.5")      returns _,  error
+//   ToUint("blabla")   returns _,  error
+//   ToUint(struct{}{}) returns _,  error
 func ToUint(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -178,14 +178,14 @@ func ToUint(v interface{}) (interface{}, error) {
 //   - If v is a number (integer or float) or bool or string: return its value as string.
 //   - Otherwise, return string representation of v (fmt.Sprint(v))
 //
-//  Examples:
+// Examples:
 //
-//    ToString(true)       returns "true",   nil
-//    ToString(false)      returns "false",  nil
-//    ToString(0)          returns "0",      nil
-//    ToString(1.2)        returns "1.2",    nil
-//    ToString("blabla")   returns "blabla", nil
-//    ToString(struct{}{}) returns "{}",     nil
+//   ToString(true)       returns "true",   nil
+//   ToString(false)      returns "false",  nil
+//   ToString(0)          returns "0",      nil
+//   ToString(1.2)        returns "1.2",    nil
+//   ToString("blabla")   returns "blabla", nil
+//   ToString(struct{}{}) returns "{}",     nil
 func ToString(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -255,8 +255,8 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 //   - Otherwise, return error
 //
 // Notes:
-//   - array/slice is converted to slice
-//   - element type can be converted too, for example: []int can be converted to []string
+//   - Array/slice is converted to slice
+//   - Element type can be converted too, for example: []int can be converted to []string
 //
 // Examples:
 //
@@ -293,7 +293,7 @@ func ToSlice(v interface{}, t interface{}) (interface{}, error) {
 //   - Otherwise, return error
 //
 // Notes:
-//   - element type can be converted too, for example: map[int]int can be converted to map[string]string
+//   - Element type can be converted too, for example: map[int]int can be converted to map[string]string
 //
 // Examples:
 //
@@ -329,7 +329,7 @@ func ToMap(v interface{}, t interface{}) (interface{}, error) {
 // ToPointer converts a value (v) to pointer of type specified by (t) (t must be a pointer).
 // The output is guaranteed to have the same type as (t).
 //
-// Examples:
+// Example 1:
 //
 //   a := float64(1.23)
 //   zero := int32(0)
@@ -341,6 +341,8 @@ func ToMap(v interface{}, t interface{}) (interface{}, error) {
 //   /* we now successfully converted *float644 to *int32 */
 //   i32 := *output.(*interface{}) // note: type of output is *interface{}
 //   fmt.Println(i32.(int32))      // i32 is safe to type asserted .(int32)
+//
+// Example 2:
 //
 //   type Abc struct {
 //     A int
