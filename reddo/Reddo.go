@@ -1,4 +1,53 @@
-// Package reddo provides utilities to convert values using Golang's reflect.
+// Package reddo provides utility functions to convert values using Golang's reflect.
+//
+// Sample usage:
+//
+//   package main
+//
+//   import (
+// 	   "fmt"
+// 	   "github.com/btnguyen2k/consu/reddo"
+//   )
+//
+//   type Abc struct {
+// 	   A int
+//   }
+//
+//   type Def struct {
+// 	   Abc
+// 	   D string
+//   }
+//
+//   func getValue(data map[string]interface{}, field string, zero interface{}) interface{} {
+// 	   v, err := reddo.Convert(data[field], zero)
+// 	   if err != nil {
+// 	     panic(err)
+// 	   }
+// 	   return v
+//   }
+//
+//   func main() {
+// 	   data := map[string]interface{}{}
+// 	   data["id"] = "1"
+// 	   data["name"] = "Thanh Nguyen"
+// 	   data["year"] = 2019
+// 	   data["abc"] = Abc{A: 103}
+// 	   data["def"] = Def{Abc: Abc{A: 1981}, D: "btnguyen2k"}
+//
+// 	   var id = getValue(data, "id", reddo.ZeroString).(string)
+// 	   var year = getValue(data, "year", reddo.ZeroInt).(int64)
+// 	   var yearUint = getValue(data, "year", reddo.ZeroUint).(uint64)
+// 	   fmt.Printf("Id is %s, year is %d (%d)\n", id, year, yearUint)
+//
+// 	   zeroAbc := Abc{}
+// 	   zeroDef := Def{}
+// 	   var abc = getValue(data, "abc", zeroAbc).(Abc)
+// 	   var def = getValue(data, "def", zeroDef).(Def)
+// 	   var abc2 = getValue(data, "def", zeroAbc).(Abc)
+// 	   fmt.Println("data.abc       :", abc)
+// 	   fmt.Println("data.def       :", def)
+// 	   fmt.Println("data.def as abc:", abc2)
+//   }
 package reddo
 
 import (
