@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-	"unsafe"
 )
 
 const (
@@ -108,13 +107,14 @@ func ToFloat(v interface{}) (interface{}, error) {
 //
 //  Examples:
 //
-//    ToFloat(true)       returns 1.0,  nil
-//    ToFloat(false)      returns 0.0,  nil
-//    ToFloat(0)          returns 0.0,  nil
-//    ToFloat(1.2)        returns 1.2,  nil
-//    ToFloat("-3.4")     returns -3.4, nil
-//    ToFloat("blabla")   returns _,     error
-//    ToFloat(struct{}{}) returns _,     error
+//    ToInt(true)       returns 1,  nil
+//    ToInt(false)      returns 0,  nil
+//    ToInt(0)          returns 0,  nil
+//    ToInt(1.2)        returns 1,  nil
+//    ToInt("-3")       returns -3, nil
+//    ToInt("4.5")      returns _,  error
+//    ToInt("blabla")   returns _,  error
+//    ToInt(struct{}{}) returns _,  error
 func ToInt(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -141,6 +141,18 @@ func ToInt(v interface{}) (interface{}, error) {
 //   - If v is a bool: return 1 if its value is true, 0 otherwise.
 //   - If v is a string: return result from strconv.ParseUint(string).
 //   - Otherwise, return error
+//
+//  Examples:
+//
+//    ToUint(true)       returns 1,  nil
+//    ToUint(false)      returns 0,  nil
+//    ToUint(0)          returns 0,  nil
+//    ToUint(1.2)        returns 1,  nil
+//    ToUint(-1)         returns 18446744073709551615,  nil /* be caution with negative numbers! */
+//    ToUint("-3")       returns _,  error
+//    ToUint("4.5")      returns _,  error
+//    ToUint("blabla")   returns _,  error
+//    ToUint(struct{}{}) returns _,  error
 func ToUint(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -165,6 +177,15 @@ func ToUint(v interface{}) (interface{}, error) {
 //
 //   - If v is a number (integer or float) or bool or string: return its value as string.
 //   - Otherwise, return string representation of v (fmt.Sprint(v))
+//
+//  Examples:
+//
+//    ToString(true)       returns "true",   nil
+//    ToString(false)      returns "false",  nil
+//    ToString(0)          returns "0",      nil
+//    ToString(1.2)        returns "1.2",    nil
+//    ToString("blabla")   returns "blabla", nil
+//    ToString(struct{}{}) returns "{}",     nil
 func ToString(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -182,14 +203,31 @@ func ToString(v interface{}) (interface{}, error) {
 	return fmt.Sprint(v), nil
 }
 
-// ToStruct converts a value (v) to struct of type specified by (t). The output is guaranteed to have the same type as (t).
+// ToStruct converts a value (v) to struct of type specified by (t) (t must be a struct). The output is guaranteed to have the same type as (t).
 //
 //   - If v is a struct:
 //     - If v and t are same type, simply cast v to the specified type and return it
 //     - Otherwise, loop through v's fields. If there is a field that is same type as t, return it
 //   - Otherwise, return error
+//
+// Examples:
+//
+//   type Abc struct{ Key1 int }
+//   type Dev struct {
+//     Abc
+//     Key2 string
+//   }
+//   ToStruct(Abc{Key1:1}, Abc{})                   returns Abc{Key1:1},                   nil
+//   ToStruct(Abc{Key1:1}, Def{})                   returns _,                             error
+//   ToStruct(Def{Abc:Abc{Key1:1},Key2:"a"}, Def{}) returns Def{Abc:Abc{Key1:1},Key2:"a"}, nil
+//   ToStruct(Def{Abc:Abc{Key1:1},Key2:"a"}, Abc{}) returns Abc{Key1:1},                   nil
+//   ToStruct(Abc{Key1:1}, "")                      returns _,                             error
+//   ToStruct("", Abc{})                            returns _,                             error
 func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
+	if tV.Kind() != reflect.Struct {
+		return nil, errors.New("Target type must be a struct, but received [" + fmt.Sprint(tV.Type()) + "]")
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Struct:
@@ -215,8 +253,20 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 //
 //   - If v is an array or slice: convert each element of v to the correct type (specified by t), put them into a slice, and finally return it.
 //   - Otherwise, return error
+//
+// Notes:
+//   - array/slice is converted to slice
+//   - element type can be converted too, for example: []int can be converted to []string
+//
+// Examples:
+//
+//   ToSlice([]bool{true,false}, [0]int{})    returns []int{1,0},             nil
+//   ToSlice([3]int{-1,0,1}, []string{""})    returns []string{"-1","0","1"}, nil
 func ToSlice(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
+	if tV.Kind() != reflect.Array && tV.Kind() != reflect.Slice {
+		return nil, errors.New("Target type must be an array or slice, but received [" + fmt.Sprint(tV.Type()) + "]")
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Array, reflect.Slice:
@@ -241,8 +291,18 @@ func ToSlice(v interface{}, t interface{}) (interface{}, error) {
 //
 //   - If v is a map: convert each element {key:value} of v to the correct type (specified by t), put them into a map, and finally return it.
 //   - Otherwise, return error
+//
+// Notes:
+//   - element type can be converted too, for example: map[int]int can be converted to map[string]string
+//
+// Examples:
+//
+//   ToMap(map[string]bool{"a":true,"b":false}, map[string]int{})    returns map[string]int{"a":1,"b":0"}, nil
 func ToMap(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
+	if tV.Kind() != reflect.Map {
+		return nil, errors.New("Target type must be a map, but received [" + fmt.Sprint(tV.Type()) + "]")
+	}
 	vV := reflect.ValueOf(v)
 	if vV.Kind() == reflect.Map {
 		keyType := tV.Type().Key()           // type of map's key
@@ -263,25 +323,56 @@ func ToMap(v interface{}, t interface{}) (interface{}, error) {
 		}
 		return m.Interface(), nil
 	}
-	return nil, nil
+	return nil, errors.New("Cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]!")
 }
 
 // ToPointer converts a value (v) to pointer of type specified by (t) (t must be a pointer).
 // The output is guaranteed to have the same type as (t).
 //
-//   - If v is a map: convert each element {key:value} of v to the correct type (specified by t), put them into a map, and finally return it.
-//   - Otherwise, return error
+// Examples:
+//
+//   a := float64(1.23)
+//   zero := int32(0)
+//   output, err := ToPointer(&a, &zero)
+//   /* here err should be nil */
+//   if err != nil {
+//     panic("Something wrong!")
+//   }
+//   /* we now successfully converted *float644 to *int32 */
+//   i32 := *output.(*interface{}) // note: type of output is *interface{}
+//   fmt.Println(i32.(int32))      // i32 is safe to type asserted .(int32)
+//
+//   type Abc struct {
+//     A int
+//   }
+//   type Def struct {
+//     Abc
+//     D string
+//   }
+//   a := Def{Abc: Abc{1}, D: "2"}
+//   output, err := ToPointer(&a, &Abc{})
+//   /* here err should be nil */
+//   if err != nil {
+//     panic("Something wrong!")
+//   }
+//   /* we now successfully converted *Def to *Abc */
+//   abc := *output.(*interface{}) // note: type of output is *interface{}
+//   fmt.Println(abc.(Abc))        // i32 is safe to type asserted .(Abc)
 func ToPointer(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
+	if tV.Kind() != reflect.Ptr {
+		return nil, errors.New("Target type must be a pointer, but received [" + fmt.Sprint(tV.Type()) + "]")
+	}
 	vV := reflect.ValueOf(v)
 	if vV.Kind() == reflect.Ptr {
 		v, err := Convert(vV.Elem().Interface(), tV.Elem().Interface())
+		if err != nil {
+			return nil, err
+		}
 		x := reflect.ValueOf(v).Convert(tV.Elem().Type()).Interface()
-		p := unsafe.Pointer(&x)
-		z := reflect.NewAt(tV.Elem().Type(), p)
-		return z.Interface(), err
+		return &x, nil
 	}
-	return nil, nil
+	return nil, errors.New("Cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]!")
 }
 
 // Convert converts a value (v) to specified type (t):
