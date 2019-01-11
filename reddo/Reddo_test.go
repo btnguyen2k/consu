@@ -112,8 +112,6 @@ func TestToBool(t *testing.T) {
 
 /*----------------------------------------------------------------------*/
 
-// const epsilon = 1E-9
-
 func testToFloat(t *testing.T, input interface{}, expected float64, zero float64) {
 	v, e := ToFloat(input)
 	ifFailed(t, "TestToFloat", e)
@@ -637,6 +635,21 @@ func TestToSlice(t *testing.T) {
 			t.Errorf("TestToSlice failed: [%v] should not be convertable to string!", input)
 		}
 	}
+
+	{
+		input := []string{"a", "b", "c"}
+		_, err := ToSlice(input, []int{})
+		if err == nil {
+			t.Errorf("TestToSlice failed: [%v] should not be convertable to []int!", input)
+		}
+	}
+	{
+		input := []string{"a", "b", "c"}
+		_, err := Convert(input, []int{})
+		if err == nil {
+			t.Errorf("TestToSlice failed: [%v] should not be convertable to []int!", input)
+		}
+	}
 }
 
 /*----------------------------------------------------------------------*/
@@ -830,4 +843,30 @@ func TestToPointer(t *testing.T) {
 			t.Errorf("TestToPointer failed: received [%v]", output)
 		}
 	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestConvert(t *testing.T) {
+	{
+		_, err := Convert("", nil)
+		if err == nil {
+			t.Errorf("TestToPointer failed: [%v] should not be convertable to [%v]!", "", nil)
+		}
+	}
+	{
+		_, err := Convert(nil, "")
+		if err == nil {
+			t.Errorf("TestToPointer failed: [%v] should not be convertable to [%v]!", nil, "")
+		}
+	}
+	{
+		input := ""
+		zero := func() {}
+		_, err := Convert(input, zero)
+		if err == nil {
+			t.Errorf("TestToPointer failed: [%v] should not be convertable to func!", input)
+		}
+	}
+
 }

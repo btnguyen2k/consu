@@ -56,7 +56,7 @@ func ToBool(v interface{}) (interface{}, error) {
 	case reflect.String:
 		return strconv.ParseBool(vV.String())
 	}
-	return false, errors.New("Cannot convert value [" + vV.String() + "] to bool.")
+	return false, errors.New("cannot convert value [" + vV.String() + "] to bool.")
 }
 
 // ToFloat converts a value to float64. The output is guaranteed to ad-here to type assertion .(float64)
@@ -95,7 +95,7 @@ func ToFloat(v interface{}) (interface{}, error) {
 	case reflect.String:
 		return strconv.ParseFloat(vV.String(), 64)
 	}
-	return float64(0), errors.New("Cannot convert value [" + vV.String() + "] to float64.")
+	return float64(0), errors.New("cannot convert value [" + vV.String() + "] to float64.")
 }
 
 // ToInt converts a value to int64. The output is guaranteed to ad-here to type assertion .(int64)
@@ -132,7 +132,7 @@ func ToInt(v interface{}) (interface{}, error) {
 	case reflect.String:
 		return strconv.ParseInt(vV.String(), 10, 64)
 	}
-	return int64(0), errors.New("Cannot convert value [" + vV.String() + "] to int64.")
+	return int64(0), errors.New("cannot convert value [" + vV.String() + "] to int64.")
 }
 
 // ToUint converts a value to uint64. The output is guaranteed to ad-here to type assertion .(uint64)
@@ -170,7 +170,7 @@ func ToUint(v interface{}) (interface{}, error) {
 	case reflect.String:
 		return strconv.ParseUint(vV.String(), 10, 64)
 	}
-	return uint64(0), errors.New("Cannot convert value [" + vV.String() + "] to uint64.")
+	return uint64(0), errors.New("cannot convert value [" + vV.String() + "] to uint64.")
 }
 
 // ToString converts a value to string. The output is guaranteed to ad-here to type assertion .(string)
@@ -226,7 +226,7 @@ func ToString(v interface{}) (interface{}, error) {
 func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
 	if tV.Kind() != reflect.Struct {
-		return nil, errors.New("Target type must be a struct, but received [" + fmt.Sprint(tV.Type()) + "]")
+		return nil, errors.New("target type must be a struct, but received [" + fmt.Sprint(tV.Type()) + "]")
 	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -245,7 +245,7 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 			}
 		}
 	}
-	return nil, errors.New("Value of type [" + fmt.Sprint(vV.Type()) + "] cannot be converted to [" + fmt.Sprint(tV.Type()) + "]")
+	return nil, errors.New("value of type [" + fmt.Sprint(vV.Type()) + "] cannot be converted to [" + fmt.Sprint(tV.Type()) + "]")
 }
 
 // ToSlice converts a value (v) to slice of type specified by (t) (t must be a slice or array, not an element of slice/array).
@@ -265,7 +265,7 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 func ToSlice(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
 	if tV.Kind() != reflect.Array && tV.Kind() != reflect.Slice {
-		return nil, errors.New("Target type must be an array or slice, but received [" + fmt.Sprint(tV.Type()) + "]")
+		return nil, errors.New("target type must be an array or slice, but received [" + fmt.Sprint(tV.Type()) + "]")
 	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -283,7 +283,7 @@ func ToSlice(v interface{}, t interface{}) (interface{}, error) {
 		}
 		return slice.Interface(), nil
 	}
-	return nil, errors.New("Cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]!")
+	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]")
 }
 
 // ToMap converts a value (v) to map where types of key & value are specified by (t) (t must be a map).
@@ -301,7 +301,7 @@ func ToSlice(v interface{}, t interface{}) (interface{}, error) {
 func ToMap(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
 	if tV.Kind() != reflect.Map {
-		return nil, errors.New("Target type must be a map, but received [" + fmt.Sprint(tV.Type()) + "]")
+		return nil, errors.New("target type must be a map, but received [" + fmt.Sprint(tV.Type()) + "]")
 	}
 	vV := reflect.ValueOf(v)
 	if vV.Kind() == reflect.Map {
@@ -323,7 +323,7 @@ func ToMap(v interface{}, t interface{}) (interface{}, error) {
 		}
 		return m.Interface(), nil
 	}
-	return nil, errors.New("Cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]!")
+	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]")
 }
 
 // ToPointer converts a value (v) to pointer of type specified by (t) (t must be a pointer).
@@ -363,7 +363,7 @@ func ToMap(v interface{}, t interface{}) (interface{}, error) {
 func ToPointer(v interface{}, t interface{}) (interface{}, error) {
 	tV := reflect.ValueOf(t)
 	if tV.Kind() != reflect.Ptr {
-		return nil, errors.New("Target type must be a pointer, but received [" + fmt.Sprint(tV.Type()) + "]")
+		return nil, errors.New("target type must be a pointer, but received [" + fmt.Sprint(tV.Type()) + "]")
 	}
 	vV := reflect.ValueOf(v)
 	if vV.Kind() == reflect.Ptr {
@@ -374,7 +374,7 @@ func ToPointer(v interface{}, t interface{}) (interface{}, error) {
 		x := reflect.ValueOf(v).Convert(tV.Elem().Type()).Interface()
 		return &x, nil
 	}
-	return nil, errors.New("Cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]!")
+	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(tV.Type()) + "]")
 }
 
 // Convert converts a value (v) to specified type (t):
@@ -390,7 +390,7 @@ func ToPointer(v interface{}, t interface{}) (interface{}, error) {
 //   - If t is a pointer: see ToPointer(interface{}, interface{}) (interface{}, error)
 func Convert(v interface{}, t interface{}) (interface{}, error) {
 	if v == nil || t == nil {
-		return nil, nil
+		return nil, errors.New("cannot convert: both (v) and (t) must not be nil")
 	}
 	k := reflect.TypeOf(t).Kind()
 	switch k {
@@ -413,5 +413,5 @@ func Convert(v interface{}, t interface{}) (interface{}, error) {
 	case reflect.Ptr:
 		return ToPointer(v, t)
 	}
-	return v, nil
+	return v, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + fmt.Sprint(reflect.TypeOf(t)) + "]")
 }
