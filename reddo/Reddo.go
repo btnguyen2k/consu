@@ -24,17 +24,21 @@ const (
 //
 // Examples:
 //
-//    ToPool(true)     returns true,  nil
-//    ToPool(false)    returns false, nil
-//    ToPool(0)        returns false, nil
-//    ToPool(1)        returns true,  nil
-//    ToPool(0.0)      returns false, nil
-//    ToPool(1.2)      returns true,  nil
-//    ToPool(1i)       returns true,  nil
-//    ToPool(0i)       returns false, nil
-//    ToPool("true")   returns true,  nil
-//    ToPool("false")  returns false, nil
-//    ToPool("blabla") returns _,     error
+//    ToBool(true)       returns true,  nil
+//    ToBool(false)      returns false, nil
+//    ToBool(0)          returns false, nil
+//    ToBool(1)          returns true,  nil
+//    ToBool(-1)         returns true,  nil
+//    ToBool(0.0)        returns false, nil
+//    ToBool(1.2)        returns true,  nil
+//    ToBool(-3.4)       returns true,  nil
+//    ToBool(1i)         returns true,  nil
+//    ToBool(-1i)        returns true,  nil
+//    ToBool(0i)         returns false, nil
+//    ToBool("true")     returns true,  nil
+//    ToBool("false")    returns false, nil
+//    ToBool("blabla")   returns _,     error
+//    ToBool(struct{}{}) returns _,     error
 func ToBool(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -56,12 +60,61 @@ func ToBool(v interface{}) (interface{}, error) {
 	return false, errors.New("Cannot convert value [" + vV.String() + "] to bool.")
 }
 
+// ToFloat converts a value to float64. The output is guaranteed to ad-here to type assertion .(float64)
+//
+//   - If v is a bool: return 1.0 if its value is true, 0.0 otherwise.
+//   - If v is a number (integer or float): return its value as float64.
+//   - If v is a string: return result from strconv.ParseFloat(string).
+//   - Otherwise, return error
+//
+//  Examples:
+//
+//    ToFloat(true)       returns 1.0,  nil
+//    ToFloat(false)      returns 0.0,  nil
+//    ToFloat(0)          returns 0.0,  nil
+//    ToFloat(1.2)        returns 1.2,  nil
+//    ToFloat("-3.4")     returns -3.4, nil
+//    ToFloat("blabla")   returns _,     error
+//    ToFloat(struct{}{}) returns _,     error
+func ToFloat(v interface{}) (interface{}, error) {
+	vV := reflect.ValueOf(v)
+	switch vV.Kind() {
+	case reflect.Bool:
+		if vV.Bool() {
+			return float64(1.0), nil
+		}
+		return float64(0.0), nil
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return float64(vV.Int()), nil
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return float64(vV.Uint()), nil
+	case reflect.Float32:
+		// special case for float32
+		return strconv.ParseFloat(fmt.Sprint(vV.Interface().(float32)), 64)
+	case reflect.Float64:
+		return vV.Float(), nil
+	case reflect.String:
+		return strconv.ParseFloat(vV.String(), 64)
+	}
+	return float64(0), errors.New("Cannot convert value [" + vV.String() + "] to float64.")
+}
+
 // ToInt converts a value to int64. The output is guaranteed to ad-here to type assertion .(int64)
 //
 //   - If v is a number (integer or float): return its value as int64.
 //   - If v is a bool: return 1 if its value is true, 0 otherwise.
 //   - If v is a string: return result from strconv.ParseInt(string).
 //   - Otherwise, return error
+//
+//  Examples:
+//
+//    ToFloat(true)       returns 1.0,  nil
+//    ToFloat(false)      returns 0.0,  nil
+//    ToFloat(0)          returns 0.0,  nil
+//    ToFloat(1.2)        returns 1.2,  nil
+//    ToFloat("-3.4")     returns -3.4, nil
+//    ToFloat("blabla")   returns _,     error
+//    ToFloat(struct{}{}) returns _,     error
 func ToInt(v interface{}) (interface{}, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
@@ -106,32 +159,6 @@ func ToUint(v interface{}) (interface{}, error) {
 		return strconv.ParseUint(vV.String(), 10, 64)
 	}
 	return uint64(0), errors.New("Cannot convert value [" + vV.String() + "] to uint64.")
-}
-
-// ToFloat converts a value to float64. The output is guaranteed to ad-here to type assertion .(float64)
-//
-//   - If v is a number (integer or float): return its value as float64.
-//   - If v is a bool: return 1.0 if its value is true, 0.0 otherwise.
-//   - If v is a string: return result from strconv.ParseFloat(string).
-//   - Otherwise, return error
-func ToFloat(v interface{}) (interface{}, error) {
-	vV := reflect.ValueOf(v)
-	switch vV.Kind() {
-	case reflect.Bool:
-		if vV.Bool() {
-			return float64(1.0), nil
-		}
-		return float64(0.0), nil
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return float64(vV.Int()), nil
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return float64(vV.Uint()), nil
-	case reflect.Float32, reflect.Float64:
-		return vV.Float(), nil
-	case reflect.String:
-		return strconv.ParseFloat(vV.String(), 64)
-	}
-	return float64(0), errors.New("Cannot convert value [" + vV.String() + "] to float64.")
 }
 
 // ToString converts a value to string. The output is guaranteed to ad-here to type assertion .(string)
