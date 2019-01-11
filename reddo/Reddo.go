@@ -11,6 +11,27 @@ import (
 const (
 	// Version defines version number of this package
 	Version = "0.1.0"
+
+	// ZeroBool defines 'zero' value of type bool
+	ZeroBool = false
+
+	// ZeroFloat defines 'zero' value of type float64
+	ZeroFloat = float64(0.0)
+	// ZeroFloat64 defines 'zero' value of type float64
+	ZeroFloat64 = float64(0.0)
+
+	// ZeroInt defines 'zero' value of type int64
+	ZeroInt = int64(0)
+	// ZeroInt64 defines 'zero' value of type int64
+	ZeroInt64 = int64(0)
+
+	// ZeroUint defines 'zero' value of type uint64
+	ZeroUint = uint64(0)
+	// ZeroUintptr defines 'zero' value of type uintptr
+	ZeroUintptr = uintptr(0)
+
+	// ZeroString defines 'zero' value of type string
+	ZeroString = ""
 )
 
 // ToBool converts a value to bool. The output is guaranteed to ad-here to type assertion .(bool)
