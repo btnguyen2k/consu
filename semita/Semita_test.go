@@ -90,13 +90,30 @@ func TestSplitPath(t *testing.T) {
 	testSplitPath(t, "a.b.c.[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
 }
 
+func TestSemita_GetValueInvalid(t *testing.T) {
+	input := map[string]interface{}{
+		"a": "string",
+		"b": 1,
+		"c": true,
+	}
+	s := NewSemita(input)
+
+	{
+		p := "[1]"
+		_, e := s.GetValue(p)
+		if e == nil {
+			t.Errorf("TestSemita_GetValueArray getting value at [%#v] for input %#v", p, input)
+		}
+	}
+}
+
 func TestSemita_GetValueArray(t *testing.T) {
 	input := [3]int{1, 2, 3}
 	s := NewSemita(input)
 
 	{
 		// index out-of-bound
-		p := "-1"
+		p := "[-1]"
 		_, e := s.GetValue(p)
 		if e == nil {
 			t.Errorf("TestSemita_GetValueArray getting value at [%#v] for input %#v", p, input)
@@ -104,7 +121,7 @@ func TestSemita_GetValueArray(t *testing.T) {
 	}
 	{
 		// index out-of-bound
-		p := "3"
+		p := "[3]"
 		_, e := s.GetValue(p)
 		if e == nil {
 			t.Errorf("TestSemita_GetValueArray getting value at [%#v] for input %#v", p, input)
@@ -115,6 +132,13 @@ func TestSemita_GetValueArray(t *testing.T) {
 		p := "[0]"
 		v, e := s.GetValue(p)
 		if e != nil || v != input[0] {
+			t.Errorf("TestSemita_GetValueArray getting value at [%#v] for input %#v", p, input)
+		}
+	}
+	{
+		p := "[a]"
+		_, e := s.GetValue(p)
+		if e == nil {
 			t.Errorf("TestSemita_GetValueArray getting value at [%#v] for input %#v", p, input)
 		}
 	}
@@ -126,7 +150,7 @@ func TestSemita_GetValueSlice(t *testing.T) {
 
 	{
 		// index out-of-bound
-		p := "-1"
+		p := "[-1]"
 		_, e := s.GetValue(p)
 		if e == nil {
 			t.Errorf("TestSemita_GetValueSlice getting value at [%#v] for input %#v", p, input)
@@ -134,7 +158,7 @@ func TestSemita_GetValueSlice(t *testing.T) {
 	}
 	{
 		// index out-of-bound
-		p := "3"
+		p := "[3]"
 		_, e := s.GetValue(p)
 		if e == nil {
 			t.Errorf("TestSemita_GetValueSlice getting value at [%#v] for input %#v", p, input)
@@ -145,6 +169,13 @@ func TestSemita_GetValueSlice(t *testing.T) {
 		p := "[0]"
 		v, e := s.GetValue(p)
 		if e != nil || v != input[0] {
+			t.Errorf("TestSemita_GetValueSlice getting value at [%#v] for input %#v", p, input)
+		}
+	}
+	{
+		p := "[a]"
+		_, e := s.GetValue(p)
+		if e == nil {
 			t.Errorf("TestSemita_GetValueSlice getting value at [%#v] for input %#v", p, input)
 		}
 	}
