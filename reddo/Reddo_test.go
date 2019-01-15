@@ -493,6 +493,14 @@ func TestToTimeError(t *testing.T) {
 	}
 
 	{
+		input := "-1.abc"
+		_, err := ToStruct(input, ZeroTime)
+		if err == nil {
+			t.Errorf("TestToTime failed: [%#v] should not be convertable to time.Time!", input)
+		}
+	}
+
+	{
 		input := struct {
 		}{}
 		_, err := ToStruct(input, ZeroTime)
