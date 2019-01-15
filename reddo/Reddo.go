@@ -52,6 +52,12 @@
 //     fmt.Println("data.abc       :", abc)  // data.abc       : {103}
 //     fmt.Println("data.def       :", def)  // data.def       : {{1981} btnguyen2k}
 //     fmt.Println("data.def as abc:", abc2) // data.def as abc: {1981}
+//
+//     // Special case: convert value to 'time.Time'
+//     v,_ := reddo.ToTime(1547549353)
+//     fmt.Println(v)                         // 2019-01-15 17:49:13 +0700 +07
+//     v,_ = reddo.ToTime("1547549353123")
+//     fmt.Println(v)                         // 2019-01-15 17:49:13.123 +0700 +07
 //   }
 package reddo
 
@@ -60,11 +66,12 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.0"
+	Version = "0.1.1"
 
 	// ZeroBool defines 'zero' value of type bool
 	ZeroBool = false
@@ -86,6 +93,11 @@ const (
 
 	// ZeroString defines 'zero' value of type string
 	ZeroString = ""
+)
+
+var (
+	// ZeroTime defines 'zero' value of type 'time.Time'
+	ZeroTime = *new(time.Time)
 )
 
 // ToBool converts a value to bool. The output is guaranteed to ad-here to type assertion .(bool)
@@ -278,6 +290,54 @@ func ToString(v interface{}) (interface{}, error) {
 	return fmt.Sprint(v), nil
 }
 
+// ToTime converts a value (v) to 'time.Time'.
+//
+//   - If v is 'time.Time': return v
+//   - If v is integer: depends on how big is v, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+//   - If v is string and convertable to integer: depends on how big is v, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+//   - Otherwise, return error
+//
+// Availability: This function is available since v0.1.0.
+//
+// Examples:
+//
+//   ToTime(1547549353)      returns Time(Tuesday, January 15, 2019 10:49:13.000 AM GMT), nil
+//   ToTime("1547549353123") returns Time(Tuesday, January 15, 2019 10:49:13.123 AM GMT), nil
+//   ToTime(-1)              returns _, error
+func ToTime(v interface{}) (time.Time, error) {
+	vV := reflect.ValueOf(v)
+	switch vV.Kind() {
+	case reflect.Struct:
+		if vV.Type().PkgPath() == "time" && vV.Type().Name() == "Time" {
+			// same type, just cast it
+			return vV.Interface().(time.Time), nil
+		}
+		return ZeroTime, errors.New("value of type [" + fmt.Sprint(vV.Type()) + "] cannot be converted to [time.Time]")
+	}
+	v, e := ToInt(v)
+	if e != nil {
+		return ZeroTime, errors.New("value of type [" + fmt.Sprint(vV.Type()) + "] cannot be converted to [time.Time]")
+	}
+	vi := v.(int64)
+	if vi >= 0 && vi <= 99999999999 {
+		// assume seconds
+		return time.Unix(vi, 0), nil
+	}
+	if vi > 99999999999 && vi <= 99999999999999 {
+		// assume milliseconds
+		return time.Unix(vi/1000, (vi%1000)*1000000), nil
+	}
+	if vi > 99999999999999 && vi <= 99999999999999999 {
+		// assume microseconds
+		return time.Unix(vi/1000000, (vi%1000000)*1000), nil
+	}
+	if vi > 99999999999999999 {
+		// assume nanoseconds
+		return time.Unix(0, vi), nil
+	}
+	return ZeroTime, errors.New("value of [" + fmt.Sprint(v) + "] cannot be converted to [time.Time]")
+}
+
 // ToStruct converts a value (v) to struct of type specified by (t) (t must be a struct). The output is guaranteed to have the same type as (t).
 //
 //   - If v is a struct:
@@ -303,6 +363,12 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 	if tV.Kind() != reflect.Struct {
 		return nil, errors.New("target type must be a struct, but received [" + fmt.Sprint(tV.Type()) + "]")
 	}
+
+	if tV.Type().PkgPath() == "time" && tV.Type().Name() == "Time" {
+		// special case: convert value to 'time.Time'
+		return ToTime(v)
+	}
+
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Struct:

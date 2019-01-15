@@ -67,6 +67,12 @@ func main() {
 	fmt.Println("data.abc       :", abc)  // data.abc       : {103}
 	fmt.Println("data.def       :", def)  // data.def       : {{1981} btnguyen2k}
 	fmt.Println("data.def as abc:", abc2) // data.def as abc: {1981}
+	
+	// Special case: convert value to 'time.Time'
+	v,_ := reddo.ToTime(1547549353)
+	fmt.Println(v) // 2019-01-15 17:49:13 +0700 +07
+	v,_ = reddo.ToTime("1547549353123")
+	fmt.Println(v) // 2019-01-15 17:49:13.123 +0700 +07
 }
 ```
 
@@ -78,7 +84,14 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 
 ## History
 
-Current version: `0.1.0`.
+Current version: `0.1.1`.
+
+### 2019-01-15 - v0.1.1
+
+- `ToStruct(interface{}, interface{}) (interface{}, error)` & new function `ToTime(interface{}) (time.Time, error)`:
+  - Add special case when converting to `time.Time`
+  - Add global value `ZeroTime`
+
 
 ### 2019-01-12 - v0.1.0
 
