@@ -343,6 +343,7 @@ func ToTime(v interface{}) (time.Time, error) {
 //   - If v is a struct:
 //     - If v and t are same type, simply cast v to the specified type and return it
 //     - Otherwise, loop through v's fields. If there is a field that is same type as t, return it
+//     - (since v0.1.1) special case: if t is 'time.Time', return result from ToTime(v)
 //   - Otherwise, return error
 //
 // Examples:
