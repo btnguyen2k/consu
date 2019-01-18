@@ -2,17 +2,17 @@
 //
 // Notation:
 //   - . (the dot character): path separator
-//   - name: access a map's attribute specified by name
+//   - Name: access a map's attribute specified by Name
 //   - i]: access i'th element of a list/array (0-based)
 //
-// Sample of a path: `employees.[1].first_name`. The dot right before `[]` can be omitted: `employees[1].first_name`.
+// Sample of a path: `Employees.[1].first_name`. The dot right before `[]` can be omitted: `Employees[1].first_name`.
 package semita
 
 import (
 	"errors"
+	"github.com/btnguyen2k/consu/reddo"
 	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -59,76 +59,219 @@ func SplitPath(path string) []string {
 
 // Semita struct wraps a underlying data store inside.
 type Semita struct {
-	Data interface{}
+	root *node
 }
 
-// NewSemita creates a new Data and wraps a data store inside it.
+// NewSemita wraps the supplied 'data' inside a Semita instance and returns pointer to the Semita instance.
+// data must be either array, slice, map or struct (or pointer fo them).
 func NewSemita(data interface{}) *Semita {
-	switch reflect.TypeOf(data).Kind() {
+	v := reflect.ValueOf(data)
+	switch v.Kind() {
 	case reflect.Array, reflect.Slice, reflect.Map, reflect.Struct:
-		return &Semita{data}
+		v := reflect.ValueOf(data)
+		return &Semita{
+			&node{
+				prev:     nil,
+				prevType: nil,
+				key:      "",
+				value:    v,
+			},
+		}
+	case reflect.Ptr:
+		switch v.Elem().Kind() {
+		case reflect.Array, reflect.Slice, reflect.Map, reflect.Struct:
+			p := unsafe.Pointer(v.Pointer())
+			r := reflect.NewAt(v.Elem().Type(), p)
+			v := r.Elem()
+			return &Semita{
+				&node{
+					prev:     nil,
+					prevType: nil,
+					key:      "",
+					value:    v,
+				},
+			}
+		}
 	}
 	return nil
 }
 
-func isExportedField(fieldName string) bool {
-	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
+/*----------------------------------------------------------------------*/
+// Unwrap returns the underlying data
+func (s *Semita) Unwrap() interface{} {
+	if s.root == nil || s.root.value.Kind() == reflect.Invalid {
+		return nil
+	}
+	return s.root.value.Interface()
 }
 
-func getValue(target interface{}, path string) (interface{}, error) {
-	if target == nil {
+// seek seeks along the path and returns (prevNode, node, error)
+func (s *Semita) seek(path string) (prevCursor *node, cursor *node, err error) {
+	paths := SplitPath(path)
+	prevCursor, cursor = s.root, s.root
+	for _, index := range paths {
+		cursor, err = cursor.next(index)
+		if err != nil {
+			return nil, nil, err
+		}
+		if cursor == nil {
+			return prevCursor, nil, nil
+		}
+		prevCursor = cursor
+	}
+	return cursor.prev, cursor, nil
+}
+
+// GetValue returns a value located at 'path'.
+//
+// Notes:
+//
+//   - Wrapped data must be either a struct, map, array or slice
+//   - map's keys must be strings
+//   - Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
+//   - Getting value of struct's unexported field is supported
+//   - If index is out-of-bound, (nil, nil) is returned
+//
+// Example:
+//
+//   data := map[string]interface{}{
+//     "Name": "Monster Corp.",
+//     "Year": 2003,
+//     "Employees": []map[string]interface{}{
+//       {
+//         "first_name": "Mike",
+//         "last_name" : "Wazowski",
+//         "email"     : "mike.wazowski@monster.com",
+//         "age"       : 29,
+//         "options"   : map[string]interface{}{
+//           "work_hours": []int{9, 10, 11, 12, 13, 14, 15, 16},
+//           "overtime"  : false,
+//         },
+//       },
+//       {
+//         "first_name": "Sulley",
+//         "last_name" : "Sullivan",
+//         "email"     : "sulley.sullivan@monster.com",
+//         "age"       : 30,
+//         "options"   : map[string]interface{}{
+//           "work_hours": []int{13, 14, 15, 16, 17, 18, 19, 20},
+//           "overtime"  :   true,
+//         },
+//       },
+//     },
+//   }
+//   s := NewSetima(data)
+//   s.GetValue("Name")              // "Monster Corp."
+//   s.GetValue("Employees[0].age")  // 29
+func (s *Semita) GetValue(path string) (interface{}, error) {
+	_, cursor, err := s.seek(path)
+	if err != nil {
+		return nil, err
+	}
+	if cursor == nil {
 		return nil, nil
 	}
-	v := reflect.ValueOf(target)
-	k := v.Kind()
-	if match := patternIndex.FindStringSubmatch(path); len(match) > 0 {
-		if k != reflect.Array && k != reflect.Slice {
-			return nil, errors.New("required array or slice for path [" + path + "], but input is " + v.Type().String())
-		}
-		i, err := strconv.Atoi(match[1])
-		if err != nil {
-			return nil, errors.New("invalid index " + match[1])
-		}
-		if i < 0 || i > v.Len()-1 {
-			return nil, errors.New("array index [" + strconv.Itoa(i) + "] out of range")
-		}
-		return v.Index(i).Interface(), nil
-	}
-	switch k {
-	case reflect.Map:
-		entry := v.MapIndex(reflect.ValueOf(path))
-		if entry.Kind() == reflect.Invalid {
-			// non-exist index
-			return nil, nil
-		}
-		return entry.Interface(), nil
-	case reflect.Struct:
-		f := v.FieldByName(path)
-		if f.Kind() == reflect.Invalid {
-			// non-exist field
-			return nil, nil
-		}
-		if !isExportedField(path) {
-			rv := reflect.New(v.Type()).Elem()
-			rv.Set(v)
-			f = rv.FieldByName(path)
-			f = reflect.NewAt(f.Type(), unsafe.Pointer(f.UnsafeAddr())).Elem()
-		}
-		return f.Interface(), nil
-	}
-	return nil, errors.New("required map or struct for path [" + path + "], but input is " + v.Type().String())
+	return cursor.unwrap(), nil
 }
 
-// GetValue returns a value located at 'path'
-func (s *Semita) GetValue(path string) (interface{}, error) {
+// GetValueOfType retrieves value located at 'path', converts the value to target's type and returns it.
+//
+// Notes:
+//
+//   - Wrapped data must be either a struct, map, array or slice
+//   - map's keys must be strings
+//   - Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
+//   - Getting value of struct's unexported field is supported
+//   - If index is out-of-bound, (nil, nil) is returned
+//
+// Example:
+//
+//   data := map[string]interface{}{
+//     "Name": "Monster Corp.",
+//     "Year": 2003,
+//     "Employees": []map[string]interface{}{
+//       {
+//         "first_name": "Mike",
+//         "last_name" : "Wazowski",
+//         "email"     : "mike.wazowski@monster.com",
+//         "age"       : 29,
+//         "options"   : map[string]interface{}{
+//           "work_hours": []int{9, 10, 11, 12, 13, 14, 15, 16},
+//           "overtime"  : false,
+//         },
+//       },
+//       {
+//         "first_name": "Sulley",
+//         "last_name" : "Sullivan",
+//         "email"     : "sulley.sullivan@monster.com",
+//         "age"       : 30,
+//         "options"   : map[string]interface{}{
+//           "work_hours": []int{13, 14, 15, 16, 17, 18, 19, 20},
+//           "overtime"  :   true,
+//         },
+//       },
+//     },
+//   }
+//   s := NewSetima(data)
+//   var Name string = s.GetValueOfType("Name", reddo.ZeroString).(string)          // "Monster Corp."
+//   var age int64   = s.GetValueOfType("Employees[0].age", reddo.ZeroInt).(int64)  // 29
+func (s *Semita) GetValueOfType(path string, target interface{}) (interface{}, error) {
+	v, e := s.GetValue(path)
+	if v == nil || e != nil {
+		return v, e
+	}
+	return reddo.Convert(v, target)
+}
+
+// SetValue sets a value to position specified by 'path'.
+//
+// Notes:
+//
+//   - Wrapped data must be either a struct, map, array or slice
+//   - map's keys must be strings
+//   - If 'path' points to a map's key, the key must be exported
+//   - Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
+//   - If child nodes along the path does not exist, this function will create them
+//   - If index is out-of-bound, this function returns error
+//
+// Example:
+//
+//   data := map[string]interface{}{}
+//   s := NewSetima(data)
+//   s.SetValue("Name", "Monster Corp.") // data is now {"Name":"Monster Corp."}
+//   s.SetValue("Year", 2013)            // data is now {"Name":"Monster Corp.", "Year":2013}
+//   s.SetValue("employees[0].age", 29)  // data is now {"Name":"Monster Corp.", "Year":2013, "employees":[{"age":29}]}
+func (s *Semita) SetValue(path string, value interface{}) error {
 	paths := SplitPath(path)
-	result := s.Data
-	var err error
-	for _, p := range paths {
-		result, err = getValue(result, p)
+	var pathSoFar string
+	// "seek"to the correct position
+	for i, index := range paths[0 : len(paths)-1] {
+		if i > 0 {
+			pathSoFar = string(append([]byte(pathSoFar), PathSeparator))
+		}
+		pathSoFar += index
+		prevCursor, cursor, err := s.seek(pathSoFar)
 		if err != nil {
-			return nil, err
+			return errors.New("error while getting value at path: " + pathSoFar)
+		}
+		if cursor == nil {
+			nextIndex := paths[i+1]
+			// create node along the way
+			if patternIndex.MatchString(nextIndex) || "[]" == nextIndex {
+				_, err = prevCursor.createChildSlice(index)
+			} else {
+				_, err = prevCursor.createChildMap(index)
+			}
+		}
+		if err != nil {
+			return errors.New("error while creating node at at path: " + pathSoFar)
 		}
 	}
-	return result, nil
+	_, cursor, err := s.seek(pathSoFar)
+	if cursor == nil || cursor.unwrap() == nil {
+		return errors.New("path not found: " + pathSoFar)
+	}
+	index := paths[len(paths)-1]
+	_, err = cursor.setValue(index, reflect.ValueOf(value))
+	return err
 }
