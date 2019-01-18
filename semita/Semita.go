@@ -97,6 +97,7 @@ func NewSemita(data interface{}) *Semita {
 }
 
 /*----------------------------------------------------------------------*/
+
 // Unwrap returns the underlying data
 func (s *Semita) Unwrap() interface{} {
 	if s.root == nil || s.root.value.Kind() == reflect.Invalid {
@@ -268,7 +269,7 @@ func (s *Semita) SetValue(path string, value interface{}) error {
 		}
 	}
 	_, cursor, err := s.seek(pathSoFar)
-	if cursor == nil || cursor.unwrap() == nil {
+	if err != nil || cursor == nil || cursor.unwrap() == nil {
 		return errors.New("path not found: " + pathSoFar)
 	}
 	index := paths[len(paths)-1]

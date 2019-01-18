@@ -146,7 +146,6 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 		}
 		return n, errors.New("expecting current node is map, but it is {" + vNode.Type().String() + "}")
 	}
-	return n, nil
 }
 
 // createChildMap creates an empty map and insert it as a child node

@@ -345,17 +345,17 @@ func generateDataMap() interface{} {
 
 func generateDataStruct() interface{} {
 	type Options struct {
-		work_hours []int
-		overtime   bool
+		workHours []int
+		overtime  bool
 	}
 
 	type Employee struct {
-		first_name string
-		last_name  string
-		email      string
-		age        int
-		options    Options
-		join_date  time.Time
+		firstName string
+		lastName  string
+		email     string
+		age       int
+		options   Options
+		joinDate  time.Time
 	}
 
 	type Company struct {
@@ -370,26 +370,26 @@ func generateDataStruct() interface{} {
 		Year: companyYear,
 		Employees: []Employee{
 			{
-				first_name: employee0FirstName,
-				last_name:  employee0LastName,
-				email:      employee0Email,
-				age:        employee0Age,
+				firstName: employee0FirstName,
+				lastName:  employee0LastName,
+				email:     employee0Email,
+				age:       employee0Age,
 				options: Options{
-					work_hours: employee0WorkHours,
-					overtime:   employee0Overtime,
+					workHours: employee0WorkHours,
+					overtime:  employee0Overtime,
 				},
-				join_date: d0,
+				joinDate: d0,
 			},
 			{
-				first_name: employee1FirstName,
-				last_name:  employee1LastName,
-				email:      employee1Email,
-				age:        employee1Age,
+				firstName: employee1FirstName,
+				lastName:  employee1LastName,
+				email:     employee1Email,
+				age:       employee1Age,
 				options: Options{
-					work_hours: employee1WorkHours,
-					overtime:   employee1Overtime,
+					workHours: employee1WorkHours,
+					overtime:  employee1Overtime,
 				},
-				join_date: d1,
+				joinDate: d1,
 			},
 		},
 	}
