@@ -66,6 +66,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -338,11 +339,15 @@ func ToTime(v interface{}) (time.Time, error) {
 	return ZeroTime, errors.New("value of [" + fmt.Sprint(v) + "] cannot be converted to [time.Time]")
 }
 
+func isExportedField(fieldName string) bool {
+	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
+}
+
 // ToStruct converts a value (v) to struct of type specified by (t) (t must be a struct). The output is guaranteed to have the same type as (t).
 //
 //   - If v is a struct:
 //     - If v and t are same type, simply cast v to the specified type and return it
-//     - Otherwise, loop through v's fields. If there is a field that is same type as t, return it
+//     - Otherwise, loop through v's fields. If there is an exported field that is same type as t, return it
 //     - (since v0.1.1) special case: if t is 'time.Time', return result from ToTime(v)
 //   - Otherwise, return error
 //
@@ -380,7 +385,8 @@ func ToStruct(v interface{}, t interface{}) (interface{}, error) {
 		// difference type, look into fields
 		for i, n := 0, vV.NumField(); i < n; i++ {
 			f := vV.Field(i)
-			if f.Kind() == reflect.Struct {
+			fn := vV.Type().Field(i).Name
+			if f.Kind() == reflect.Struct && isExportedField(fn) {
 				if f.Type().Name() == tV.Type().Name() {
 					return f.Interface(), nil
 				}

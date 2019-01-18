@@ -91,6 +91,7 @@ Current version: `0.1.1`.
 - `ToStruct(interface{}, interface{}) (interface{}, error)` & new function `ToTime(interface{}) (time.Time, error)`:
   - Add special case when converting to `time.Time`
   - Add global value `ZeroTime`
+  - Fix a bug when converting a unexported field
 
 
 ### 2019-01-12 - v0.1.0
