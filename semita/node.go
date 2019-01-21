@@ -13,14 +13,17 @@ var (
 	genericMapType   = reflect.TypeOf(map[string]interface{}{})
 )
 
+// createEmptyGenericSlice creates an empty slice of type interface{}
 func createEmptyGenericSlice() reflect.Value {
 	return reflect.MakeSlice(genericSliceType, 0, 0)
 }
 
+// createEmptyGenericMap creates an empty map of type [string]interface{}
 func createEmptyGenericMap() reflect.Value {
 	return reflect.MakeMap(genericMapType)
 }
 
+// isExportedField returns true if 'fieldName' indicates a struct' exported field.
 func isExportedField(fieldName string) bool {
 	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
