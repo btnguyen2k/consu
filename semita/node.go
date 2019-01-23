@@ -46,21 +46,28 @@ func (n *node) unwrap() interface{} {
 	return n.value.Interface()
 }
 
-// next returns a child node according to 'index'
+// next returns a child node located at 'index'
 func (n *node) next(index string) (*node, error) {
 	if n.value.Kind() == reflect.Invalid {
 		return nil, errors.New("current node is nil")
 	}
 	vNode := n.value
+	if vNode.Kind() == reflect.Ptr {
+		vNode = vNode.Elem()
+	}
 	if vNode.Kind() == reflect.Interface {
 		vNode = n.value.Elem()
 	}
 	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
 		// current node should be an array or slice
 		if vNode.Kind() == reflect.Array || vNode.Kind() == reflect.Slice {
-			i, e := strconv.Atoi(match[1])
-			if e != nil {
-				return nil, e
+			var i = vNode.Len()
+			if "[]" != index {
+				var e error
+				i, e = strconv.Atoi(match[1])
+				if e != nil {
+					return nil, e
+				}
 			}
 			if i < 0 || i >= vNode.Len() {
 				return nil, nil
@@ -107,30 +114,35 @@ func (n *node) next(index string) (*node, error) {
 	return nil, errors.New("invalid type {" + vNode.Type().String() + "}")
 }
 
-// setValue inserts the value as a child into the correct position specified by 'index'
+// setValue inserts the value as a child into the correct position specified by 'index'.
+// when successful, this function returns the newly created child node.
 func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 	if n.value.Kind() == reflect.Invalid {
-		return n, errors.New("current node is nil")
+		return nil, errors.New("current node is nil")
 	}
 	vNode := n.value
+	if vNode.Kind() == reflect.Ptr {
+		vNode = vNode.Elem()
+	}
 	if vNode.Kind() == reflect.Interface {
 		vNode = n.value.Elem()
 	}
 
-	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 || "[]" == index {
+	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
 		if vNode.Kind() == reflect.Slice || vNode.Kind() == reflect.Array {
-			var i int
+			var i = vNode.Len()
 			var e error
-			if "[]" == index {
-				i = vNode.Len()
-			} else {
+			if "[]" != index {
 				i, e = strconv.Atoi(match[1])
 				if e != nil {
-					return n, e
+					return nil, e
 				}
 			}
 			if i < 0 || i > vNode.Len() {
-				return n, errors.New("index out of bound " + index)
+				return nil, errors.New("index out of bound {" + index + "}")
+			}
+			if !value.Type().AssignableTo(vNode.Type().Elem()) {
+				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to element of {" + vNode.Type().String() + "}")
 			}
 			if i == vNode.Len() && vNode.Kind() == reflect.Slice {
 				// special case
@@ -139,15 +151,28 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 			} else {
 				vNode.Index(i).Set(value)
 			}
-			return n, nil
+			return n.next(index)
 		}
-		return n, errors.New("expecting current node is array, but it is {" + vNode.Type().String() + "}")
+		return nil, errors.New("expecting array or slice, but it is {" + vNode.Type().String() + "}")
 	} else {
 		if vNode.Kind() == reflect.Map {
 			vNode.SetMapIndex(reflect.ValueOf(index), value)
-			return n, nil
+			return n.next(index)
+		} else if vNode.Kind() == reflect.Struct {
+			f := vNode.FieldByName(index)
+			if f.Kind() == reflect.Invalid || !isExportedField(index) {
+				return nil, errors.New("{" + vNode.Type().String() + "} does not has exported field {" + index + "}")
+			}
+			if !value.Type().AssignableTo(f.Type()) {
+				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to field {" + f.Type().String() + "}")
+			}
+			if !f.CanSet() {
+				return nil, errors.New("field {" + index + "} is not settable")
+			}
+			f.Set(value)
+			return n.next(index)
 		}
-		return n, errors.New("expecting current node is map, but it is {" + vNode.Type().String() + "}")
+		return nil, errors.New("expecting map or struct, but it is {" + vNode.Type().String() + "}")
 	}
 }
 
