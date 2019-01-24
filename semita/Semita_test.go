@@ -101,7 +101,34 @@ func TestSemita_GetValueInvalid(t *testing.T) {
 		}
 	}
 	{
+		data := struct {
+			a string
+			b int
+			c bool
+		}{
+			a: "string",
+			b: 1,
+			c: true,
+		}
+		s := NewSemita(data)
+		p := "[1]"
+		_, e := s.GetValue(p)
+		if e == nil {
+			t.Errorf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
+		}
+	}
+
+	{
 		data := [3]int{1, 2, 3}
+		s := NewSemita(data)
+		p := "1"
+		_, e := s.GetValue(p)
+		if e == nil {
+			t.Errorf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
+		}
+	}
+	{
+		data := []string{"1", "2", "3"}
 		s := NewSemita(data)
 		p := "1"
 		_, e := s.GetValue(p)

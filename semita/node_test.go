@@ -594,6 +594,39 @@ func TestNode_setValueStructInvalidType(t *testing.T) {
 	}
 }
 
+func TestNode_setValueStructUnaddressable(t *testing.T) {
+	type MyStruct struct {
+		A       interface{}
+		B       interface{}
+		M       interface{}
+		S       interface{}
+		private interface{}
+	}
+	v := MyStruct{
+		A: []int{0, 1, 2, 3, 4, 5},
+		B: [3]string{"a", "b", "c"},
+		M: map[string]interface{}{
+			"x": "x",
+			"y": 19.81,
+			"z": true,
+		},
+		S:       Inner{b: true, f: 1.03, i: 1981, s: "btnguyen2k"},
+		private: 1.2,
+	}
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v), // for struct: only addressable struct is settable
+	}
+
+	p := "A"
+	node, err := root.setValue("[0]", reflect.ValueOf("data"))
+	if node != nil || err == nil {
+		t.Errorf("TestNode_setValueStructUnaddressable failed with data %#v at index {%#v}", v, p)
+	}
+}
+
 func TestNode_setValueStruct(t *testing.T) {
 	type MyStruct struct {
 		A       interface{}
@@ -773,7 +806,7 @@ func TestNode_setValueArrayUnaddressable(t *testing.T) {
 	p := "[0]"
 	node, err := root.setValue("[0]", reflect.ValueOf("data"))
 	if node != nil || err == nil {
-		t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_setValueArrayUnaddressable failed with data %#v at index {%#v}", v, p)
 	}
 
 }
