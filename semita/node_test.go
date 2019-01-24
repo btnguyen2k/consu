@@ -142,14 +142,14 @@ func TestNode_nextInvalid(t *testing.T) {
 		}
 	}
 	{
-		v := map[int]string{1: "one"}
+		v := []int{0, 1, 2, 3}
 		n := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		_, err := n.next("1")
+		_, err := n.next("[a]")
 		if err == nil {
 			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
 		}
@@ -673,10 +673,19 @@ func TestNode_setValueSliceInvalidType(t *testing.T) {
 		key:      "",
 		value:    reflect.ValueOf(v),
 	}
-	node, err := root.setValue("[1]", reflect.ValueOf(1))
-	if node != nil || err == nil {
-		// invalid type
-		t.Errorf("TestNode_setValueSliceInvalidType failed with data %#v", v)
+	{
+		node, err := root.setValue("[1]", reflect.ValueOf(1))
+		if node != nil || err == nil {
+			// invalid type
+			t.Errorf("TestNode_setValueSliceInvalidType failed with data %#v", v)
+		}
+	}
+	{
+		node, err := root.setValue("[a]", reflect.ValueOf(1))
+		if node != nil || err == nil {
+			// invalid type
+			t.Errorf("TestNode_setValueSliceInvalidType failed with data %#v", v)
+		}
 	}
 }
 
@@ -737,10 +746,19 @@ func TestNode_setValueArrayInvalidType(t *testing.T) {
 		key:      "",
 		value:    reflect.ValueOf(v),
 	}
-	node, err := root.setValue("[1]", reflect.ValueOf(1))
-	if node != nil || err == nil {
-		// invalid type
-		t.Errorf("TestNode_setValueArrayInvalidType failed with data %#v", v)
+	{
+		node, err := root.setValue("[1]", reflect.ValueOf(1))
+		if node != nil || err == nil {
+			// invalid type
+			t.Errorf("TestNode_setValueArrayInvalidType failed with data %#v", v)
+		}
+	}
+	{
+		node, err := root.setValue("[a]", reflect.ValueOf(1))
+		if node != nil || err == nil {
+			// invalid type
+			t.Errorf("TestNode_setValueArrayInvalidType failed with data %#v", v)
+		}
 	}
 }
 
@@ -787,6 +805,159 @@ func TestNode_setValueArray(t *testing.T) {
 		node, err = root.setValue(p, data)
 		if node == nil || err != nil || node.unwrap() != data.Interface() {
 			t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+		}
+	}
+}
+
+/*----------------------------------------------------------------------*/
+func TestNode_createChildMap(t *testing.T) {
+	{
+		v := genDataArray()
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
+		}
+		path := "[0]"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+	{
+		v := genDataSlice()
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[0]"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+	{
+		v := genDataMap()
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "xyz"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+	{
+		type MyStruct struct {
+			A       interface{}
+			B       interface{}
+			M       interface{}
+			S       interface{}
+			private interface{}
+		}
+		v := MyStruct{
+			A: []int{0, 1, 2, 3, 4, 5},
+			B: [3]string{"a", "b", "c"},
+			M: map[string]interface{}{
+				"x": "x",
+				"y": 19.81,
+				"z": true,
+			},
+			S:       Inner{b: true, f: 1.03, i: 1981, s: "btnguyen2k"},
+			private: 1.2,
+		}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
+		}
+		path := "A"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+}
+
+func createChildSlice(t *testing.T) {
+	{
+		v := genDataArray()
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
+		}
+		path := "[0]"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+	{
+		v := genDataSlice()
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[0]"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+	{
+		v := genDataMap()
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "xyz"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		}
+	}
+	{
+		type MyStruct struct {
+			A       interface{}
+			B       interface{}
+			M       interface{}
+			S       interface{}
+			private interface{}
+		}
+		v := MyStruct{
+			A: []int{0, 1, 2, 3, 4, 5},
+			B: [3]string{"a", "b", "c"},
+			M: map[string]interface{}{
+				"x": "x",
+				"y": 19.81,
+				"z": true,
+			},
+			S:       Inner{b: true, f: 1.03, i: 1981, s: "btnguyen2k"},
+			private: 1.2,
+		}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
+		}
+		path := "A"
+		node, err := root.createChildMap(path)
+		if node == nil || err != nil {
+			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
 		}
 	}
 }

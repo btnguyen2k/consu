@@ -41,17 +41,17 @@ type node struct {
 
 // unwrap returns the underlying 'value' as an interface
 func (n *node) unwrap() interface{} {
-	if n.value.Kind() == reflect.Invalid {
-		return nil
-	}
+	// if n.value.Kind() == reflect.Invalid {
+	// 	return nil
+	// }
 	return n.value.Interface()
 }
 
 // next returns a child node located at 'index'
 func (n *node) next(index string) (*node, error) {
-	if n.value.Kind() == reflect.Invalid {
-		return nil, errors.New("current node is nil")
-	}
+	// if n.value.Kind() == reflect.Invalid {
+	// 	return nil, errors.New("current node is nil")
+	// }
 	vNode := n.value
 	if vNode.Kind() == reflect.Ptr {
 		vNode = vNode.Elem()
@@ -122,9 +122,9 @@ func (n *node) next(index string) (*node, error) {
 // setValue inserts the value as a child into the correct position specified by 'index'.
 // when successful, this function returns the newly created child node.
 func (n *node) setValue(index string, value reflect.Value) (*node, error) {
-	if n.value.Kind() == reflect.Invalid {
-		return nil, errors.New("current node is nil")
-	}
+	// if n.value.Kind() == reflect.Invalid {
+	// 	return nil, errors.New("current node is nil")
+	// }
 	vNode := n.value
 	if vNode.Kind() == reflect.Ptr {
 		vNode = vNode.Elem()
@@ -158,12 +158,12 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 					n.prev.setValue(n.key, vNode)
 				}
 			} else {
-				n := vNode.Index(i)
-				if !n.CanSet() {
+				childNode := vNode.Index(i)
+				if !childNode.CanSet() {
 					// final check
 					return nil, errors.New("entry at index {" + index + "} is not settable")
 				}
-				n.Set(value)
+				childNode.Set(value)
 			}
 			return n.next(fmt.Sprintf("[%d]", i))
 		}
