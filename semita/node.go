@@ -2,6 +2,7 @@ package semita
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -81,6 +82,10 @@ func (n *node) next(index string) (*node, error) {
 		}
 		return nil, errors.New("invalid type {" + vNode.Type().String() + "}")
 	} else if vNode.Kind() == reflect.Map {
+		// map's key must be string
+		if vNode.Type().Key().Kind() != reflect.String {
+			return nil, errors.New("node of type {" + vNode.Type().String() + "} is not supported, map type must be string")
+		}
 		v := vNode.MapIndex(reflect.ValueOf(index))
 		if v.Kind() == reflect.Invalid {
 			return nil, nil
@@ -138,35 +143,55 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 					return nil, e
 				}
 			}
-			if i < 0 || i > vNode.Len() {
+			if i < 0 || i > vNode.Len() || (i == vNode.Len() && vNode.Kind() != reflect.Slice) {
 				return nil, errors.New("index out of bound {" + index + "}")
 			}
 			if !value.Type().AssignableTo(vNode.Type().Elem()) {
 				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to element of {" + vNode.Type().String() + "}")
 			}
-			if i == vNode.Len() && vNode.Kind() == reflect.Slice {
-				// special case
+			if i == vNode.Len() {
+				// special case: append to tail of slice
 				vNode = reflect.Append(vNode, value)
-				n.prev.setValue(n.key, vNode)
+				if n.prev == nil {
+					n.value = vNode
+				} else {
+					n.prev.setValue(n.key, vNode)
+				}
 			} else {
-				vNode.Index(i).Set(value)
+				n := vNode.Index(i)
+				if !n.CanSet() {
+					// final check
+					return nil, errors.New("entry at index {" + index + "} is not settable")
+				}
+				n.Set(value)
 			}
-			return n.next(index)
+			return n.next(fmt.Sprintf("[%d]", i))
 		}
 		return nil, errors.New("expecting array or slice, but it is {" + vNode.Type().String() + "}")
 	} else {
 		if vNode.Kind() == reflect.Map {
+			if vNode.Type().Key().Kind() != reflect.String {
+				// map's key must be string
+				return nil, errors.New("node of type {" + vNode.Type().String() + "} is not supported, map type must be string")
+			}
+			if !value.Type().AssignableTo(vNode.Type().Elem()) {
+				// map's element type must match
+				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to element of map {" + vNode.Type().String() + "}")
+			}
 			vNode.SetMapIndex(reflect.ValueOf(index), value)
 			return n.next(index)
 		} else if vNode.Kind() == reflect.Struct {
 			f := vNode.FieldByName(index)
 			if f.Kind() == reflect.Invalid || !isExportedField(index) {
+				// field must exist and is exported
 				return nil, errors.New("{" + vNode.Type().String() + "} does not has exported field {" + index + "}")
 			}
 			if !value.Type().AssignableTo(f.Type()) {
+				// field type must match
 				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to field {" + f.Type().String() + "}")
 			}
 			if !f.CanSet() {
+				// final check
 				return nil, errors.New("field {" + index + "} is not settable")
 			}
 			f.Set(value)

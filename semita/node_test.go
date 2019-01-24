@@ -97,7 +97,7 @@ func TestNode_nextInvalid(t *testing.T) {
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		_, err := n.next("path")
+		_, err := n.next("[0]")
 		if err == nil {
 			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
 		}
@@ -123,7 +123,33 @@ func TestNode_nextInvalid(t *testing.T) {
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		_, err := n.next("path")
+		_, err := n.next("[0]")
+		if err == nil {
+			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		}
+	}
+	{
+		v := map[int]string{1: "one"}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		_, err := n.next("1")
+		if err == nil {
+			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		}
+	}
+	{
+		v := map[int]string{1: "one"}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		_, err := n.next("1")
 		if err == nil {
 			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
 		}
@@ -207,7 +233,7 @@ func TestNode_nextMap(t *testing.T) {
 	node, err = root.next(p)
 	if node != nil || err != nil {
 		// non-exists entry
-		t.Errorf("TestNode_nextMap failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextMap failed with data %#v at index {%#v}, error: %e", v, p, err)
 	}
 
 	for _, path := range []string{"a.[0]", "b.[1]", "m.z", "s.A.[0]", "s.B.[1]", "s.M.z", "s.S.s"} {
@@ -424,7 +450,7 @@ func TestNode_setValueInvalid(t *testing.T) {
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		_, err := n.setValue("path", reflect.ValueOf("value"))
+		_, err := n.setValue("[0]", reflect.ValueOf("value"))
 		if err == nil {
 			t.Errorf("TestNode_setValueInvalid failed for value {%#v}", v)
 		}
@@ -450,9 +476,53 @@ func TestNode_setValueInvalid(t *testing.T) {
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		_, err := n.setValue("path", reflect.ValueOf("value"))
+		_, err := n.setValue("[0]", reflect.ValueOf("value"))
 		if err == nil {
 			t.Errorf("TestNode_setValueInvalid failed for value {%#v}", v)
+		}
+	}
+	{
+		v := map[int]string{1: "one"}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		_, err := n.setValue("1", reflect.ValueOf("value"))
+		if err == nil {
+			t.Errorf("TestNode_setValueInvalid failed for value {%#v}", v)
+		}
+	}
+}
+
+func TestNode_setValueMapInvalidType(t *testing.T) {
+	{
+		v := map[int]string{}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		node, err := root.setValue("1", reflect.ValueOf("string"))
+		if node != nil || err == nil {
+			// invalid key type
+			t.Errorf("TestNode_setValueMapInvalidType failed with data %#v", v)
+		}
+	}
+	{
+		v := map[string]int{"one": 1}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		_, err := n.setValue("two", reflect.ValueOf("2"))
+		if err == nil {
+			// invalid element type
+			t.Errorf("TestNode_setValueMapInvalidType failed for value {%#v}", v)
 		}
 	}
 }
@@ -504,6 +574,26 @@ func TestNode_setValueMap(t *testing.T) {
 	}
 }
 
+func TestNode_setValueStructInvalidType(t *testing.T) {
+	type MyStruct struct {
+		S string
+		I int
+	}
+
+	v := MyStruct{S: "string", I: 123}
+	n := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v),
+	}
+	_, err := n.setValue("S", reflect.ValueOf(1981))
+	if err == nil {
+		// invalid element type
+		t.Errorf("TestNode_setValueStructInvalidType failed for value {%#v}", v)
+	}
+}
+
 func TestNode_setValueStruct(t *testing.T) {
 	type MyStruct struct {
 		A       interface{}
@@ -527,7 +617,7 @@ func TestNode_setValueStruct(t *testing.T) {
 		prev:     nil,
 		prevType: nil,
 		key:      "",
-		value:    reflect.ValueOf(&v),
+		value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
 	}
 	var data = reflect.ValueOf("data")
 	var err error
@@ -571,6 +661,132 @@ func TestNode_setValueStruct(t *testing.T) {
 		node, err = root.setValue(p, data)
 		if node == nil || err != nil || node.unwrap() != data.Interface() {
 			t.Errorf("TestNode_setValueStruct failed with data %#v at index {%#v}", v, p)
+		}
+	}
+}
+
+func TestNode_setValueSliceInvalidType(t *testing.T) {
+	v := []string{"a", "b", "c"}
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v),
+	}
+	node, err := root.setValue("[1]", reflect.ValueOf(1))
+	if node != nil || err == nil {
+		// invalid type
+		t.Errorf("TestNode_setValueSliceInvalidType failed with data %#v", v)
+	}
+}
+
+func TestNode_setValueSlice(t *testing.T) {
+	v := genDataSlice()
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v),
+	}
+	var data = reflect.ValueOf("data")
+	var err error
+	var p string
+	var node *node
+
+	p = "xyz"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// invalid type
+		t.Errorf("TestNode_setValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[-1]"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("TestNode_setValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+	p = "[999]"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("TestNode_setValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	l := root.value.Len()
+	p = "[]"
+	node, err = root.setValue(p, data)
+	if node == nil || err != nil || node.unwrap() != data.Interface() || root.value.Len() != l+1 {
+		// non-exists entry
+		t.Errorf("TestNode_setValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	for _, p = range []string{"[0]", "[1]", "[2]", "[]"} {
+		node, err = root.setValue(p, data)
+		if node == nil || err != nil || node.unwrap() != data.Interface() {
+			t.Errorf("TestNode_setValueSlice failed with data %#v at index {%#v}", v, p)
+		}
+	}
+}
+
+func TestNode_setValueArrayInvalidType(t *testing.T) {
+	v := [3]string{"a", "b", "c"}
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v),
+	}
+	node, err := root.setValue("[1]", reflect.ValueOf(1))
+	if node != nil || err == nil {
+		// invalid type
+		t.Errorf("TestNode_setValueArrayInvalidType failed with data %#v", v)
+	}
+}
+
+func TestNode_setValueArray(t *testing.T) {
+	v := genDataArray()
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(&v), // for array: only addressable array is settable
+	}
+	var data = reflect.ValueOf("data")
+	var err error
+	var p string
+	var node *node
+
+	p = "xyz"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// invalid type
+		t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[-1]"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+	}
+	p = "[999]"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+	}
+	p = "[]"
+	node, err = root.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+	for _, p = range []string{"[0]", "[1]", "[2]", "[3]"} {
+		node, err = root.setValue(p, data)
+		if node == nil || err != nil || node.unwrap() != data.Interface() {
+			t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
 		}
 	}
 }
