@@ -849,7 +849,7 @@ func TestNode_createChildMap(t *testing.T) {
 		}
 		path := "xyz"
 		node, err := root.createChildMap(path)
-		if node == nil || err != nil {
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
 			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
 		}
 	}
@@ -886,7 +886,7 @@ func TestNode_createChildMap(t *testing.T) {
 	}
 }
 
-func createChildSlice(t *testing.T) {
+func TestNode_createChildSlice(t *testing.T) {
 	{
 		v := genDataArray()
 		root := &node{
@@ -896,9 +896,9 @@ func createChildSlice(t *testing.T) {
 			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
 		}
 		path := "[0]"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		node, err := root.createChildSlice(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -910,9 +910,9 @@ func createChildSlice(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		path := "[0]"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		node, err := root.createChildSlice(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -924,9 +924,9 @@ func createChildSlice(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		path := "xyz"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		node, err := root.createChildSlice(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -955,9 +955,9 @@ func createChildSlice(t *testing.T) {
 			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
 		}
 		path := "A"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+		node, err := root.createChildSlice(path)
+		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
+			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 }
