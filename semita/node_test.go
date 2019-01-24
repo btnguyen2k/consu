@@ -762,6 +762,22 @@ func TestNode_setValueArrayInvalidType(t *testing.T) {
 	}
 }
 
+func TestNode_setValueArrayUnaddressable(t *testing.T) {
+	v := genDataArray()
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v), // for array: only addressable array is settable
+	}
+	p := "[0]"
+	node, err := root.setValue("[0]", reflect.ValueOf("data"))
+	if node != nil || err == nil {
+		t.Errorf("TestNode_setValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+}
+
 func TestNode_setValueArray(t *testing.T) {
 	v := genDataArray()
 	root := &node{
