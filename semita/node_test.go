@@ -810,7 +810,7 @@ func TestNode_setValueArray(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
-func TestNode_createChildMap(t *testing.T) {
+func TestNode_createChildMap_ArrayAndSlice(t *testing.T) {
 	{
 		v := genDataArray()
 		root := &node{
@@ -839,6 +839,9 @@ func TestNode_createChildMap(t *testing.T) {
 			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
 		}
 	}
+}
+
+func TestNode_createChildMap_MapAndStruct(t *testing.T) {
 	{
 		v := genDataMap()
 		root := &node{
@@ -886,7 +889,7 @@ func TestNode_createChildMap(t *testing.T) {
 	}
 }
 
-func TestNode_createChildSlice(t *testing.T) {
+func TestNode_createChildSlice_ArrayAndSlice(t *testing.T) {
 	{
 		v := genDataArray()
 		root := &node{
@@ -915,6 +918,9 @@ func TestNode_createChildSlice(t *testing.T) {
 			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
+}
+
+func TestNode_createChildSlice_MapAndStruct(t *testing.T) {
 	{
 		v := genDataMap()
 		root := &node{
