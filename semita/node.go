@@ -168,37 +168,36 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 			return n.next(fmt.Sprintf("[%d]", i))
 		}
 		return nil, errors.New("expecting array or slice, but it is {" + vNode.Type().String() + "}")
-	} else {
-		if vNode.Kind() == reflect.Map {
-			if vNode.Type().Key().Kind() != reflect.String {
-				// map's key must be string
-				return nil, errors.New("node of type {" + vNode.Type().String() + "} is not supported, map type must be string")
-			}
-			if !value.Type().AssignableTo(vNode.Type().Elem()) {
-				// map's element type must match
-				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to element of map {" + vNode.Type().String() + "}")
-			}
-			vNode.SetMapIndex(reflect.ValueOf(index), value)
-			return n.next(index)
-		} else if vNode.Kind() == reflect.Struct {
-			f := vNode.FieldByName(index)
-			if f.Kind() == reflect.Invalid || !isExportedField(index) {
-				// field must exist and is exported
-				return nil, errors.New("{" + vNode.Type().String() + "} does not has exported field {" + index + "}")
-			}
-			if !value.Type().AssignableTo(f.Type()) {
-				// field type must match
-				return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to field {" + f.Type().String() + "}")
-			}
-			if !f.CanSet() {
-				// final check
-				return nil, errors.New("field {" + index + "} is not settable")
-			}
-			f.Set(value)
-			return n.next(index)
-		}
-		return nil, errors.New("expecting map or struct, but it is {" + vNode.Type().String() + "}")
 	}
+	if vNode.Kind() == reflect.Map {
+		if vNode.Type().Key().Kind() != reflect.String {
+			// map's key must be string
+			return nil, errors.New("node of type {" + vNode.Type().String() + "} is not supported, map type must be string")
+		}
+		if !value.Type().AssignableTo(vNode.Type().Elem()) {
+			// map's element type must match
+			return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to element of map {" + vNode.Type().String() + "}")
+		}
+		vNode.SetMapIndex(reflect.ValueOf(index), value)
+		return n.next(index)
+	} else if vNode.Kind() == reflect.Struct {
+		f := vNode.FieldByName(index)
+		if f.Kind() == reflect.Invalid || !isExportedField(index) {
+			// field must exist and is exported
+			return nil, errors.New("{" + vNode.Type().String() + "} does not has exported field {" + index + "}")
+		}
+		if !value.Type().AssignableTo(f.Type()) {
+			// field type must match
+			return nil, errors.New("value of type {" + value.Type().String() + "} is not assignable to field {" + f.Type().String() + "}")
+		}
+		if !f.CanSet() {
+			// final check
+			return nil, errors.New("field {" + index + "} is not settable")
+		}
+		f.Set(value)
+		return n.next(index)
+	}
+	return nil, errors.New("expecting map or struct, but it is {" + vNode.Type().String() + "}")
 }
 
 // createChildMap creates an empty map and insert it as a child node
