@@ -7,7 +7,8 @@ Collection of helpful utilities in Golang to make your life easier.
 
 ## Sub-packages
 
-- [reddo](reddo/): utilities to convert values using Golang's reflect.
+- [reddo](reddo/): utility functions to convert values using Golang's reflect.
+- [semita](semita/): utility functions to access data from a hierarchy structure.
 
 ## License
 
