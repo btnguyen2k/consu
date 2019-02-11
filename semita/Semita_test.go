@@ -1,69 +1,11 @@
 package semita
 
 import (
+	"github.com/btnguyen2k/consu/reddo"
+	"reflect"
 	"testing"
+	"time"
 )
-
-/*----------------------------------------------------------------------*/
-
-// TestNewSemita test if Semita instance can be created correctly.
-func TestNewSemita(t *testing.T) {
-	// only Array, Slice, Map and Struct can be wrapped
-	{
-		data := [3]int{1, 2, 3}
-		s := NewSemita(data)
-		if s == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-	{
-		data := []string{"a", "b", "c"}
-		s := NewSemita(data)
-		if s == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-	{
-		data := map[string]interface{}{}
-		s := NewSemita(data)
-		if s == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-	{
-		data := struct {
-			a int
-			b string
-			c bool
-		}{a: 1, b: "2", c: true}
-		s := NewSemita(data)
-		if s == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-
-	{
-		data := 1
-		s := NewSemita(data)
-		if s != nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-	{
-		data := "string"
-		s := NewSemita(data)
-		if s != nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-	{
-		data := false
-		s := NewSemita(data)
-		if s != nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
-		}
-	}
-}
 
 /*----------------------------------------------------------------------*/
 
@@ -82,6 +24,90 @@ func TestSplitPath(t *testing.T) {
 	testSplitPath(t, "a.b.c[i].[j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
 	testSplitPath(t, "a.b.c[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
 	testSplitPath(t, "a.b.c.[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+}
+
+/*----------------------------------------------------------------------*/
+
+// TestNewSemita test if Semita instance can be created correctly.
+func TestNewSemita(t *testing.T) {
+	// only Array, Slice, Map and Struct can be wrapped
+	{
+		data := [3]int{1, 2, 3}
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 == nil || s2 == nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+	{
+		data := []string{"a", "b", "c"}
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 == nil || s2 == nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+	{
+		data := map[string]interface{}{}
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 == nil || s2 == nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+	{
+		data := struct {
+			a int
+			b string
+			c bool
+		}{a: 1, b: "2", c: true}
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 == nil || s2 == nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+
+	{
+		data := 1
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 != nil || s2 != nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+	{
+		data := "string"
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 != nil || s2 != nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+	{
+		data := false
+		s1 := NewSemita(data)
+		s2 := NewSemita(&data)
+		if s1 != nil || s2 != nil {
+			t.Errorf("TestNewSemita failed for data %#v", data)
+		}
+	}
+}
+
+func TestSemita_Unwrap(t *testing.T) {
+	data := map[string]interface{}{}
+
+	s1 := NewSemita(data)
+	d1 := s1.Unwrap().(map[string]interface{})
+	if !reflect.DeepEqual(data, d1) {
+		t.Errorf("TestSemita_Unwrap failed for data %#v", data)
+	}
+
+	s2 := NewSemita(&data)
+	d2 := s2.Unwrap().(map[string]interface{})
+	if !reflect.DeepEqual(data, d2) {
+		t.Errorf("TestSemita_Unwrap failed for data %#v", data)
+	}
 }
 
 /*----------------------------------------------------------------------*/
@@ -138,554 +164,1124 @@ func TestSemita_GetValueInvalid(t *testing.T) {
 	}
 }
 
-// func TestSemita_GetValueArray(t *testing.T) {
-// 	data := [3]int{1, 2, 3}
-// 	s := NewSemita(data)
-//
-// 	{
-// 		// index out-of-bound
-// 		p := "[-1]"
-// 		v, e := s.GetValue(p)
-// 		if e == nil && v != nil {
-// 			t.Errorf("TestSemita_GetValueArray getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-// 	{
-// 		// index out-of-bound
-// 		p := "[3]"
-// 		v, e := s.GetValue(p)
-// 		if e == nil && v != nil {
-// 			t.Errorf("TestSemita_GetValueArray getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-//
-// 	{
-// 		p := "[0]"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data[0] {
-// 			t.Errorf("TestSemita_GetValueArray getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "[a]"
-// 		_, e := s.GetValue(p)
-// 		if e == nil {
-// 			t.Errorf("TestSemita_GetValueArray getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-// }
-//
-// func TestSemita_GetValueSlice(t *testing.T) {
-// 	data := []string{"1", "2", "3"}
-// 	s := NewSemita(data)
-//
-// 	{
-// 		// index out-of-bound
-// 		p := "[-1]"
-// 		v, e := s.GetValue(p)
-// 		if e == nil && v != nil {
-// 			t.Errorf("TestSemita_GetValueSlice getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-// 	{
-// 		// index out-of-bound
-// 		p := "[3]"
-// 		v, e := s.GetValue(p)
-// 		if e == nil && v != nil {
-// 			t.Errorf("TestSemita_GetValueSlice getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-//
-// 	{
-// 		p := "[0]"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data[0] {
-// 			t.Errorf("TestSemita_GetValueSlice getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "[a]"
-// 		_, e := s.GetValue(p)
-// 		if e == nil {
-// 			t.Errorf("TestSemita_GetValueSlice getting value at path {%#v} for data {%#v}", p, data)
-// 		}
-// 	}
-// }
-//
-// func TestSemita_GetValueMap(t *testing.T) {
-// 	data := map[string]interface{}{
-// 		"a": "string",
-// 		"b": 1,
-// 		"c": true,
-// 	}
-// 	s := NewSemita(data)
-//
-// 	{
-// 		p := "a"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data[p] {
-// 			t.Errorf("TestSemita_GetValueMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "b"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data[p] {
-// 			t.Errorf("TestSemita_GetValueMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "b"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data[p] {
-// 			t.Errorf("TestSemita_GetValueMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-//
-// 	{
-// 		p := "z"
-// 		v, e := s.GetValue(p)
-// 		if v != nil && e != nil {
-// 			t.Errorf("TestSemita_GetValueMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// }
-//
-// func TestSemita_GetValueStruct(t *testing.T) {
-// 	type MyStruct struct {
-// 		A string
-// 		B int
-// 		C bool
-// 		x string // un-exported field
-// 	}
-// 	data := MyStruct{
-// 		A: "string",
-// 		B: 1,
-// 		C: true,
-// 		x: "another string",
-// 	}
-// 	s := NewSemita(data)
-//
-// 	{
-// 		p := "A"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data.A {
-// 			t.Errorf("TestSemita_GetValueStruct getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "B"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data.B {
-// 			t.Errorf("TestSemita_GetValueStruct getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "C"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data.C {
-// 			t.Errorf("TestSemita_GetValueStruct getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "x"
-// 		v, e := s.GetValue(p)
-// 		if e != nil || v != data.x {
-// 			t.Errorf("TestSemita_GetValueStruct getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-//
-// 	{
-// 		p := "z"
-// 		v, e := s.GetValue(p)
-// 		if v != nil && e != nil {
-// 			t.Errorf("TestSemita_GetValueStruct getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// }
-//
-// /*----------------------------------------------------------------------*/
-//
-// func ifFailed(t *testing.T, f string, e error) {
-// 	if e != nil {
-// 		t.Errorf("%s failed: %e", f, e)
-// 	}
-// }
-//
-// var (
-// 	companyName = "Monster Corp."
-// 	companyYear = 2003
-//
-// 	employee0FirstName      = "Mike"
-// 	employee0LastName       = "Wazowski"
-// 	employee0Email          = "mike.wazowski@monster.com"
-// 	employee0Age            = 29
-// 	employee0WorkHours      = []int{9, 10, 11, 12, 13, 14, 15, 16}
-// 	employee0Overtime       = false
-// 	employee0JoinDate       = "Apr 29, 2011"
-// 	employee0JoinDateFormat = "Jan 02, 2006"
-//
-// 	employee1FirstName      = "Sulley"
-// 	employee1LastName       = "Sullivan"
-// 	employee1Email          = "sulley.sullivan@monster.com"
-// 	employee1Age            = 30
-// 	employee1WorkHours      = []int{13, 14, 15, 16, 17, 18, 19, 20}
-// 	employee1Overtime       = true
-// 	employee1JoinDate       = "2012-03-01 01:30:15 PM"
-// 	employee1JoinDateFormat = "2006-01-02 03:04:05 PM"
-// )
-//
-// func generateDataMap() interface{} {
-// 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
-// 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
-// 	return map[string]interface{}{
-// 		"Name": companyName,
-// 		"Year": companyYear,
-// 		"Employees": []map[string]interface{}{
-// 			{
-// 				"first_name": employee0FirstName,
-// 				"last_name":  employee0LastName,
-// 				"email":      employee0Email,
-// 				"age":        employee0Age,
-// 				"options": map[string]interface{}{
-// 					"work_hours": employee0WorkHours,
-// 					"overtime":   employee0Overtime,
-// 				},
-// 				"join_date": d0,
-// 			},
-// 			{
-// 				"first_name": employee1FirstName,
-// 				"last_name":  employee1LastName,
-// 				"email":      employee1Email,
-// 				"age":        employee1Age,
-// 				"options": map[string]interface{}{
-// 					"work_hours": employee1WorkHours,
-// 					"overtime":   employee1Overtime,
-// 				},
-// 				"join_date": d1,
-// 			},
-// 		},
-// 	}
-// }
-//
-// func generateDataStruct() interface{} {
-// 	type Options struct {
-// 		workHours []int
-// 		overtime  bool
-// 	}
-//
-// 	type Employee struct {
-// 		firstName string
-// 		lastName  string
-// 		email     string
-// 		age       int
-// 		options   Options
-// 		joinDate  time.Time
-// 	}
-//
-// 	type Company struct {
-// 		Name      string
-// 		Year      int
-// 		Employees []Employee
-// 	}
-// 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
-// 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
-// 	return Company{
-// 		Name: companyName,
-// 		Year: companyYear,
-// 		Employees: []Employee{
-// 			{
-// 				firstName: employee0FirstName,
-// 				lastName:  employee0LastName,
-// 				email:     employee0Email,
-// 				age:       employee0Age,
-// 				options: Options{
-// 					workHours: employee0WorkHours,
-// 					overtime:  employee0Overtime,
-// 				},
-// 				joinDate: d0,
-// 			},
-// 			{
-// 				firstName: employee1FirstName,
-// 				lastName:  employee1LastName,
-// 				email:     employee1Email,
-// 				age:       employee1Age,
-// 				options: Options{
-// 					workHours: employee1WorkHours,
-// 					overtime:  employee1Overtime,
-// 				},
-// 				joinDate: d1,
-// 			},
-// 		},
-// 	}
-// }
-//
-// /*----------------------------------------------------------------------*/
-//
-// func TestSemita_GetValueOfTypeMultiLevelMap(t *testing.T) {
-// 	data := generateDataMap()
-// 	s := NewSemita(data)
-//
-// 	{
-// 		p := "Name"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroString)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(string) != companyName {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Year"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroInt)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(int64) != int64(companyYear) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees.[0].age"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroInt)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(int64) != int64(employee0Age) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees[1].email"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroString)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(string) != employee1Email {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees[0].options.work_hours"
-// 		v, e := s.GetValueOfType(p, []int{})
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if len(v.([]int)) != len(employee0WorkHours) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
-// 			if employee0WorkHours[i] != v.([]int)[i] {
-// 				t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 			}
-// 		}
-// 	}
-// 	{
-// 		p := "Employees.[1].options.overtime"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroBool)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(bool) != employee1Overtime {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees.[0].join_date"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroTime)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees[1].join_date"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroTime)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// }
-//
-// func TestSemita_GetValueOfTypeMultiLevelStruct(t *testing.T) {
-// 	data := generateDataStruct()
-// 	s := NewSemita(data)
-//
-// 	{
-// 		p := "Name"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroString)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(string) != companyName {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Year"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroInt)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(int64) != int64(companyYear) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees.[0].age"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroInt)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(int64) != int64(employee0Age) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees[1].email"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroString)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(string) != employee1Email {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees[0].options.work_hours"
-// 		v, e := s.GetValueOfType(p, []int{})
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if len(v.([]int)) != len(employee0WorkHours) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
-// 			if employee0WorkHours[i] != v.([]int)[i] {
-// 				t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 			}
-// 		}
-// 	}
-// 	{
-// 		p := "Employees.[1].options.overtime"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroBool)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(bool) != employee1Overtime {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees.[0].join_date"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroTime)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "Employees[1].join_date"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroTime)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// }
-//
-// func generateDataMixed() interface{} {
-// 	type Options struct {
-// 		work_hours []int
-// 		overtime   bool
-// 	}
-//
-// 	type Company struct {
-// 		name      string
-// 		year      int
-// 		employees []map[string]interface{}
-// 	}
-// 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
-// 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
-// 	return Company{
-// 		name: companyName,
-// 		year: companyYear,
-// 		employees: []map[string]interface{}{
-// 			{
-// 				"first_name": employee0FirstName,
-// 				"last_name":  employee0LastName,
-// 				"email":      employee0Email,
-// 				"age":        employee0Age,
-// 				"options": Options{
-// 					work_hours: employee0WorkHours,
-// 					overtime:   employee0Overtime,
-// 				},
-// 				"join_date": d0,
-// 			},
-// 			{
-// 				"first_name": employee1FirstName,
-// 				"last_name":  employee1LastName,
-// 				"email":      employee1Email,
-// 				"age":        employee1Age,
-// 				"options": Options{
-// 					work_hours: employee1WorkHours,
-// 					overtime:   employee1Overtime,
-// 				},
-// 				"join_date": d1,
-// 			},
-// 		},
-// 	}
-// }
-//
-// func TestSemita_GetValueOfTypeMultiLevelMixed(t *testing.T) {
-// 	data := generateDataMixed()
-// 	s := NewSemita(data)
-//
-// 	{
-// 		p := "name"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroString)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(string) != companyName {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "year"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroInt)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(int64) != int64(companyYear) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "employees.[0].age"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroInt)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(int64) != int64(employee0Age) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "employees[1].email"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroString)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(string) != employee1Email {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "employees[0].options.work_hours"
-// 		v, e := s.GetValueOfType(p, []int{})
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if len(v.([]int)) != len(employee0WorkHours) {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
-// 			if employee0WorkHours[i] != v.([]int)[i] {
-// 				t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 			}
-// 		}
-// 	}
-// 	{
-// 		p := "employees.[1].options.overtime"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroBool)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(bool) != employee1Overtime {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "employees.[0].join_date"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroTime)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// 	{
-// 		p := "employees[1].join_date"
-// 		v, e := s.GetValueOfType(p, reddo.ZeroTime)
-// 		ifFailed(t, "TestSemita_GetValueOfTypeMultiLevelMap", e)
-// 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-// 			t.Errorf("TestSemita_GetValueOfTypeMultiLevelMap getting value at [%#v] for data %#v", p, data)
-// 		}
-// 	}
-// }
+func TestSemita_GetValueArray(t *testing.T) {
+	v := genDataArray()
+	s1 := NewSemita(v)
+	s2 := NewSemita(&v)
+	var p string
+	var err error
+	var n interface{}
+
+	p = "abc"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[-1]"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[999]"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[]"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+	}
+
+	for _, p = range []string{"[4].[0]", "[5][1]", "[6].z", "[7].A.[0]", "[7].B[1]", "[7].M.z", "[7].S.s"} {
+		n, err = s1.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueArray failed with data %#v at path {%#v}", v, p)
+		}
+		n, err = s2.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueArray failed with data %#v at path {%#v}", v, p)
+		}
+	}
+}
+
+func TestSemita_GetValueSlice(t *testing.T) {
+	v := genDataSlice()
+	s1 := NewSemita(v)
+	s2 := NewSemita(&v)
+	var p string
+	var err error
+	var n interface{}
+
+	p = "abc"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[-1]"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[999]"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[]"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// index out-of-bound: silent nil should be return
+		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+	}
+
+	for _, p = range []string{"[4].[0]", "[5][1]", "[6].z", "[7].A.[0]", "[7].B[1]", "[7].M.z", "[7].S.s"} {
+		n, err = s1.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueSlice failed with data %#v at path {%#v}", v, p)
+		}
+		n, err = s2.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueSlice failed with data %#v at path {%#v}", v, p)
+		}
+	}
+}
+
+func TestSemita_GetValueMap(t *testing.T) {
+	v := genDataMap()
+	s1 := NewSemita(v)
+	s2 := NewSemita(&v)
+	var p string
+	var err error
+	var n interface{}
+
+	p = "[-1]"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[999]"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[]"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "not exist"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// non-exists entry
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// non-exists entry
+		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+	}
+
+	for _, p = range []string{"a.[0]", "b[1]", "m.z", "s.A.[0]", "s.B[1]", "s.M.z", "s.S.s"} {
+		n, err = s1.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueMap failed with data %#v at path {%#v}", v, p)
+		}
+		n, err = s2.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueMap failed with data %#v at path {%#v}", v, p)
+		}
+	}
+}
+
+func TestSemita_GetValueStruct(t *testing.T) {
+	v := genDataOuter()
+	s1 := NewSemita(v)
+	s2 := NewSemita(&v)
+	var p string
+	var err error
+	var n interface{}
+
+	p = "[-1]"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[999]"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "[]"
+	n, err = s1.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err == nil {
+		// invalid type
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+
+	p = "not exist"
+	n, err = s1.GetValue(p)
+	if n != nil || err != nil {
+		// non-exists entry
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+	n, err = s2.GetValue(p)
+	if n != nil || err != nil {
+		// non-exists entry
+		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+	}
+
+	for _, p := range []string{"A.[0]", "B[1]", "M.z", "S.s", "private"} {
+		n, err = s1.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueStruct failed with data %#v at path {%#v}", v, p)
+		}
+		n, err = s2.GetValue(p)
+		if n == nil || err != nil {
+			t.Errorf("TestSemita_GetValueStruct failed with data %#v at path {%#v}", v, p)
+		}
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func ifFailed(t *testing.T, f string, e error) {
+	if e != nil {
+		t.Errorf("%s failed: %e", f, e)
+		t.FailNow()
+	}
+}
+
+var (
+	companyName = "Monster Corp."
+	companyYear = 2003
+
+	employee0FirstName      = "Mike"
+	employee0LastName       = "Wazowski"
+	employee0Email          = "mike.wazowski@monster.com"
+	employee0Age            = 29
+	employee0WorkHours      = []int{9, 10, 11, 12, 13, 14, 15, 16}
+	employee0Overtime       = false
+	employee0JoinDate       = "Apr 29, 2011"
+	employee0JoinDateFormat = "Jan 02, 2006"
+
+	employee1FirstName      = "Sulley"
+	employee1LastName       = "Sullivan"
+	employee1Email          = "sulley.sullivan@monster.com"
+	employee1Age            = 30
+	employee1WorkHours      = []int{13, 14, 15, 16, 17, 18, 19, 20}
+	employee1Overtime       = true
+	employee1JoinDate       = "2012-03-01 01:30:15 PM"
+	employee1JoinDateFormat = "2006-01-02 03:04:05 PM"
+)
+
+type (
+	Options struct {
+		WorkHours []int
+		Overtime  bool
+	}
+	Employee struct {
+		FirstName string
+		LastName  string
+		Email     string
+		Age       int
+		Options   Options
+		JoinDate  time.Time
+	}
+	Company struct {
+		Name      string
+		Year      int
+		Employees []Employee
+	}
+
+	OptionsMixed struct {
+		work_hours []int
+		overtime   bool
+	}
+	CompanyMixed struct {
+		name      string
+		year      int
+		employees []map[string]interface{}
+	}
+)
+
+func generateDataMap() interface{} {
+	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
+	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+	return map[string]interface{}{
+		"Name": companyName,
+		"Year": companyYear,
+		"Employees": []map[string]interface{}{
+			{
+				"first_name": employee0FirstName,
+				"last_name":  employee0LastName,
+				"email":      employee0Email,
+				"age":        employee0Age,
+				"options": map[string]interface{}{
+					"work_hours": employee0WorkHours,
+					"overtime":   employee0Overtime,
+				},
+				"join_date": d0,
+			},
+			{
+				"first_name": employee1FirstName,
+				"last_name":  employee1LastName,
+				"email":      employee1Email,
+				"age":        employee1Age,
+				"options": map[string]interface{}{
+					"work_hours": employee1WorkHours,
+					"overtime":   employee1Overtime,
+				},
+				"join_date": d1,
+			},
+		},
+	}
+}
+
+func generateDataStruct() interface{} {
+	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
+	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+	return Company{
+		Name: companyName,
+		Year: companyYear,
+		Employees: []Employee{
+			{
+				FirstName: employee0FirstName,
+				LastName:  employee0LastName,
+				Email:     employee0Email,
+				Age:       employee0Age,
+				Options: Options{
+					WorkHours: employee0WorkHours,
+					Overtime:  employee0Overtime,
+				},
+				JoinDate: d0,
+			},
+			{
+				FirstName: employee1FirstName,
+				LastName:  employee1LastName,
+				Email:     employee1Email,
+				Age:       employee1Age,
+				Options: Options{
+					WorkHours: employee1WorkHours,
+					Overtime:  employee1Overtime,
+				},
+				JoinDate: d1,
+			},
+		},
+	}
+}
+
+func generateDataMixed() interface{} {
+	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
+	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+	return CompanyMixed{
+		name: companyName,
+		year: companyYear,
+		employees: []map[string]interface{}{
+			{
+				"first_name": employee0FirstName,
+				"last_name":  employee0LastName,
+				"email":      employee0Email,
+				"age":        employee0Age,
+				"options": OptionsMixed{
+					work_hours: employee0WorkHours,
+					overtime:   employee0Overtime,
+				},
+				"join_date": d0,
+			},
+			{
+				"first_name": employee1FirstName,
+				"last_name":  employee1LastName,
+				"email":      employee1Email,
+				"age":        employee1Age,
+				"options": OptionsMixed{
+					work_hours: employee1WorkHours,
+					overtime:   employee1Overtime,
+				},
+				"join_date": d1,
+			},
+		},
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
+	name := "TestSemita_GetValueOfType_MultiLevelMap"
+	data := generateDataMap()
+	s1 := NewSemita(data)
+	d := data.(map[string]interface{})
+	s2 := NewSemita(&d)
+
+	{
+		p := "Name"
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != companyName {
+			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != companyName {
+			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+		}
+	}
+	{
+		p := "Year"
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(companyYear) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(companyYear) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].age"
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(employee0Age) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(employee0Age) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].email"
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != employee1Email {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != employee1Email {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[0].options.work_hours"
+		v, e := s1.GetValueOfType(p, []int{})
+		ifFailed(t, name, e)
+		if len(v.([]int)) != len(employee0WorkHours) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		for i, n := 0, len(employee0WorkHours); i < n; i++ {
+			if employee0WorkHours[i] != v.([]int)[i] {
+				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			}
+		}
+		v, e = s2.GetValueOfType(p, []int{})
+		ifFailed(t, name, e)
+		if len(v.([]int)) != len(employee0WorkHours) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		for i, n := 0, len(employee0WorkHours); i < n; i++ {
+			if employee0WorkHours[i] != v.([]int)[i] {
+				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			}
+		}
+	}
+	{
+		p := "Employees.[1].options.overtime"
+		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != employee1Overtime {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != employee1Overtime {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].join_date"
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].join_date"
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
+	name := "TestSemita_GetValueOfType_MultiLevelStruct"
+	data := generateDataStruct()
+	s1 := NewSemita(data)
+	d := data.(Company)
+	s2 := NewSemita(&d)
+
+	{
+		p := "Name"
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != companyName {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != companyName {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Year"
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(companyYear) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(companyYear) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].Age"
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(employee0Age) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(employee0Age) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].Email"
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != employee1Email {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != employee1Email {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[0].Options.WorkHours"
+		v, e := s1.GetValueOfType(p, []int{})
+		ifFailed(t, name, e)
+		if len(v.([]int)) != len(employee0WorkHours) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		for i, n := 0, len(employee0WorkHours); i < n; i++ {
+			if employee0WorkHours[i] != v.([]int)[i] {
+				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			}
+		}
+		v, e = s2.GetValueOfType(p, []int{})
+		ifFailed(t, name, e)
+		if len(v.([]int)) != len(employee0WorkHours) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		for i, n := 0, len(employee0WorkHours); i < n; i++ {
+			if employee0WorkHours[i] != v.([]int)[i] {
+				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			}
+		}
+	}
+	{
+		p := "Employees.[1].Options.Overtime"
+		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != employee1Overtime {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != employee1Overtime {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].JoinDate"
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].JoinDate"
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
+	name := "TestSemita_GetValueOfType_MultiLevelMixed"
+	data := generateDataMixed()
+	s1 := NewSemita(data)
+	d := data.(CompanyMixed)
+	s2 := NewSemita(&d)
+
+	{
+		p := "name"
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != companyName {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != companyName {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "year"
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(companyYear) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(companyYear) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "employees.[0].age"
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(employee0Age) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(employee0Age) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "employees[1].email"
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != employee1Email {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != employee1Email {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "employees[0].options.work_hours"
+		v, e := s1.GetValueOfType(p, []int{})
+		ifFailed(t, name, e)
+		if len(v.([]int)) != len(employee0WorkHours) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		for i, n := 0, len(employee0WorkHours); i < n; i++ {
+			if employee0WorkHours[i] != v.([]int)[i] {
+				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			}
+		}
+		v, e = s2.GetValueOfType(p, []int{})
+		ifFailed(t, name, e)
+		if len(v.([]int)) != len(employee0WorkHours) {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		for i, n := 0, len(employee0WorkHours); i < n; i++ {
+			if employee0WorkHours[i] != v.([]int)[i] {
+				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			}
+		}
+	}
+	{
+		p := "employees.[1].options.overtime"
+		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != employee1Overtime {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != employee1Overtime {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "employees.[0].join_date"
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "employees[1].join_date"
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
+	name := "TestSemita_SetValue_MultiLevelMap"
+	data := generateDataMap()
+	s1 := NewSemita(data)
+	d := data.(map[string]interface{})
+	s2 := NewSemita(&d)
+
+	{
+		p := "Name"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		ifFailed(t, name, e)
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Year"
+
+		vSet1 := "1"
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := "2"
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].age"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		ifFailed(t, name, e)
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].email"
+
+		vSet1 := "1"
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := "2"
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[0].options.work_hours.[0]"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		ifFailed(t, name, e)
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[1].options.overtime"
+
+		vSet1 := "1"
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := "2"
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].join_date"
+		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
+		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+
+		vSet1 := d1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := d0
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
+	name := "TestSemita_SetValue_MultiLevelStruct"
+	data := generateDataStruct()
+	s1 := NewSemita(data)
+	d := data.(Company)
+	s2 := NewSemita(&d)
+
+	{
+		p := "Name"
+
+		// vSet1 := "1"
+		// e := s1.SetValue(p, vSet1)
+		// ifFailed(t, name, e)
+		// v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		// ifFailed(t, name, e)
+		// if v.(string) != vSet1 {
+		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// }
+
+		vSet2 := "2"
+		e := s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e := s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Year"
+
+		// vSet1 := "1"
+		// e := s1.SetValue(p, vSet1)
+		// ifFailed(t, name, e)
+		// v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		// ifFailed(t, name, e)
+		// if v.(string) != vSet1 {
+		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// }
+
+		vSet2 := 2
+		e := s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e := s2.GetValueOfType(p, reddo.ZeroUint)
+		ifFailed(t, name, e)
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].Age"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		ifFailed(t, name, e)
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].Email"
+
+		vSet1 := "1"
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := "2"
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		ifFailed(t, name, e)
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[0].Options.WorkHours.[0]"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		ifFailed(t, name, e)
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		ifFailed(t, name, e)
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[1].Options.Overtime"
+
+		vSet1 := !employee1Overtime
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := !vSet1
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
+		ifFailed(t, name, e)
+		if v.(bool) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].JoinDate"
+		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
+		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+
+		vSet1 := d1
+		e := s1.SetValue(p, vSet1)
+		ifFailed(t, name, e)
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := d0
+		e = s2.SetValue(p, vSet2)
+		ifFailed(t, name, e)
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		ifFailed(t, name, e)
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}

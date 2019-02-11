@@ -342,13 +342,13 @@ func TestNode_nextSlice(t *testing.T) {
 	node, err = root.next(p)
 	if node != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestNode_nextMap failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextSlice failed with data %#v at index {%#v}", v, p)
 	}
 	p = "[]"
 	node, err = root.next(p)
 	if node != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestNode_nextMap failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextSlice failed with data %#v at index {%#v}", v, p)
 	}
 
 	for _, path := range []string{"[4].[0]", "[5].[1]", "[6].z", "[7].A.[0]", "[7].B.[1]", "[7].M.z", "[7].S.s"} {
@@ -356,7 +356,7 @@ func TestNode_nextSlice(t *testing.T) {
 		for _, p = range strings.Split(path, ".") {
 			node, err = node.next(p)
 			if node == nil || err != nil {
-				t.Errorf("TestNode_nextMap failed with data %#v at path {%#v}", v, path)
+				t.Errorf("TestNode_nextSlice failed with data %#v at path {%#v}", v, path)
 			}
 		}
 	}
@@ -395,26 +395,26 @@ func TestNode_nextArray(t *testing.T) {
 	node, err = root.next(p)
 	if node != nil || err == nil {
 		// invalid type
-		t.Errorf("TestNode_nextSlice failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextArray failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[-1]"
 	node, err = root.next(p)
 	if node != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestNode_nextSlice failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextArray failed with data %#v at index {%#v}", v, p)
 	}
 	p = "[999]"
 	node, err = root.next(p)
 	if node != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestNode_nextMap failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextArray failed with data %#v at index {%#v}", v, p)
 	}
 	p = "[]"
 	node, err = root.next(p)
 	if node != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestNode_nextMap failed with data %#v at index {%#v}", v, p)
+		t.Errorf("TestNode_nextArray failed with data %#v at index {%#v}", v, p)
 	}
 
 	for _, path := range []string{"[4].[0]", "[5].[1]", "[6].z", "[7].A.[0]", "[7].B.[1]", "[7].M.z", "[7].S.s"} {
@@ -422,7 +422,7 @@ func TestNode_nextArray(t *testing.T) {
 		for _, p = range strings.Split(path, ".") {
 			node, err = node.next(p)
 			if node == nil || err != nil {
-				t.Errorf("TestNode_nextMap failed with data %#v at path {%#v}", v, path)
+				t.Errorf("TestNode_nextArray failed with data %#v at path {%#v}", v, path)
 			}
 		}
 	}
@@ -621,7 +621,7 @@ func TestNode_setValueStructUnaddressable(t *testing.T) {
 	}
 
 	p := "A"
-	node, err := root.setValue("[0]", reflect.ValueOf("data"))
+	node, err := root.setValue(p, reflect.ValueOf("data"))
 	if node != nil || err == nil {
 		t.Errorf("TestNode_setValueStructUnaddressable failed with data %#v at index {%#v}", v, p)
 	}
@@ -804,11 +804,10 @@ func TestNode_setValueArrayUnaddressable(t *testing.T) {
 		value:    reflect.ValueOf(v), // for array: only addressable array is settable
 	}
 	p := "[0]"
-	node, err := root.setValue("[0]", reflect.ValueOf("data"))
+	node, err := root.setValue(p, reflect.ValueOf("data"))
 	if node != nil || err == nil {
 		t.Errorf("TestNode_setValueArrayUnaddressable failed with data %#v at index {%#v}", v, p)
 	}
-
 }
 
 func TestNode_setValueArray(t *testing.T) {
@@ -871,7 +870,7 @@ func TestNode_createChildMap_ArrayAndSlice(t *testing.T) {
 		path := "[0]"
 		node, err := root.createChildMap(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildMap_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -885,7 +884,7 @@ func TestNode_createChildMap_ArrayAndSlice(t *testing.T) {
 		path := "[0]"
 		node, err := root.createChildMap(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildMap_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 }
@@ -902,7 +901,7 @@ func TestNode_createChildMap_MapAndStruct(t *testing.T) {
 		path := "xyz"
 		node, err := root.createChildMap(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildMap_MapAndStruct failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -933,7 +932,7 @@ func TestNode_createChildMap_MapAndStruct(t *testing.T) {
 		path := "A"
 		node, err := root.createChildMap(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildMap_MapAndStruct failed with data %#v at index {%#v}", v, path)
 		}
 	}
 }
@@ -950,7 +949,7 @@ func TestNode_createChildSlice_ArrayAndSlice(t *testing.T) {
 		path := "[0]"
 		node, err := root.createChildSlice(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildSlice_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -964,7 +963,7 @@ func TestNode_createChildSlice_ArrayAndSlice(t *testing.T) {
 		path := "[0]"
 		node, err := root.createChildSlice(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildSlice_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
 		}
 	}
 }
@@ -981,7 +980,7 @@ func TestNode_createChildSlice_MapAndStruct(t *testing.T) {
 		path := "xyz"
 		node, err := root.createChildSlice(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildSlice_MapAndStruct failed with data %#v at index {%#v}", v, path)
 		}
 	}
 	{
@@ -1012,7 +1011,7 @@ func TestNode_createChildSlice_MapAndStruct(t *testing.T) {
 		path := "A"
 		node, err := root.createChildSlice(path)
 		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice failed with data %#v at index {%#v}", v, path)
+			t.Errorf("TestNode_createChildSlice_MapAndStruct failed with data %#v at index {%#v}", v, path)
 		}
 	}
 }
