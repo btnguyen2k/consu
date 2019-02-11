@@ -155,7 +155,11 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 				if n.prev == nil {
 					n.value = vNode
 				} else {
-					n.prev.setValue(n.key, vNode)
+					_n, _e := n.prev.setValue(n.key, vNode)
+					if _n == nil || _e != nil {
+						return nil, errors.New("error setting appended slice to previous node {" + n.key + "}")
+					}
+					return _n.next(fmt.Sprintf("[%d]", i))
 				}
 			} else {
 				childNode := vNode.Index(i)

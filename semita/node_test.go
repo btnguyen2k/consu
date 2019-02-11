@@ -722,6 +722,68 @@ func TestNode_setValueSliceInvalidType(t *testing.T) {
 	}
 }
 
+func TestNode_setValueSliceAppend(t *testing.T) {
+	name := "TestNode_setValueSliceAppend"
+	v := map[string]interface{}{
+		"s": []interface{}{0, "1", false, true},
+	}
+	root := &node{
+		prev:     nil,
+		prevType: nil,
+		key:      "",
+		value:    reflect.ValueOf(v),
+	}
+	_p := "s"
+	_node, _err := root.next("s")
+	if _node == nil || _err != nil {
+		t.Errorf("%s failed with data %#v at index {%#v}", name, v, _p)
+	}
+
+	var data = reflect.ValueOf("data")
+	var err error
+	var p string
+	var node *node
+
+	p = "xyz"
+	node, err = _node.setValue(p, data)
+	if node != nil || err == nil {
+		// invalid type
+		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
+	}
+
+	p = "[-1]"
+	node, err = _node.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
+	}
+	p = "[999]"
+	node, err = _node.setValue(p, data)
+	if node != nil || err == nil {
+		// index out-of-bound
+		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
+	}
+
+	l := len(_node.unwrap().([]interface{}))
+	p = "[]"
+	node, err = _node.setValue(p, data)
+	_node, _err = root.next("s")
+	if _node == nil || _err != nil {
+		t.Errorf("%s failed with data %#v at index {%#v}", name, v, _p)
+	}
+	if node == nil || err != nil || node.unwrap() != data.Interface() || len(_node.unwrap().([]interface{})) != l+1 {
+		// non-exists entry
+		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
+	}
+
+	for _, p = range []string{"[0]", "[1]", "[2]", "[]"} {
+		node, err = _node.setValue(p, data)
+		if node == nil || err != nil || node.unwrap() != data.Interface() {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
+		}
+	}
+}
+
 func TestNode_setValueSlice(t *testing.T) {
 	v := genDataSlice()
 	root := &node{
