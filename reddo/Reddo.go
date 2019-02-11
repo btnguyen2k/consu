@@ -89,7 +89,7 @@ const (
 
 	// ZeroUint defines 'zero' value of type uint64
 	ZeroUint = uint64(0)
-	// ZeroUint644 defines 'zero' value of type uint64
+	// ZeroUint64 defines 'zero' value of type uint64
 	ZeroUint64 = uint64(0)
 
 	// ZeroUintptr defines 'zero' value of type uintptr
