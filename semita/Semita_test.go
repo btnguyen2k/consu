@@ -438,12 +438,12 @@ func TestSemita_GetValueStruct(t *testing.T) {
 
 /*----------------------------------------------------------------------*/
 
-func ifFailed(t *testing.T, f string, e error) {
-	if e != nil {
-		t.Errorf("%s failed: %e", f, e)
-		t.FailNow()
-	}
-}
+// func ifFailed(t *testing.T, f string, e error) {
+// 	if e != nil {
+// 		t.Errorf("%s failed: %e", f, e)
+// 		t.FailNow()
+// 	}
+// }
 
 var (
 	companyName = "Monster Corp."
@@ -599,6 +599,29 @@ func generateDataMixed() interface{} {
 
 /*----------------------------------------------------------------------*/
 
+func TestSemita_GetValueOfType_Invalid(t *testing.T) {
+	name := "TestSemita_GetValueOfType_Invalid"
+	p := "not_exists"
+
+	data := generateDataMap()
+	s1 := NewSemita(data)
+	{
+		v, _ := s1.GetValueOfType(p, reddo.ZeroString)
+		if v != nil {
+			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+		}
+	}
+
+	d := data.(map[string]interface{})
+	s2 := NewSemita(&d)
+	{
+		v, _ := s2.GetValueOfType(p, reddo.ZeroString)
+		if v != nil {
+			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+		}
+	}
+}
+
 func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	name := "TestSemita_GetValueOfType_MultiLevelMap"
 	data := generateDataMap()
@@ -609,12 +632,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != companyName {
 			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != companyName {
 			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
 		}
@@ -622,12 +651,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(companyYear) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(companyYear) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -635,12 +670,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Employees.[0].age"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(employee0Age) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(employee0Age) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -648,12 +689,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Employees[1].email"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != employee1Email {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != employee1Email {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -661,7 +708,10 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Employees[0].options.work_hours"
 		v, e := s1.GetValueOfType(p, []int{})
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if len(v.([]int)) != len(employee0WorkHours) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -671,7 +721,10 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 			}
 		}
 		v, e = s2.GetValueOfType(p, []int{})
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if len(v.([]int)) != len(employee0WorkHours) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -684,12 +737,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Employees.[1].options.overtime"
 		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != employee1Overtime {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != employee1Overtime {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -697,12 +756,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Employees.[0].join_date"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -710,12 +775,18 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	{
 		p := "Employees[1].join_date"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -732,12 +803,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != companyName {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != companyName {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -745,12 +822,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(companyYear) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(companyYear) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -758,12 +841,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Employees.[0].Age"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(employee0Age) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(employee0Age) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -771,12 +860,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Employees[1].Email"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != employee1Email {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != employee1Email {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -784,7 +879,10 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Employees[0].Options.WorkHours"
 		v, e := s1.GetValueOfType(p, []int{})
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if len(v.([]int)) != len(employee0WorkHours) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -794,7 +892,10 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 			}
 		}
 		v, e = s2.GetValueOfType(p, []int{})
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if len(v.([]int)) != len(employee0WorkHours) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -807,12 +908,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Employees.[1].Options.Overtime"
 		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != employee1Overtime {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != employee1Overtime {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -820,12 +927,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Employees.[0].JoinDate"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -833,12 +946,18 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	{
 		p := "Employees[1].JoinDate"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -855,12 +974,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != companyName {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != companyName {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -868,12 +993,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(companyYear) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(companyYear) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -881,12 +1012,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Employees.[0].age"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(employee0Age) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(employee0Age) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -894,12 +1031,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Employees[1].email"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != employee1Email {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != employee1Email {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -907,7 +1050,10 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Employees[0].options.WorkHours"
 		v, e := s1.GetValueOfType(p, []int{})
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if len(v.([]int)) != len(employee0WorkHours) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -917,7 +1063,10 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 			}
 		}
 		v, e = s2.GetValueOfType(p, []int{})
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if len(v.([]int)) != len(employee0WorkHours) {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -930,12 +1079,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Employees.[1].options.Overtime"
 		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != employee1Overtime {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != employee1Overtime {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -943,12 +1098,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Employees.[0].join_date"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -956,12 +1117,18 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	{
 		p := "Employees[1].join_date"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
@@ -982,18 +1149,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(vSet1) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1003,18 +1182,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet1 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet2 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1024,18 +1215,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(vSet1) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1045,18 +1248,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet1 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet2 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1066,18 +1281,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(vSet1) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1087,18 +1314,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet1 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet2 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1110,18 +1349,30 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 		vSet1 := d1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := d0
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1149,9 +1400,15 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet2 := "2"
 		e := s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet2 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1170,9 +1427,15 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet2 := 2
 		e := s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s2.GetValueOfType(p, reddo.ZeroUint)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1182,18 +1445,30 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(vSet1) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1203,18 +1478,30 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet1 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroString)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(string) != vSet2 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1224,18 +1511,30 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(int64) != int64(vSet1) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1245,18 +1544,30 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet1 := !employee1Overtime
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != vSet1 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := !vSet1
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroBool)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(bool) != vSet2 {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
@@ -1268,18 +1579,266 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 		vSet1 := d1
 		e := s1.SetValue(p, vSet1)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := d0
 		e = s2.SetValue(p, vSet2)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
-		ifFailed(t, name, e)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
+	name := "TestSemita_SetValue_MultiLevelMixed"
+	data := generateDataMixed()
+	s1 := NewSemita(data)
+	d := data.(CompanyMixed)
+	s2 := NewSemita(&d)
+
+	{
+		p := "Name"
+
+		// vSet1 := "1"
+		// e := s1.SetValue(p, vSet1)
+		// ifFailed(t, name, e)
+		// v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		// ifFailed(t, name, e)
+		// if v.(string) != vSet1 {
+		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// }
+
+		vSet2 := "2"
+		e := s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s2.GetValueOfType(p, reddo.ZeroString)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Year"
+
+		// vSet1 := 1
+		// e := s1.SetValue(p, vSet1)
+		// if e != nil {
+		// 	t.Errorf("%s failed: %e", name, e)
+		// 	t.FailNow()
+		// }
+		// v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		// if e != nil {
+		// 	t.Errorf("%s failed: %e", name, e)
+		// 	t.FailNow()
+		// }
+		// if v.(int64) != int64(vSet1) {
+		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// }
+
+		vSet2 := 2
+		e := s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s2.GetValueOfType(p, reddo.ZeroUint)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees.[0].age"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[1].email"
+
+		vSet1 := "1"
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s1.GetValueOfType(p, reddo.ZeroString)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(string) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := "2"
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(string) != vSet2 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		p := "Employees[0].options.WorkHours.[0]"
+
+		vSet1 := 1
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 2
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroUint)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	// {
+	// 	p := "Employees.[1].options.Overtime"
+	//
+	// 	vSet1 := !employee1Overtime
+	// 	e := s1.SetValue(p, vSet1)
+	// 	if e != nil {
+	// 		t.Errorf("%s failed: %e", name, e)
+	// 		t.FailNow()
+	// 	}
+	// 	v, e := s1.GetValueOfType(p, reddo.ZeroBool)
+	// 	if e != nil {
+	// 		t.Errorf("%s failed: %e", name, e)
+	// 		t.FailNow()
+	// 	}
+	// 	if v.(bool) != vSet1 {
+	// 		t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+	// 	}
+	//
+	// 	vSet2 := !vSet1
+	// 	e = s2.SetValue(p, vSet2)
+	// 	if e != nil {
+	// 		t.Errorf("%s failed: %e", name, e)
+	// 		t.FailNow()
+	// 	}
+	// 	v, e = s2.GetValueOfType(p, reddo.ZeroBool)
+	// 	if e != nil {
+	// 		t.Errorf("%s failed: %e", name, e)
+	// 		t.FailNow()
+	// 	}
+	// 	if v.(bool) != vSet2 {
+	// 		t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+	// 	}
+	// }
+	{
+		p := "Employees.[0].join_date"
+		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
+		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+
+		vSet1 := d1
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := d0
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}

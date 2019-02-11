@@ -41,24 +41,23 @@ type node struct {
 
 // unwrap returns the underlying 'value' as an interface
 func (n *node) unwrap() interface{} {
-	// if n.value.Kind() == reflect.Invalid {
-	// 	return nil
-	// }
 	return n.value.Interface()
+}
+
+func (n *node) elem() reflect.Value {
+	v := n.value
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() == reflect.Interface {
+		v = n.value.Elem()
+	}
+	return v
 }
 
 // next returns a child node located at 'index'
 func (n *node) next(index string) (*node, error) {
-	// if n.value.Kind() == reflect.Invalid {
-	// 	return nil, errors.New("current node is nil")
-	// }
-	vNode := n.value
-	if vNode.Kind() == reflect.Ptr {
-		vNode = vNode.Elem()
-	}
-	if vNode.Kind() == reflect.Interface {
-		vNode = n.value.Elem()
-	}
+	vNode := n.elem()
 	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
 		// current node should be an array or slice
 		if vNode.Kind() == reflect.Array || vNode.Kind() == reflect.Slice {
@@ -122,17 +121,7 @@ func (n *node) next(index string) (*node, error) {
 // setValue inserts the value as a child into the correct position specified by 'index'.
 // when successful, this function returns the newly created child node.
 func (n *node) setValue(index string, value reflect.Value) (*node, error) {
-	// if n.value.Kind() == reflect.Invalid {
-	// 	return nil, errors.New("current node is nil")
-	// }
-	vNode := n.value
-	if vNode.Kind() == reflect.Ptr {
-		vNode = vNode.Elem()
-	}
-	if vNode.Kind() == reflect.Interface {
-		vNode = n.value.Elem()
-	}
-
+	vNode := n.elem()
 	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
 		if vNode.Kind() == reflect.Slice || vNode.Kind() == reflect.Array {
 			var i = vNode.Len()
