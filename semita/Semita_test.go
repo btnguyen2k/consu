@@ -489,7 +489,7 @@ type (
 
 	OptionsMixed struct {
 		WorkHours []int
-		Overtime   bool
+		Overtime  bool
 	}
 	CompanyMixed struct {
 		Name      string
@@ -578,7 +578,7 @@ func generateDataMixed() interface{} {
 				"age":        employee0Age,
 				"options": OptionsMixed{
 					WorkHours: employee0WorkHours,
-					Overtime:   employee0Overtime,
+					Overtime:  employee0Overtime,
 				},
 				"join_date": d0,
 			},
@@ -589,7 +589,7 @@ func generateDataMixed() interface{} {
 				"age":        employee1Age,
 				"options": OptionsMixed{
 					WorkHours: employee1WorkHours,
-					Overtime:   employee1Overtime,
+					Overtime:  employee1Overtime,
 				},
 				"join_date": d1,
 			},
