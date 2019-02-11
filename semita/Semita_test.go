@@ -488,13 +488,13 @@ type (
 	}
 
 	OptionsMixed struct {
-		work_hours []int
-		overtime   bool
+		WorkHours []int
+		Overtime   bool
 	}
 	CompanyMixed struct {
-		name      string
-		year      int
-		employees []map[string]interface{}
+		Name      string
+		Year      int
+		Employees []map[string]interface{}
 	}
 )
 
@@ -568,17 +568,17 @@ func generateDataMixed() interface{} {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
 	return CompanyMixed{
-		name: companyName,
-		year: companyYear,
-		employees: []map[string]interface{}{
+		Name: companyName,
+		Year: companyYear,
+		Employees: []map[string]interface{}{
 			{
 				"first_name": employee0FirstName,
 				"last_name":  employee0LastName,
 				"email":      employee0Email,
 				"age":        employee0Age,
 				"options": OptionsMixed{
-					work_hours: employee0WorkHours,
-					overtime:   employee0Overtime,
+					WorkHours: employee0WorkHours,
+					Overtime:   employee0Overtime,
 				},
 				"join_date": d0,
 			},
@@ -588,8 +588,8 @@ func generateDataMixed() interface{} {
 				"email":      employee1Email,
 				"age":        employee1Age,
 				"options": OptionsMixed{
-					work_hours: employee1WorkHours,
-					overtime:   employee1Overtime,
+					WorkHours: employee1WorkHours,
+					Overtime:   employee1Overtime,
 				},
 				"join_date": d1,
 			},
@@ -853,7 +853,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	s2 := NewSemita(&d)
 
 	{
-		p := "name"
+		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
 		ifFailed(t, name, e)
 		if v.(string) != companyName {
@@ -866,7 +866,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "year"
+		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
 		ifFailed(t, name, e)
 		if v.(int64) != int64(companyYear) {
@@ -879,7 +879,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "employees.[0].age"
+		p := "Employees.[0].age"
 		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
 		ifFailed(t, name, e)
 		if v.(int64) != int64(employee0Age) {
@@ -892,7 +892,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "employees[1].email"
+		p := "Employees[1].email"
 		v, e := s1.GetValueOfType(p, reddo.ZeroString)
 		ifFailed(t, name, e)
 		if v.(string) != employee1Email {
@@ -905,7 +905,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "employees[0].options.work_hours"
+		p := "Employees[0].options.WorkHours"
 		v, e := s1.GetValueOfType(p, []int{})
 		ifFailed(t, name, e)
 		if len(v.([]int)) != len(employee0WorkHours) {
@@ -928,7 +928,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "employees.[1].options.overtime"
+		p := "Employees.[1].options.Overtime"
 		v, e := s1.GetValueOfType(p, reddo.ZeroBool)
 		ifFailed(t, name, e)
 		if v.(bool) != employee1Overtime {
@@ -941,7 +941,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "employees.[0].join_date"
+		p := "Employees.[0].join_date"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
 		ifFailed(t, name, e)
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
@@ -954,7 +954,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
-		p := "employees[1].join_date"
+		p := "Employees[1].join_date"
 		v, e := s1.GetValueOfType(p, reddo.ZeroTime)
 		ifFailed(t, name, e)
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
