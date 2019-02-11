@@ -72,7 +72,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1"
+	Version = "0.1.1.1"
 
 	// ZeroBool defines 'zero' value of type bool
 	ZeroBool = false
@@ -89,6 +89,9 @@ const (
 
 	// ZeroUint defines 'zero' value of type uint64
 	ZeroUint = uint64(0)
+	// ZeroUint644 defines 'zero' value of type uint64
+	ZeroUint64 = uint64(0)
+
 	// ZeroUintptr defines 'zero' value of type uintptr
 	ZeroUintptr = uintptr(0)
 

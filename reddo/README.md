@@ -84,7 +84,12 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 
 ## History
 
-Current version: `0.1.1`.
+Current version: `0.1.1.1`.
+
+### 2019-02-11 - v0.1.1.1
+
+- New constant `ZeroUint64`
+
 
 ### 2019-01-15 - v0.1.1
 
