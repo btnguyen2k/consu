@@ -84,7 +84,10 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 
 ## History
 
-Current version: `0.1.1.1`.
+### 2019-02-12 - v0.1.1.2
+
+- New (semi)constants `ZeroMap` and `ZeroSlice`
+
 
 ### 2019-02-11 - v0.1.1.1
 

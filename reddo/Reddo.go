@@ -72,7 +72,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1.1"
+	Version = "0.1.1.2"
 
 	// ZeroBool defines 'zero' value of type bool
 	ZeroBool = false
@@ -102,6 +102,12 @@ const (
 var (
 	// ZeroTime defines 'zero' value of type 'time.Time'
 	ZeroTime = *new(time.Time)
+
+	// ZeroMap defines 'zero' value of type 'map'
+	ZeroMap = make(map[string]interface{})
+
+	// ZeroSlice defines 'zero' value of type 'slice'
+	ZeroSlice = make([]interface{}, 0)
 )
 
 // ToBool converts a value to bool. The output is guaranteed to ad-here to type assertion .(bool)
