@@ -87,6 +87,8 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 ### 2019-02-12 - v0.1.1.2
 
 - New (semi)constants `ZeroMap` and `ZeroSlice`
+- Fix: to solve the case "convert to `interface{}`"
+  - Function `Convert(v interface{}, t interface{}) (interface{}, error)` returns `(v, nil)` if `t` is `nil`
 
 
 ### 2019-02-11 - v0.1.1.1

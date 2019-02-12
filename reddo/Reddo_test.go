@@ -8,29 +8,31 @@ import (
 	"time"
 )
 
-func ifFailed(t *testing.T, f string, e error) bool {
-	if e != nil {
-		t.Errorf("%s failed: %e", f, e)
-		return true
-	}
-	return false
-}
-
-/*----------------------------------------------------------------------*/
+// func ifFailed(t *testing.T, f string, e error) bool {
+// 	if e != nil {
+// 		t.Errorf("%s failed: %e", f, e)
+// 		return true
+// 	}
+// 	return false
+// }
+//
+// /*----------------------------------------------------------------------*/
 
 func testToBool(t *testing.T, input interface{}, expected bool, zero bool) {
+	name := "TestToBool"
+
 	v, e := ToBool(input)
-	if !ifFailed(t, "TestToBool", e) {
-		if v != expected {
-			t.Errorf("TestToBool failed: expected [%#v] but received [%#v]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 	}
 
 	v, e = Convert(input, zero)
-	if !ifFailed(t, "TestToBool", e) {
-		if v != expected {
-			t.Errorf("TestToBool failed: expected [%#v] but received [%#v]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 	}
 }
 
@@ -118,18 +120,20 @@ func TestToBool(t *testing.T) {
 /*----------------------------------------------------------------------*/
 
 func testToFloat(t *testing.T, input interface{}, expected float64, zero float64) {
+	name := "TestToFloat"
+
 	v, e := ToFloat(input)
-	if !ifFailed(t, "TestToFloat", e) {
-		if v != expected {
-			t.Errorf("TestToFloat failed: expected [%f] but received [%f]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%f] but received [%f]", name, expected, v)
 	}
 
 	v, e = Convert(input, zero)
-	if !ifFailed(t, "TestToFloat", e) {
-		if v != expected {
-			t.Errorf("TestToFloat failed: expected [%f] but received [%f]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%f] but received [%f]", name, expected, v)
 	}
 }
 
@@ -202,18 +206,20 @@ func TestToFloat(t *testing.T) {
 /*----------------------------------------------------------------------*/
 
 func testToInt(t *testing.T, input interface{}, expected int64, zero int64) {
+	name := "TestToInt"
+
 	v, e := ToInt(input)
-	if !ifFailed(t, "TestToInt", e) {
-		if v != expected {
-			t.Errorf("TestToInt failed: expected [%d] but received [%d]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
 	}
 
 	v, e = Convert(input, zero)
-	if !ifFailed(t, "TestToInt", e) {
-		if v != expected {
-			t.Errorf("TestToInt failed: expected [%d] but received [%d]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
 	}
 }
 
@@ -305,18 +311,20 @@ const (
 )
 
 func testToUint(t *testing.T, input interface{}, expected uint64, zero uint64) {
+	name := "TestToUint"
+
 	v, e := ToUint(input)
-	if !ifFailed(t, "TestToUint", e) {
-		if v != expected {
-			t.Errorf("TestToUint failed: expected [%d] but received [%d]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
 	}
 
 	v, e = Convert(input, zero)
-	if !ifFailed(t, "TestToUint", e) {
-		if v != expected {
-			t.Errorf("TestToUint failed: expected [%d] but received [%d]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
 	}
 }
 
@@ -411,18 +419,20 @@ func TestToUint(t *testing.T) {
 /*----------------------------------------------------------------------*/
 
 func testToString(t *testing.T, input interface{}, expected string, zero string) {
+	name := "TestToString"
+
 	v, e := ToString(input)
-	if !ifFailed(t, "TestToString", e) {
-		if v != expected {
-			t.Errorf("TestToString failed: expected [%s] but received [%s]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%s] but received [%s]", name, expected, v)
 	}
 
 	v, e = Convert(input, zero)
-	if !ifFailed(t, "TestToString", e) {
-		if v != expected {
-			t.Errorf("TestToString failed: expected [%s] but received [%s]", expected, v)
-		}
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else if v != expected {
+		t.Errorf("%s failed: expected [%s] but received [%s]", name, expected, v)
 	}
 }
 
@@ -512,30 +522,34 @@ func TestToTimeError(t *testing.T) {
 
 // TestToTimeStruct tests if time.Time are converted correctly to time.Time
 func TestToTimeStruct(t *testing.T) {
+	name := "TestToTimeStruct"
+
 	{
 		// convert 'time.Time' to 'time.Time'
 		now := time.Now()
 		input := now
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano() != now.UnixNano() {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).UnixNano() != now.UnixNano() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 }
 
 // TestToTimeInteger tests if integers are converted correctly to time.Time
 func TestToTimeInteger(t *testing.T) {
+	name := "TestToTimeInteger"
+
 	{
 		// convert 'long(seconds)' to 'time.Time'
 		now := time.Now()
 		input := now.Unix()
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).Unix() != now.Unix() {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -543,11 +557,11 @@ func TestToTimeInteger(t *testing.T) {
 		// convert 'long(milliseconds)' to 'time.Time'
 		now := time.Now()
 		input := now.UnixNano() / 1000000
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano()/1000000 != now.UnixNano()/1000000 {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -555,11 +569,11 @@ func TestToTimeInteger(t *testing.T) {
 		// convert 'long(microseconds)' to 'time.Time'
 		now := time.Now()
 		input := now.UnixNano() / 1000
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano()/1000 != now.UnixNano()/1000 {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -567,26 +581,28 @@ func TestToTimeInteger(t *testing.T) {
 		// convert 'long(nanoseconds)' to 'time.Time'
 		now := time.Now()
 		input := now.UnixNano()
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano() != now.UnixNano() {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 }
 
 // TestToTimeString tests if strings are converted correctly to time.Time
 func TestToTimeString(t *testing.T) {
+	name := "TestToTimeString"
+
 	{
 		// convert 'long(seconds)' to 'time.Time'
 		now := time.Now()
 		input := strconv.FormatInt(now.Unix(), 10)
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).Unix() != now.Unix() {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -594,11 +610,11 @@ func TestToTimeString(t *testing.T) {
 		// convert 'long(milliseconds)' to 'time.Time'
 		now := time.Now()
 		input := strconv.FormatInt(now.UnixNano()/1000000, 10)
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano()/1000000 != now.UnixNano()/1000000 {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -606,11 +622,11 @@ func TestToTimeString(t *testing.T) {
 		// convert 'long(microseconds)' to 'time.Time'
 		now := time.Now()
 		input := strconv.FormatInt(now.UnixNano()/1000, 10)
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano()/1000 != now.UnixNano()/1000 {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -618,17 +634,18 @@ func TestToTimeString(t *testing.T) {
 		// convert 'long(nanoseconds)' to 'time.Time'
 		now := time.Now()
 		input := strconv.FormatInt(now.UnixNano(), 10)
-		v, err := ToStruct(input, ZeroTime)
-		if !ifFailed(t, "TestToTime", err) {
-			if v.(time.Time).UnixNano() != now.UnixNano() {
-				t.Errorf("TestToTime failed: expected [%#v] but received [%#v]", now, v)
-			}
+		v, e := ToStruct(input, ZeroTime)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 }
 
 // TestToStruct tests if values are converted correctly to struct
 func TestToStruct(t *testing.T) {
+	name := "TestToStruct"
 	type Abc struct{ Key1 int }
 	zeroAbc := Abc{}
 
@@ -641,133 +658,149 @@ func TestToStruct(t *testing.T) {
 	{
 		// Abc is convertable to Abc
 		input := Abc{}
-		v, err := ToStruct(input, zeroAbc)
-		ifFailed(t, "TestToStruct", err)
-		if v != input {
-			t.Errorf("TestToStruct failed: expected [%#v] but received [%#v]", input, v)
+		v, e := ToStruct(input, zeroAbc)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != input {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, input, v)
 		}
 	}
 	{
 		// Abc is convertable to Abc
 		input := Abc{}
-		v, err := Convert(input, zeroAbc)
-		ifFailed(t, "TestToStruct", err)
-		if v != input {
-			t.Errorf("TestToStruct failed: expected [%#v] but received [%#v]", input, v)
+		v, e := Convert(input, zeroAbc)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != input {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, input, v)
 		}
 	}
 
 	{
 		// Abc is NOT convertable to Def
 		input := Abc{}
-		_, err := ToStruct(input, zeroDef)
-		if err == nil {
-			t.Errorf("TestToStruct failed: [%#v] should not be convertable to struct Def!", input)
+		_, e := ToStruct(input, zeroDef)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to struct Def!", name, input)
 		}
 	}
 	{
 		// Abc is NOT convertable to Def
 		input := Abc{}
-		_, err := Convert(input, zeroDef)
-		if err == nil {
-			t.Errorf("TestToStruct failed: [%#v] should not be convertable to struct Def!", input)
+		_, e := Convert(input, zeroDef)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to struct Def!", name, input)
 		}
 	}
 
 	{
 		// Def is convertable to Def
 		input := Def{}
-		v, err := ToStruct(input, zeroDef)
-		ifFailed(t, "TestToStruct", err)
-		if v != input {
-			t.Errorf("TestToStruct failed: expected [%#v] but received [%#v]", input, v)
+		v, e := ToStruct(input, zeroDef)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != input {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, input, v)
 		}
 	}
 	{
 		// Def is convertable to Def
 		input := Def{}
-		v, err := Convert(input, zeroDef)
-		ifFailed(t, "TestToStruct", err)
-		if v != input {
-			t.Errorf("TestToStruct failed: expected [%#v] but received [%#v]", input, v)
+		v, e := Convert(input, zeroDef)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != input {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, input, v)
 		}
 	}
 
 	{
 		// Def is convertable to Abc
 		input := Def{}
-		v, err := ToStruct(input, zeroAbc)
-		ifFailed(t, "TestToStruct", err)
-		if v != input.Abc {
-			t.Errorf("TestToStruct failed: expected [%#v] but received [%#v]", input.Abc, v)
+		v, e := ToStruct(input, zeroAbc)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != input.Abc {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, input, v)
 		}
 	}
 	{
 		// Def is convertable to Abc
 		input := Def{}
-		v, err := Convert(input, zeroAbc)
-		ifFailed(t, "TestToStruct", err)
-		if v != input.Abc {
-			t.Errorf("TestToStruct failed: expected [%#v] but received [%#v]", input.Abc, v)
+		v, e := Convert(input, zeroAbc)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != input.Abc {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, input, v)
 		}
 	}
 
 	{
 		input := Abc{}
-		_, err := ToStruct(input, "")
-		if err == nil {
-			t.Errorf("TestToStruct failed: [%#v] should not be convertable to string!", input)
+		_, e := ToStruct(input, "")
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to string!", name, input)
 		}
 	}
 	{
 		input := ""
-		_, err := ToStruct(input, zeroAbc)
-		if err == nil {
-			t.Errorf("TestToStruct failed: [%#v] should not be convertable to struct Abc!", input)
+		_, e := ToStruct(input, zeroAbc)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to struct Abc!", name, input)
 		}
 	}
 	{
 		input := ""
-		_, err := Convert(input, zeroAbc)
-		if err == nil {
-			t.Errorf("TestToStruct failed: [%#v] should not be convertable to struct Abc!", input)
+		_, e := Convert(input, zeroAbc)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to struct Abc!", name, input)
 		}
 	}
 }
 
 /*----------------------------------------------------------------------*/
 func testToSlice(t *testing.T, input interface{}, expected interface{}, zero interface{}) {
+	name := "TestToSlice"
+
 	v, e := ToSlice(input, zero)
-	ifFailed(t, "TestToSlice", e)
-	from := reflect.ValueOf(v)
-	to := reflect.ValueOf(expected)
-	if from.Len() != to.Len() {
-		t.Errorf("TestToSlice failed: expected [%#v] but received [%#v]", expected, v)
-	}
-	for i, n := 0, from.Len(); i < n; i++ {
-		if from.Index(i).Interface() != to.Index(i).Interface() {
-			t.Errorf("TestToSlice failed: expected [%#v] but received [%#v]", expected, v)
-			break
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else {
+		from := reflect.ValueOf(v)
+		to := reflect.ValueOf(expected)
+		if from.Len() != to.Len() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
+		for i, n := 0, from.Len(); i < n; i++ {
+			if from.Index(i).Interface() != to.Index(i).Interface() {
+				t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+				break
+			}
 		}
 	}
 
 	v, e = Convert(input, zero)
-	ifFailed(t, "TestToSlice", e)
-	from = reflect.ValueOf(v)
-	to = reflect.ValueOf(expected)
-	if from.Len() != to.Len() {
-		t.Errorf("TestToSlice failed: expected [%#v] but received [%#v]", expected, v)
-	}
-	for i, n := 0, from.Len(); i < n; i++ {
-		if from.Index(i).Interface() != to.Index(i).Interface() {
-			t.Errorf("TestToSlice failed: expected [%#v] but received [%#v]", expected, v)
-			break
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else {
+		from := reflect.ValueOf(v)
+		to := reflect.ValueOf(expected)
+		if from.Len() != to.Len() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
+		for i, n := 0, from.Len(); i < n; i++ {
+			if from.Index(i).Interface() != to.Index(i).Interface() {
+				t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+				break
+			}
 		}
 	}
 }
 
 // TestToSlice tests if values are converted correctly to slice
 func TestToSlice(t *testing.T) {
+	name := "TestToSlice"
+
 	{
 		input := []bool{true, false}
 		zero := [0]int{}
@@ -781,83 +814,93 @@ func TestToSlice(t *testing.T) {
 
 	{
 		input := ""
-		_, err := ToSlice(input, [0]int{})
-		if err == nil {
-			t.Errorf("TestToSlice failed: [%#v] should not be convertable to []int!", input)
+		_, e := ToSlice(input, [0]int{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to []int!", name, input)
 		}
 	}
 	{
 		input := ""
-		_, err := Convert(input, []int{})
-		if err == nil {
-			t.Errorf("TestToSlice failed: [%#v] should not be convertable to []int!", input)
+		_, e := Convert(input, []int{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to []int!", name, input)
 		}
 	}
 	{
 		input := []bool{true, false}
-		_, err := ToSlice(input, "")
-		if err == nil {
-			t.Errorf("TestToSlice failed: [%#v] should not be convertable to string!", input)
+		_, e := ToSlice(input, "")
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to string!", name, input)
 		}
 	}
 
 	{
 		input := []string{"a", "b", "c"}
-		_, err := ToSlice(input, []int{})
-		if err == nil {
-			t.Errorf("TestToSlice failed: [%#v] should not be convertable to []int!", input)
+		_, e := ToSlice(input, []int{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to []int!", name, input)
 		}
 	}
 	{
 		input := []string{"a", "b", "c"}
-		_, err := Convert(input, []int{})
-		if err == nil {
-			t.Errorf("TestToSlice failed: [%#v] should not be convertable to []int!", input)
+		_, e := Convert(input, []int{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to []int!", name, input)
 		}
 	}
 }
 
 /*----------------------------------------------------------------------*/
 func testToMap(t *testing.T, input interface{}, expected interface{}, zero interface{}) {
+	name := "TestToMap"
+
 	v, e := ToMap(input, zero)
-	ifFailed(t, "TestToMap", e)
-	from := reflect.ValueOf(v)
-	to := reflect.ValueOf(expected)
-	if from.Len() != to.Len() {
-		t.Errorf("TestToMap failed: expected [%#v] but received [%#v]", expected, v)
-	}
-	for _, k := range from.MapKeys() {
-		if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-			t.Errorf("TestToMap failed: expected [%#v] but received [%#v]", expected, v)
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else {
+		from := reflect.ValueOf(v)
+		to := reflect.ValueOf(expected)
+		if from.Len() != to.Len() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
-	}
-	for _, k := range to.MapKeys() {
-		if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-			t.Errorf("TestToMap failed: expected [%#v] but received [%#v]", expected, v)
+		for _, k := range from.MapKeys() {
+			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+				t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			}
+		}
+		for _, k := range to.MapKeys() {
+			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+				t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			}
 		}
 	}
 
 	v, e = Convert(input, zero)
-	ifFailed(t, "TestToMap", e)
-	from = reflect.ValueOf(v)
-	to = reflect.ValueOf(expected)
-	if from.Len() != to.Len() {
-		t.Errorf("TestToMap failed: expected [%#v] but received [%#v]", expected, v)
-	}
-	for _, k := range from.MapKeys() {
-		if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-			t.Errorf("TestToMap failed: expected [%#v] but received [%#v]", expected, v)
+	if e != nil {
+		t.Errorf("%s failed: %e", name, e)
+	} else {
+		from := reflect.ValueOf(v)
+		to := reflect.ValueOf(expected)
+		if from.Len() != to.Len() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
-	}
-	for _, k := range to.MapKeys() {
-		if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-			t.Errorf("TestToMap failed: expected [%#v] but received [%#v]", expected, v)
+		for _, k := range from.MapKeys() {
+			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+				t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			}
+		}
+		for _, k := range to.MapKeys() {
+			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+				t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			}
 		}
 	}
 }
 
 // TestToMap tests if values are converted correctly to map
 func TestToMap(t *testing.T) {
+	name := "TestToMap"
+
 	{
 		input := map[string]bool{"1": true, "0": false}
 		zero := map[int]string{}
@@ -866,39 +909,39 @@ func TestToMap(t *testing.T) {
 
 	{
 		input := map[string]bool{"one": true, "0": false}
-		_, err := ToMap(input, map[int]string{})
-		if err == nil {
-			t.Errorf("TestToMap failed: [%#v] should not be convertable to map[int]string!", input)
+		_, e := ToMap(input, map[int]string{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to map[int]string!", name, input)
 		}
 	}
 
 	{
 		input := map[bool]string{true: "1", false: "zero"}
-		_, err := ToMap(input, map[bool]int{})
-		if err == nil {
-			t.Errorf("TestToMap failed: [%#v] should not be convertable to map[bool]int!", input)
+		_, e := ToMap(input, map[bool]int{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to map[bool]int!", name, input)
 		}
 	}
 
 	{
 		input := ""
-		_, err := ToMap(input, map[int]string{})
-		if err == nil {
-			t.Errorf("TestToMap failed: [%#v] should not be convertable to map!", input)
+		_, e := ToMap(input, map[int]string{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to map!", name, input)
 		}
 	}
 	{
 		input := ""
-		_, err := Convert(input, map[int]string{})
-		if err == nil {
-			t.Errorf("TestToMap failed: [%#v] should not be convertable to map!", input)
+		_, e := Convert(input, map[int]string{})
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to map!", name, input)
 		}
 	}
 	{
 		input := map[string]bool{"1": true, "0": false}
-		_, err := ToMap(input, "")
-		if err == nil {
-			t.Errorf("TestToMap failed: [%#v] should not be convertable to string!", input)
+		_, e := ToMap(input, "")
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to string!", name, input)
 		}
 	}
 }
@@ -907,72 +950,86 @@ func TestToMap(t *testing.T) {
 
 // TestToPointer tests if values are converted correctly to pointer
 func TestToPointer(t *testing.T) {
+	name := "TestToPointer"
+
 	{
 		a := float64(1.23)
 		zero := int32(0)
-		output, err := ToPointer(&a, &zero)
-		ifFailed(t, "TestToPointer", err)
-		i32 := *output.(*interface{})
-		if i32.(int32) != 1 {
-			t.Errorf("TestToPointer failed: received [%#v]", output)
+		output, e := ToPointer(&a, &zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else {
+			i32 := *output.(*interface{})
+			if i32.(int32) != 1 {
+				t.Errorf("%s failed: received [%#v]", name, output)
+			}
 		}
 	}
 	{
 		a := float64(1.23)
 		zero := int32(0)
-		output, err := Convert(&a, &zero)
-		ifFailed(t, "TestToPointer", err)
-		i32 := *output.(*interface{})
-		if i32.(int32) != 1 {
-			t.Errorf("TestToPointer failed: received [%#v]", output)
+		output, e := Convert(&a, &zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else {
+			i32 := *output.(*interface{})
+			if i32.(int32) != 1 {
+				t.Errorf("%s failed: received [%#v]", name, output)
+			}
 		}
 	}
 
 	{
 		a := string("1.23")
 		zero := float64(0)
-		output, err := ToPointer(&a, &zero)
-		ifFailed(t, "TestToPointer", err)
-		f64 := *output.(*interface{})
-		if f64.(float64) != 1.23 {
-			t.Errorf("TestToPointer failed: received [%#v]", output)
+		output, e := ToPointer(&a, &zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else {
+			f64 := *output.(*interface{})
+			if f64.(float64) != 1.23 {
+				t.Errorf("%s failed: received [%#v]", name, output)
+			}
 		}
 	}
 	{
 		a := string("1.23")
 		zero := float64(0)
-		output, err := Convert(&a, &zero)
-		ifFailed(t, "TestToPointer", err)
-		f64 := *output.(*interface{})
-		if f64.(float64) != 1.23 {
-			t.Errorf("TestToPointer failed: received [%#v]", output)
+		output, e := Convert(&a, &zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else {
+			f64 := *output.(*interface{})
+			if f64.(float64) != 1.23 {
+				t.Errorf("%s failed: received [%#v]", name, output)
+			}
 		}
 	}
 
 	{
 		a := string("blabla")
 		zero := float64(0)
-		_, err := ToPointer(&a, &zero)
-		if err == nil {
-			t.Errorf("TestToPointer failed: [%#v] should not be convertable to [%#v]!", &a, &zero)
+		_, e := ToPointer(&a, &zero)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to [%#v]!", name, &a, &zero)
 		}
 	}
 
 	{
 		a := ""
 		zero := int64(0)
-		_, err := ToPointer(a, &zero)
-		if err == nil {
-			t.Errorf("TestToPointer failed: [%#v] should not be convertable to [%#v]!", a, &zero)
+		_, e := ToPointer(a, &zero)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to [%#v]!", name, a, &zero)
 		}
 	}
 
 	{
 		a := ""
 		zero := int64(0)
-		_, err := ToPointer(&a, zero)
-		if err == nil {
-			t.Errorf("TestToPointer failed: [%#v] should not be convertable to [%#v]!", &a, zero)
+		_, e := ToPointer(&a, zero)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to [%#v]!", name, &a, zero)
 		}
 	}
 
@@ -985,11 +1042,14 @@ func TestToPointer(t *testing.T) {
 			D string
 		}
 		a := Def{Abc: Abc{1}, D: "2"}
-		output, err := ToPointer(&a, &Abc{})
-		ifFailed(t, "TestToPointer", err)
-		abc := *output.(*interface{})
-		if abc.(Abc).A != 1 {
-			t.Errorf("TestToPointer failed: received [%#v]", output)
+		output, e := ToPointer(&a, &Abc{})
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else {
+			abc := *output.(*interface{})
+			if abc.(Abc).A != 1 {
+				t.Errorf("%s failed: received [%#v]", name, output)
+			}
 		}
 	}
 	{
@@ -1001,11 +1061,14 @@ func TestToPointer(t *testing.T) {
 			D string
 		}
 		a := Def{Abc: Abc{1}, D: "2"}
-		output, err := Convert(&a, &Abc{})
-		ifFailed(t, "TestToPointer", err)
-		abc := *output.(*interface{})
-		if abc.(Abc).A != 1 {
-			t.Errorf("TestToPointer failed: received [%#v]", output)
+		output, e := Convert(&a, &Abc{})
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else {
+			abc := *output.(*interface{})
+			if abc.(Abc).A != 1 {
+				t.Errorf("%s failed: received [%#v]", name, output)
+			}
 		}
 	}
 }
@@ -1013,25 +1076,26 @@ func TestToPointer(t *testing.T) {
 /*----------------------------------------------------------------------*/
 
 func TestConvert(t *testing.T) {
+	name := "TestConvert"
+
 	{
-		_, err := Convert("", nil)
-		if err == nil {
-			t.Errorf("TestToPointer failed: [%#v] should not be convertable to [%#v]!", "", nil)
+		v, e := Convert("", nil)
+		if e != nil || v != "" {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, "", v)
 		}
 	}
 	{
-		_, err := Convert(nil, "")
-		if err == nil {
-			t.Errorf("TestToPointer failed: [%#v] should not be convertable to [%#v]!", nil, "")
+		_, e := Convert(nil, "")
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to [%#v]!", name, nil, "")
 		}
 	}
 	{
 		input := ""
 		zero := func() {}
-		_, err := Convert(input, zero)
-		if err == nil {
-			t.Errorf("TestToPointer failed: [%#v] should not be convertable to func!", input)
+		_, e := Convert(input, zero)
+		if e == nil {
+			t.Errorf("%s failed: [%#v] should not be convertable to func!", name, input)
 		}
 	}
-
 }

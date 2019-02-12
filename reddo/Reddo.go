@@ -545,11 +545,15 @@ func ToPointer(v interface{}, t interface{}) (interface{}, error) {
 //   - If t is an array or a slice: see ToSlice(v interface{}, interface{}) (interface{}, error)
 //   - If t is a map: see ToMap(interface{}, interface{}) (interface{}, error)
 //   - If t is a pointer: see ToPointer(interface{}, interface{}) (interface{}, error)
+//   - (special case) If t is nil: this function returns (v, nil)
 func Convert(v interface{}, t interface{}) (interface{}, error) {
-	if v == nil || t == nil {
-		return nil, errors.New("cannot convert: both (v) and (t) must not be nil")
+	if t == nil {
+		return v, nil
 	}
 	k := reflect.TypeOf(t).Kind()
+	if v == nil {
+		return nil, errors.New("cannot convert: nil to " + k.String())
+	}
 	switch k {
 	case reflect.Bool:
 		return ToBool(v)
