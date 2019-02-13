@@ -2,10 +2,9 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/reddo)
+[![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/reddo)
 
-[GoCover](https://gocover.io/github.com/btnguyen2k/consu/reddo)
-
-Package reddo provides utilities to convert values using Golang's reflect.
+Package reddo provides utilities to convert values using Golang's reflection.
 
 ## Installation
 
@@ -68,7 +67,7 @@ func main() {
 	fmt.Println("data.def       :", def)  // data.def       : {{1981} btnguyen2k}
 	fmt.Println("data.def as abc:", abc2) // data.def as abc: {1981}
 	
-	// Special case: convert value to 'time.Time'
+	// special case: convert value to 'time.Time'
 	v,_ := reddo.ToTime(1547549353)
 	fmt.Println(v) // 2019-01-15 17:49:13 +0700 +07
 	v,_ = reddo.ToTime("1547549353123")

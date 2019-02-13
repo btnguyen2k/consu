@@ -1,4 +1,4 @@
-// Package reddo provides utility functions to convert values using Golang's reflect.
+// Package reddo provides utility functions to convert values using Golang's reflection.
 //
 // Sample usage:
 //
@@ -53,7 +53,7 @@
 //     fmt.Println("data.def       :", def)  // data.def       : {{1981} btnguyen2k}
 //     fmt.Println("data.def as abc:", abc2) // data.def as abc: {1981}
 //
-//     // Special case: convert value to 'time.Time'
+//     // special case: convert value to 'time.Time'
 //     v,_ := reddo.ToTime(1547549353)
 //     fmt.Println(v)                         // 2019-01-15 17:49:13 +0700 +07
 //     v,_ = reddo.ToTime("1547549353123")
