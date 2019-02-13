@@ -744,26 +744,6 @@ func TestNode_setValueSliceAppend(t *testing.T) {
 	var p string
 	var node *node
 
-	p = "xyz"
-	node, err = _node.setValue(p, data)
-	if node != nil || err == nil {
-		// invalid type
-		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
-	}
-
-	p = "[-1]"
-	node, err = _node.setValue(p, data)
-	if node != nil || err == nil {
-		// index out-of-bound
-		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
-	}
-	p = "[999]"
-	node, err = _node.setValue(p, data)
-	if node != nil || err == nil {
-		// index out-of-bound
-		t.Errorf("%s failed with data %#v at index {%#v}", name, v, p)
-	}
-
 	l := len(_node.unwrap().([]interface{}))
 	p = "[]"
 	node, err = _node.setValue(p, data)

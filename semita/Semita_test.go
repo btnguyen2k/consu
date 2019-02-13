@@ -3,6 +3,7 @@ package semita
 import (
 	"github.com/btnguyen2k/consu/reddo"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -437,13 +438,6 @@ func TestSemita_GetValueStruct(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
-
-// func ifFailed(t *testing.T, f string, e error) {
-// 	if e != nil {
-// 		t.Errorf("%s failed: %e", f, e)
-// 		t.FailNow()
-// 	}
-// }
 
 var (
 	companyName = "Monster Corp."
@@ -1139,12 +1133,12 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 
 func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 	name := "TestSemita_SetValue_MultiLevelMap"
-	data := generateDataMap()
-	s1 := NewSemita(data)
-	d := data.(map[string]interface{})
-	s2 := NewSemita(&d)
 
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Name"
 
 		vSet1 := 1
@@ -1178,6 +1172,10 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Year"
 
 		vSet1 := "1"
@@ -1211,6 +1209,10 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Employees.[0].age"
 
 		vSet1 := 1
@@ -1244,6 +1246,10 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Employees[1].email"
 
 		vSet1 := "1"
@@ -1277,6 +1283,10 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Employees[0].options.work_hours.[0]"
 
 		vSet1 := 1
@@ -1310,6 +1320,10 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Employees.[1].options.overtime"
 
 		vSet1 := "1"
@@ -1343,6 +1357,10 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
 		p := "Employees.[0].join_date"
 		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
@@ -1381,12 +1399,12 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 
 func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 	name := "TestSemita_SetValue_MultiLevelStruct"
-	data := generateDataStruct()
-	s1 := NewSemita(data)
-	d := data.(Company)
-	s2 := NewSemita(&d)
 
 	{
+		data := generateDataStruct()
+		// s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Name"
 
 		// vSet1 := "1"
@@ -1414,6 +1432,10 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataStruct()
+		// s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Year"
 
 		// vSet1 := "1"
@@ -1441,6 +1463,10 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataStruct()
+		s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Employees.[0].Age"
 
 		vSet1 := 1
@@ -1474,6 +1500,10 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataStruct()
+		s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Employees[1].Email"
 
 		vSet1 := "1"
@@ -1507,6 +1537,10 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataStruct()
+		s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Employees[0].Options.WorkHours.[0]"
 
 		vSet1 := 1
@@ -1540,6 +1574,10 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataStruct()
+		s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Employees.[1].Options.Overtime"
 
 		vSet1 := !employee1Overtime
@@ -1573,6 +1611,10 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataStruct()
+		s1 := NewSemita(data)
+		data2 := generateDataStruct().(Company)
+		s2 := NewSemita(&data2)
 		p := "Employees.[0].JoinDate"
 		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
@@ -1611,12 +1653,12 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 
 func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 	name := "TestSemita_SetValue_MultiLevelMixed"
-	data := generateDataMixed()
-	s1 := NewSemita(data)
-	d := data.(CompanyMixed)
-	s2 := NewSemita(&d)
 
 	{
+		data := generateDataMixed()
+		// s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
 		p := "Name"
 
 		// vSet1 := "1"
@@ -1644,6 +1686,10 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMixed()
+		// s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
 		p := "Year"
 
 		// vSet1 := 1
@@ -1677,6 +1723,10 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMixed()
+		s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
 		p := "Employees.[0].age"
 
 		vSet1 := 1
@@ -1710,6 +1760,10 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMixed()
+		s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
 		p := "Employees[1].email"
 
 		vSet1 := "1"
@@ -1743,6 +1797,10 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 		}
 	}
 	{
+		data := generateDataMixed()
+		s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
 		p := "Employees[0].options.WorkHours.[0]"
 
 		vSet1 := 1
@@ -1809,6 +1867,10 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 	// 	}
 	// }
 	{
+		data := generateDataMixed()
+		s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
 		p := "Employees.[0].join_date"
 		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
@@ -1840,6 +1902,183 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
+	name := "TestSemita_SetValue_MultiLevelMap_CreateNodes"
+
+	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
+		p := "Employees.[].age" // append to end of slice
+
+		_v, _ := s1.GetValueOfType("Employees", reddo.ZeroSlice)
+		l1 := len(_v.([]interface{}))
+		vSet1 := 19
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		_v, _ = s1.GetValueOfType("Employees", reddo.ZeroSlice)
+		l2 := len(_v.([]interface{}))
+		if l2 != l1+1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+		_p := "Employees[" + strconv.Itoa(l2-1) + "].age"
+		v, e := s1.GetValueOfType(_p, reddo.ZeroInt)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(int64) != int64(vSet1) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		_v, _ = s2.GetValueOfType("Employees", reddo.ZeroSlice)
+		l1 = len(_v.([]interface{}))
+		vSet2 := 81
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		_v, _ = s2.GetValueOfType("Employees", reddo.ZeroSlice)
+		l2 = len(_v.([]interface{}))
+		if l2 != l1+1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+		_p = "Employees[" + strconv.Itoa(l2-1) + "].age"
+		v, e = s2.GetValueOfType(_p, reddo.ZeroUint)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(uint64) != uint64(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
+		p := "a.b.c.d" // create all nodes for maps
+
+		vSet1 := "19"
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s1.GetValueOfType(p, reddo.ZeroInt)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if strconv.Itoa(int(v.(int64))) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 81
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e = s2.GetValueOfType(p, reddo.ZeroString)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(string) != strconv.Itoa(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+	{
+		data := generateDataMap()
+		s1 := NewSemita(data)
+		data2 := generateDataMap().(map[string]interface{})
+		s2 := NewSemita(&data2)
+		p := "a[].b.c[].d" // create all nodes for maps & slices
+		_p := "a[0].b.c[0].d"
+
+		vSet1 := "19"
+		e := s1.SetValue(p, vSet1)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e := s1.GetValueOfType(_p, reddo.ZeroInt)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if strconv.Itoa(int(v.(int64))) != vSet1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+
+		vSet2 := 81
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		v, e = s2.GetValueOfType(_p, reddo.ZeroString)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(string) != strconv.Itoa(vSet2) {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+	}
+}
+
+func TestSemita_SetValue_MultiLevelMixed_CreateNodes(t *testing.T) {
+	name := "TestSemita_SetValue_MultiLevelMixed_CreateNodes"
+
+	{
+		data := generateDataMixed()
+		s1 := NewSemita(data)
+		data2 := generateDataMixed().(CompanyMixed)
+		s2 := NewSemita(&data2)
+		p := "Employees.[].age" // append to end of slice
+
+		vSet1 := 19
+		e := s1.SetValue(p, vSet1)
+		if e == nil {
+			// s1 is not reference to strut --> can not append
+			t.Errorf("%s failed: %e", name, e)
+		}
+
+		_v, _ := s2.GetValueOfType("Employees", reddo.ZeroSlice)
+		l1 := len(_v.([]interface{}))
+		vSet2 := 81
+		e = s2.SetValue(p, vSet2)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		_v, _ = s2.GetValueOfType("Employees", reddo.ZeroSlice)
+		l2 := len(_v.([]interface{}))
+		if l2 != l1+1 {
+			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		}
+		_p := "Employees[" + strconv.Itoa(l2-1) + "].age"
+		v, e := s2.GetValueOfType(_p, reddo.ZeroUint)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+			t.FailNow()
+		}
+		if v.(uint64) != uint64(vSet2) {
 			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}

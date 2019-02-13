@@ -13,6 +13,7 @@ import (
 	"github.com/btnguyen2k/consu/reddo"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -261,7 +262,7 @@ func (s *Semita) GetValueOfType(path string, target interface{}) (interface{}, e
 func (s *Semita) SetValue(path string, value interface{}) error {
 	paths := SplitPath(path)
 	var pathSoFar string
-	// "seek"to the correct position
+	// "seek" to the correct position
 	for i, index := range paths[0 : len(paths)-1] {
 		if i > 0 {
 			pathSoFar = string(append([]byte(pathSoFar), PathSeparator))
@@ -272,16 +273,24 @@ func (s *Semita) SetValue(path string, value interface{}) error {
 			return errors.New("error while getting value at path: " + pathSoFar)
 		}
 		if cursor == nil {
-			nextIndex := paths[i+1]
 			// create node along the way
-			if patternIndex.MatchString(nextIndex) || "[]" == nextIndex {
-				_, err = prevCursor.createChildSlice(index)
+			var _newNode *node
+			var err error
+			nextIndex := paths[i+1]
+			if patternIndex.MatchString(nextIndex) {
+				_newNode, err = prevCursor.createChildSlice(index)
 			} else {
-				_, err = prevCursor.createChildMap(index)
+				_newNode, err = prevCursor.createChildMap(index)
 			}
+			if err != nil {
+				return errors.New("error while creating node at at path: " + pathSoFar)
+			}
+			prevCursor = _newNode.prev
 		}
-		if err != nil {
-			return errors.New("error while creating node at at path: " + pathSoFar)
+		if index == "[]" {
+			// special case
+			l := prevCursor.elem().Len()
+			pathSoFar = pathSoFar[0:len(pathSoFar)-2] + "[" + strconv.Itoa(l-1) + "]"
 		}
 	}
 	_, cursor, err := s.seek(pathSoFar)
