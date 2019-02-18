@@ -152,7 +152,7 @@ func testWrite(s *semita.Semita) {
 }
 
 func main() {
-	data1 := sampleData_MapsAndSlices()
+	data1 := sampleDataMapsAndSlices()
 	s1 := semita.NewSemita(data1)
 	testRead(s1)
 	testWrite(s1)

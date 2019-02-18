@@ -26,10 +26,12 @@ var (
 )
 
 type (
+	// Options is struct used by examples
 	Options struct {
 		WorkHours []int
 		Overtime  bool
 	}
+	// Employee is struct used by examples
 	Employee struct {
 		FirstName string
 		LastName  string
@@ -38,16 +40,19 @@ type (
 		Options   Options
 		JoinDate  time.Time
 	}
+	// Company is struct used by examples
 	Company struct {
 		Name      string
 		Year      int
 		Employees []Employee
 	}
 
+	// OptionsMixed is struct used by examples
 	OptionsMixed struct {
 		WorkHours []int
 		Overtime  bool
 	}
+	// CompanyMixed is struct used by examples
 	CompanyMixed struct {
 		Name      string
 		Year      int
@@ -56,7 +61,7 @@ type (
 )
 
 // generate sample data where root node is a map, with nested maps and slices
-func sampleData_MapsAndSlices() interface{} {
+func sampleDataMapsAndSlices() interface{} {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
 	return map[string]interface{}{
@@ -90,7 +95,7 @@ func sampleData_MapsAndSlices() interface{} {
 }
 
 // generate sample data where root node is a struct, with nested structs and slices
-func sampleData_Structs() interface{} {
+func sampleDataStructs() interface{} {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
 	return Company{
@@ -124,7 +129,7 @@ func sampleData_Structs() interface{} {
 }
 
 // generate sample data where root node is a struct, with nested structs, maps and slices
-func sampleData_Mixed() interface{} {
+func sampleDataMixed() interface{} {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
 	return CompanyMixed{
