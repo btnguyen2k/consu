@@ -1105,7 +1105,7 @@ func TestNode_removeValue_Invalid(t *testing.T) {
 		}
 	}
 	{
-		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1119,7 +1119,7 @@ func TestNode_removeValue_Invalid(t *testing.T) {
 		}
 	}
 	{
-		v := map[int]interface{}{1: 1, 2: "2", 3: true,}
+		v := map[int]interface{}{1: 1, 2: "2", 3: true}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1138,7 +1138,7 @@ func TestNode_removeValue_Invalid(t *testing.T) {
 			B interface{}
 			C interface{}
 		}
-		v := MyStruct{A: 1, B: "2", C: true,}
+		v := MyStruct{A: 1, B: "2", C: true}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1170,7 +1170,7 @@ func TestNode_removeValue_Invalid(t *testing.T) {
 func TestNode_removeValue_Map(t *testing.T) {
 	name := "TestNode_removeKey_Map"
 	{
-		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1192,7 +1192,7 @@ func TestNode_removeValue_Map(t *testing.T) {
 		}
 	}
 	{
-		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1215,7 +1215,7 @@ func TestNode_removeValue_Map(t *testing.T) {
 	}
 
 	{
-		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
