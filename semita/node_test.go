@@ -1057,3 +1057,202 @@ func TestNode_createChildSlice_MapAndStruct(t *testing.T) {
 		}
 	}
 }
+
+/*--------------------------------------------------------------------------------*/
+
+func TestNode_removeValue_Map(t *testing.T) {
+	name := "TestNode_removeKey_Map"
+	{
+		v := map[string]interface{}{"a": 1, "b": 2, "c": true,}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		if root.value.Kind() != reflect.Map {
+			t.Errorf("%s failed: expecting data to be a map, but received {%T}", name, root.unwrap())
+		}
+		path := "a"
+		node, _ := root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		err := root.removeValue(path)
+		node, _ = root.next(path)
+		if err != nil || node != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := map[string]interface{}{"a": 1, "b": 2, "c": true,}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v),
+		}
+		if root.value.Elem().Kind() != reflect.Map {
+			t.Errorf("%s failed: expecting data to be a map, but received {%T}", name, root.unwrap())
+		}
+		path := "a"
+		node, _ := root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		err := root.removeValue(path)
+		node, _ = root.next(path)
+		if err != nil || node != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+}
+
+func TestNode_removeValue_Struct(t *testing.T) {
+	name := "TestNode_removeValue_Struct"
+	type MyStruct struct {
+		fieldPrivate   int
+		FieldInt       int
+		FieldString    string
+		FieldPointer   *int
+		FieldInterface interface{}
+	}
+
+	{
+		i := 123
+		v := MyStruct{fieldPrivate: 1, FieldInt: 2, FieldString: "3", FieldPointer: &i, FieldInterface: true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
+		}
+		var path string
+		var node *node
+		var err error
+
+		if root.value.Elem().Kind() != reflect.Struct {
+			t.Errorf("%s failed: expecting data to be a struct, but received {%T}", name, root.unwrap())
+		}
+
+		path = "fieldPrivate"
+		err = root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+
+		path = "FieldInt"
+		err = root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+
+		path = "FieldString"
+		err = root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+
+		path = "FieldPointer"
+		node, _ = root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		err = root.removeValue(path)
+		node, _ = root.next(path)
+		if err != nil || node.unwrap().(*int) != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+
+		path = "FieldInterface"
+		node, _ = root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		err = root.removeValue(path)
+		node, _ = root.next(path)
+		if err != nil || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+}
+
+func TestNode_removeValue_Slice(t *testing.T) {
+	name := "TestNode_removeValue_Slice"
+	{
+		v := []interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		if root.value.Kind() != reflect.Slice {
+			t.Errorf("%s failed: expecting data to be a slice, but received {%T}", name, root.unwrap())
+		}
+		path := "[1]"
+		node, _ := root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		l1 := len(root.unwrap().([]interface{}))
+		err := root.removeValue(path)
+		l2 := len(root.unwrap().([]interface{}))
+		node, _ = root.next(path)
+		if err != nil || l1 != l2 || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := []interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v),
+		}
+		if root.value.Elem().Kind() != reflect.Slice {
+			t.Errorf("%s failed: expecting data to be a slice, but received {%T}", name, root.unwrap())
+		}
+		path := "[1]"
+		node, _ := root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		l1 := len(*root.unwrap().(*[]interface{}))
+		err := root.removeValue(path)
+		l2 := len(*root.unwrap().(*[]interface{}))
+		node, _ = root.next(path)
+		if err != nil || l1 != l2 || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+}
+
+func TestNode_removeValue_Array(t *testing.T) {
+	name := "TestNode_removeValue_Array"
+	{
+		v := [3]interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
+		}
+		if root.value.Elem().Kind() != reflect.Array {
+			t.Errorf("%s failed: expecting data to be an array, but received {%T}", name, root.unwrap())
+		}
+		path := "[1]"
+		node, _ := root.next(path)
+		if node == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		l1 := len(root.unwrap().(*[3]interface{}))
+		err := root.removeValue(path)
+		l2 := len(root.unwrap().(*[3]interface{}))
+		node, _ = root.next(path)
+		if err != nil || l1 != l2 || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+}

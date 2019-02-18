@@ -2,8 +2,8 @@
 //
 // Notation:
 //   - . (the dot character): path separator
-//   - Name: access a map's attribute specified by Name
-//   - i]: access i'th element of a list/array (0-based)
+//   - Name: access attribute of a map/struct specified by 'Name'
+//   - [i]: access i'th element of a slice/array (0-based)
 //
 // Sample of a path: `Employees.[1].first_name`. The dot right before `[]` can be omitted: `Employees[1].first_name`.
 package semita

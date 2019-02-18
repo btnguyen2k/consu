@@ -118,9 +118,69 @@ func (n *node) next(index string) (*node, error) {
 	return nil, errors.New("invalid type {" + vNode.Type().String() + "}")
 }
 
+// removeValue removes the value specified by 'index':
+// - if node is a map: remove key & value
+// - if node is a struct/slice/array: set value of the specified entry to 'nil'
+func (n *node) removeValue(index string) error {
+	vNode := n.elem()
+	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
+		if vNode.Kind() == reflect.Slice || vNode.Kind() == reflect.Array {
+			var i = vNode.Len()
+			var e error
+			if "[]" != index {
+				i, e = strconv.Atoi(match[1])
+				if e != nil {
+					return e
+				}
+			}
+			if i < 0 || i >= vNode.Len() {
+				return errors.New("index out of bound {" + index + "}")
+			}
+			childNode := vNode.Index(i)
+			if !childNode.CanSet() {
+				// final check
+				return errors.New("entry at index {" + index + "} is not settable")
+			}
+			childNode.Set(reflect.Zero(childNode.Type()))
+			return nil
+		}
+		return errors.New("expecting array or slice, but it is {" + vNode.Type().String() + "}")
+	}
+	if vNode.Kind() == reflect.Map {
+		if vNode.Type().Key().Kind() != reflect.String {
+			// map's key must be string
+			return errors.New("node of type {" + vNode.Type().String() + "} is not supported, map type must be string")
+		}
+		value := reflect.ValueOf(nil)
+		vNode.SetMapIndex(reflect.ValueOf(index), value)
+		return nil
+	} else if vNode.Kind() == reflect.Struct {
+		f := vNode.FieldByName(index)
+		if f.Kind() == reflect.Invalid || !isExportedField(index) {
+			// field must exist and is exported
+			return errors.New("{" + vNode.Type().String() + "} does not has exported field {" + index + "}")
+		}
+		if f.Kind() != reflect.Interface && f.Kind() != reflect.Ptr {
+			// field type must match
+			return errors.New("{nil} is not assignable to field {" + f.Type().String() + "}")
+		}
+		if !f.CanSet() {
+			// final check
+			return errors.New("field {" + index + "} is not settable")
+		}
+		f.Set(reflect.Zero(f.Type()))
+		return nil
+	}
+	return errors.New("expecting map or struct, but it is {" + vNode.Type().String() + "}")
+}
+
 // setValue inserts the value as a child into the correct position specified by 'index'.
 // when successful, this function returns the newly created child node.
+// If value is nil (value.Kind is reflect.Invalid), remove the key specified by 'index'.
 func (n *node) setValue(index string, value reflect.Value) (*node, error) {
+	if value.Kind() == reflect.Invalid {
+		return nil, n.removeValue(index)
+	}
 	vNode := n.elem()
 	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
 		if vNode.Kind() == reflect.Slice || vNode.Kind() == reflect.Array {

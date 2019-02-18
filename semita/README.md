@@ -1,15 +1,15 @@
-# consu/reddo
+# consu/semita
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/reddo)
-[![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/reddo)
+[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/semita)
+[![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/semita)
 
-Package reddo provides utility functions to convert values using Golang's reflection.
+Package semita provides utility functions to access data from a hierarchy structure.
 
 ## Installation
 
 ```shell
-$ go get -u github.com/btnguyen2k/consu/reddo
+$ go get -u github.com/btnguyen2k/consu/semita
 ```
 
 
