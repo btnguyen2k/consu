@@ -1060,10 +1060,117 @@ func TestNode_createChildSlice_MapAndStruct(t *testing.T) {
 
 /*--------------------------------------------------------------------------------*/
 
+func TestNode_removeValue_Invalid(t *testing.T) {
+	name := "TestNode_removeValue_Invalid"
+	{
+		v := []interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[a]" // invalid index: 'a' is not a number
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := []interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[10]" // index out-of-bound
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := [3]interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[1]" // unaddressable array, value cannot be set
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[1]" // invalid type: expecting array or slice
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := map[int]interface{}{1: 1, 2: "2", 3: true,}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "a" // invalid map: map's key must be string
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		type MyStruct struct {
+			A interface{}
+			B interface{}
+			C interface{}
+		}
+		v := MyStruct{A: 1, B: "2", C: true,}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "A" // unaddressable struct, value cannot be set
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+	{
+		v := []interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "a" // invalid type: expecting map or struct
+		err := root.removeValue(path)
+		if err == nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+}
+
 func TestNode_removeValue_Map(t *testing.T) {
 	name := "TestNode_removeKey_Map"
 	{
-		v := map[string]interface{}{"a": 1, "b": 2, "c": true,}
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1085,7 +1192,7 @@ func TestNode_removeValue_Map(t *testing.T) {
 		}
 	}
 	{
-		v := map[string]interface{}{"a": 1, "b": 2, "c": true,}
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
@@ -1102,6 +1209,22 @@ func TestNode_removeValue_Map(t *testing.T) {
 		}
 		err := root.removeValue(path)
 		node, _ = root.next(path)
+		if err != nil || node != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+
+	{
+		v := map[string]interface{}{"a": 1, "b": "2", "c": true,}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "a"
+		_, err := root.setValue(path, reflect.ValueOf(nil)) // set 'nil' should be equivalent to 'remove'
+		node, _ := root.next(path)
 		if err != nil || node != nil {
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
@@ -1175,6 +1298,24 @@ func TestNode_removeValue_Struct(t *testing.T) {
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 	}
+
+	{
+		i := 123
+		v := MyStruct{fieldPrivate: 1, FieldInt: 2, FieldString: "3", FieldPointer: &i, FieldInterface: true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
+		}
+
+		path := "FieldInterface"
+		_, err := root.setValue(path, reflect.ValueOf(nil)) // set 'nil' should be equivalent to 'remove'
+		node, _ := root.next(path)
+		if err != nil || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
 }
 
 func TestNode_removeValue_Slice(t *testing.T) {
@@ -1227,6 +1368,24 @@ func TestNode_removeValue_Slice(t *testing.T) {
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 	}
+
+	{
+		v := []interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		path := "[1]"
+		l1 := len(root.unwrap().([]interface{}))
+		_, err := root.setValue(path, reflect.ValueOf(nil)) // set 'nil' should be equivalent to 'remove'
+		l2 := len(root.unwrap().([]interface{}))
+		node, _ := root.next(path)
+		if err != nil || l1 != l2 || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
 }
 
 func TestNode_removeValue_Array(t *testing.T) {
@@ -1251,6 +1410,24 @@ func TestNode_removeValue_Array(t *testing.T) {
 		err := root.removeValue(path)
 		l2 := len(root.unwrap().(*[3]interface{}))
 		node, _ = root.next(path)
+		if err != nil || l1 != l2 || node.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+	}
+
+	{
+		v := [3]interface{}{1, "2", true}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
+		}
+		path := "[1]"
+		l1 := len(root.unwrap().(*[3]interface{}))
+		_, err := root.setValue(path, reflect.ValueOf(nil)) // set 'nil' should be equivalent to 'remove'
+		l2 := len(root.unwrap().(*[3]interface{}))
+		node, _ := root.next(path)
 		if err != nil || l1 != l2 || node.unwrap() != nil {
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
