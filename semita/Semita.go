@@ -90,6 +90,9 @@ func GetTypeOfStructAttibute(s interface{}, attr string) reflect.Type {
 // - if 't' is struct: returns empty struct of type 't'
 // - otherwise, return empty 'reflect.Value'
 func CreateZero(t reflect.Type) reflect.Value {
+	if t == nil {
+		return reflect.Value{}
+	}
 	switch t.Kind() {
 	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
@@ -112,7 +115,6 @@ func CreateZero(t reflect.Type) reflect.Value {
 		// Func
 		// Interface
 		// Ptr
-		// Struct
 	}
 	return reflect.Value{}
 }

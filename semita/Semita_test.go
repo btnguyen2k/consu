@@ -29,6 +29,23 @@ func TestSplitPath(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
+func TestCreateZero_Invalid(t *testing.T) {
+	name := "TestCreateZero_Invalid"
+	{
+		z := CreateZero(nil)
+		if z.IsValid() {
+			t.Errorf("%s failed", name)
+		}
+	}
+	{
+		temp := "a string"
+		v := &temp
+		z := CreateZero(reflect.TypeOf(v))
+		if z.IsValid() {
+			t.Errorf("%s failed for data %#v %T", name, v, v)
+		}
+	}
+}
 
 func TestCreateZero_Primitives(t *testing.T) {
 	name := "TestCreateZero_Primitives"
@@ -180,6 +197,188 @@ func TestCreateZero_Struct(t *testing.T) {
 	}
 	if !reflect.DeepEqual(z.FieldByName("A").Interface(), v.A) {
 		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestGetTypeOfMapKey(t *testing.T) {
+	name := "TestGetTypeOfMapKey"
+	{
+		v := map[bool]string{true: "true", false: "false"}
+		typ := GetTypeOfMapKey(v)
+		if typ == nil || typ.Kind() != reflect.Bool {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfMapKey(&v)
+		if typ == nil || typ.Kind() != reflect.Bool {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := map[int]string{1: "one", 2: "two"}
+		typ := GetTypeOfMapKey(v)
+		if typ == nil || typ.Kind() != reflect.Int {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfMapKey(&v)
+		if typ == nil || typ.Kind() != reflect.Int {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := map[uint]string{1: "1", 2: "2"}
+		typ := GetTypeOfMapKey(v)
+		if typ == nil || typ.Kind() != reflect.Uint {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfMapKey(&v)
+		if typ == nil || typ.Kind() != reflect.Uint {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := map[string]string{"1": "one", "2": "two"}
+		typ := GetTypeOfMapKey(v)
+		if typ == nil || typ.Kind() != reflect.String {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfMapKey(&v)
+		if typ == nil || typ.Kind() != reflect.String {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+
+	{
+		v := "this is not a map"
+		typ := GetTypeOfMapKey(v)
+		if typ != nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfMapKey(&v)
+		if typ != nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+}
+
+func TestGetTypeOfElement(t *testing.T) {
+	name := "TestGetTypeOfElement"
+	{
+		v := map[string]bool{"true": true, "false": false}
+		typ := GetTypeOfElement(v)
+		if typ == nil || typ.Kind() != reflect.Bool {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfElement(&v)
+		if typ == nil || typ.Kind() != reflect.Bool {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := []int{1, 2, 3}
+		typ := GetTypeOfElement(v)
+		if typ == nil || typ.Kind() != reflect.Int {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfElement(&v)
+		if typ == nil || typ.Kind() != reflect.Int {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := [4]uint{0, 1, 2, 3}
+		typ := GetTypeOfElement(v)
+		if typ == nil || typ.Kind() != reflect.Uint {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfElement(&v)
+		if typ == nil || typ.Kind() != reflect.Uint {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := "a string"
+		typ := GetTypeOfElement(v)
+		if typ == nil || typ.Kind() != reflect.String {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfElement(&v)
+		if typ == nil || typ.Kind() != reflect.String {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+}
+
+func TestGetTypeOfStructAttibute(t *testing.T) {
+	name := "TestGetTypeOfStructAttibute"
+	type MyStruct struct {
+		FieldInt     int
+		FieldBool    bool
+		FieldString  string
+		fieldPrivate interface{}
+	}
+	v := MyStruct{FieldInt: 1, FieldBool: true, FieldString: "a string", fieldPrivate: 0.1}
+	{
+		typ := GetTypeOfStructAttibute(v, "FieldInt")
+		if typ == nil || typ.Kind() != reflect.Int {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfStructAttibute(&v, "FieldInt")
+		if typ == nil || typ.Kind() != reflect.Int {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		typ := GetTypeOfStructAttibute(v, "FieldBool")
+		if typ == nil || typ.Kind() != reflect.Bool {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfStructAttibute(&v, "FieldBool")
+		if typ == nil || typ.Kind() != reflect.Bool {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		typ := GetTypeOfStructAttibute(v, "FieldString")
+		if typ == nil || typ.Kind() != reflect.String {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfStructAttibute(&v, "FieldString")
+		if typ == nil || typ.Kind() != reflect.String {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		typ := GetTypeOfStructAttibute(v, "fieldPrivate")
+		if typ == nil || typ.Kind() != reflect.Interface {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfStructAttibute(&v, "fieldPrivate")
+		if typ == nil || typ.Kind() != reflect.Interface {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		typ := GetTypeOfStructAttibute(v, "invalid")
+		if typ != nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfStructAttibute(&v, "invalid")
+		if typ != nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := "this is not a struct"
+		typ := GetTypeOfStructAttibute(v, "invalid")
+		if typ != nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+		typ = GetTypeOfStructAttibute(&v, "invalid")
+		if typ != nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
 	}
 }
 
