@@ -6,6 +6,8 @@
 //   - [i]: access i'th element of a slice/array (0-based)
 //
 // Sample of a path: `Employees.[1].first_name`. The dot right before `[]` can be omitted: `Employees[1].first_name`.
+//
+//
 package semita
 
 import (
@@ -30,6 +32,90 @@ var (
 	patternIndex    = regexp.MustCompile(`^\[(.*?)\]$`)
 	patternEndIndex = regexp.MustCompile(`^(.*)(\[.*?\])$`)
 )
+
+// concreteValue returns concrete value of target 't'.
+func concreteValue(t interface{}) reflect.Value {
+	v := reflect.ValueOf(t)
+	for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+		v = v.Elem()
+	}
+	return v
+}
+
+// GetTypeOfMapKey returns type of map 'm''s key.
+//
+// - if 'm' is a map (or pointer to a map): type of map's key is returned
+// - otherwise, nil is returned
+func GetTypeOfMapKey(m interface{}) reflect.Type {
+	v := concreteValue(m)
+	if v.Kind() == reflect.Map {
+		return v.Type().Key()
+	}
+	return nil
+}
+
+// GetTypeOfElement returns type of element of target 't'.
+//
+// - if 't' is an array, slice, map or channel (or pointer to an array, slice, map or channel): element type is returned
+// - otherwise, t's type is return
+func GetTypeOfElement(t interface{}) reflect.Type {
+	v := concreteValue(t)
+	if v.Kind() == reflect.Slice || v.Kind() == reflect.Array || v.Kind() == reflect.Map || v.Kind() == reflect.Chan {
+		return v.Type().Elem()
+	}
+	return v.Type()
+}
+
+// GetTypeOfStructAttibute returns type of a struct attribute.
+//
+// - if 's' is a struct (or pointer to a struct): type of attribute 'attr' is returned
+// - if 's' is not a struct (or pointer to a struct) or attribute 'attr' does not exist: nil is returned
+func GetTypeOfStructAttibute(s interface{}, attr string) reflect.Type {
+	v := concreteValue(s)
+	if v.Kind() != reflect.Struct {
+		return nil
+	}
+	f := v.FieldByName(attr)
+	if f.Kind() != reflect.Invalid {
+		return f.Type()
+	}
+	return nil
+}
+
+// CreateZero create 'zero' value of specified type
+//
+// - if 't' is primitive type (bool, ints, uints, floats, complexes, string, uintptr and unsafe-pointer): 'zero' value is created via reflect.Zero(t)
+// - if 't' is array or slice: returns empty slice of type 't'
+// - if 't' is map: returns empty map of type 't'
+// - if 't' is struct: returns empty struct of type 't'
+// - otherwise, return empty 'reflect.Value'
+func CreateZero(t reflect.Type) reflect.Value {
+	switch t.Kind() {
+	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128,
+		reflect.String, reflect.UnsafePointer:
+		// primitive types --> 'zero' primitive
+		return reflect.Zero(t)
+	case reflect.Slice, reflect.Array:
+		// slice/array --> empty slice
+		elType := t.Elem()
+		return reflect.MakeSlice(reflect.SliceOf(elType), 0, 0)
+	case reflect.Map:
+		// map --> 'zero' map
+		return reflect.MakeMap(t)
+	case reflect.Struct:
+		// struct --> 'zero' struct
+		return reflect.New(t).Elem()
+	default:
+		// Chan
+		// Func
+		// Interface
+		// Ptr
+		// Struct
+	}
+	return reflect.Value{}
+}
 
 // SplitPath splits a path into components.
 //
@@ -277,11 +363,12 @@ func (s *Semita) SetValue(path string, value interface{}) error {
 			var _newNode *node
 			var err error
 			nextIndex := paths[i+1]
-			if patternIndex.MatchString(nextIndex) {
-				_newNode, err = prevCursor.createChildSlice(index)
-			} else {
-				_newNode, err = prevCursor.createChildMap(index)
-			}
+			_newNode, err = prevCursor.createChild(index, nextIndex)
+			// if patternIndex.MatchString(nextIndex) {
+			// 	_newNode, err = prevCursor.createChildSlice(index)
+			// } else {
+			// 	_newNode, err = prevCursor.createChildMap(index)
+			// }
 			if err != nil {
 				return errors.New("error while creating node at at path: " + pathSoFar)
 			}

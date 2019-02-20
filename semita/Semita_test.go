@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"unsafe"
 )
 
 /*----------------------------------------------------------------------*/
@@ -25,6 +26,161 @@ func TestSplitPath(t *testing.T) {
 	testSplitPath(t, "a.b.c[i].[j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
 	testSplitPath(t, "a.b.c[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
 	testSplitPath(t, "a.b.c.[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestCreateZero_Primitives(t *testing.T) {
+	name := "TestCreateZero_Primitives"
+	{
+		vList := []interface{}{false, int(0), int8(0), int16(0), int32(0), int64(0)}
+		for _, v := range vList {
+			z := CreateZero(reflect.TypeOf(v))
+			if !z.IsValid() || z.Interface() != v {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+	{
+		vList := []interface{}{uint(0), uint8(0), uint16(0), uint32(0), uint64(0), uintptr(0)}
+		for _, v := range vList {
+			z := CreateZero(reflect.TypeOf(v))
+			if !z.IsValid() || z.Interface() != v {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+	{
+		vList := []interface{}{uint(0), uint8(0), uint16(0), uint32(0), uint64(0), uintptr(0)}
+		for _, v := range vList {
+			z := CreateZero(reflect.TypeOf(v))
+			if !z.IsValid() || z.Interface() != v {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+	{
+		vList := []interface{}{float32(0.0), float64(0.0)}
+		for _, v := range vList {
+			z := CreateZero(reflect.TypeOf(v))
+			if !z.IsValid() || z.Interface() != v {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+	{
+		vList := []interface{}{complex64(0 + 0i), complex128(0 + 0i)}
+		for _, v := range vList {
+			z := CreateZero(reflect.TypeOf(v))
+			if !z.IsValid() || z.Interface() != v {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+	{
+		vList := []interface{}{"", unsafe.Pointer(nil)}
+		for _, v := range vList {
+			z := CreateZero(reflect.TypeOf(v))
+			if !z.IsValid() || z.Interface() != v {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+}
+
+func TestCreateZero_SliceAndArray(t *testing.T) {
+	name := "TestCreateZero_SliceAndArray"
+	{
+		v := []int{1, 2, 3}
+		z := CreateZero(reflect.TypeOf(v))
+		if !z.IsValid() || z.Kind() != reflect.Slice || z.Len() != 0 {
+			t.Errorf("%s failed for data %#v %T", name, v, v)
+		}
+		z = reflect.Append(z, reflect.ValueOf(0))
+		z = reflect.Append(z, reflect.ValueOf(0))
+		z = reflect.Append(z, reflect.ValueOf(0))
+		if z.Len() != 3 {
+			t.Errorf("%s failed for data %#v %T", name, v, v)
+		}
+		for i := 0; i < len(v); i++ {
+			z.Index(i).Set(reflect.ValueOf(v[i]))
+		}
+		for i := 0; i < len(v); i++ {
+			if z.Index(i).Int() != int64(v[i]) {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+	{
+		v := [4]string{"0", "a", "false", "true"}
+		z := CreateZero(reflect.TypeOf(v))
+		if !z.IsValid() || z.Kind() != reflect.Slice || z.Len() != 0 {
+			t.Errorf("%s failed for data %#v %T", name, v, v)
+		}
+		z = reflect.Append(z, reflect.ValueOf(""))
+		z = reflect.Append(z, reflect.ValueOf(""))
+		z = reflect.Append(z, reflect.ValueOf(""))
+		z = reflect.Append(z, reflect.ValueOf(""))
+		if z.Len() != 4 {
+			t.Errorf("%s failed for data %#v %T", name, v, v)
+		}
+		for i := 0; i < len(v); i++ {
+			z.Index(i).Set(reflect.ValueOf(v[i]))
+		}
+		for i := 0; i < len(v); i++ {
+			if z.Index(i).String() != v[i] {
+				t.Errorf("%s failed for data %#v %T", name, v, v)
+			}
+		}
+	}
+}
+
+func TestCreateZero_Map(t *testing.T) {
+	name := "TestCreateZero_Map"
+	v := map[int]string{0: "", 1: "one", 2: "2"}
+	z := CreateZero(reflect.TypeOf(v))
+	if !z.IsValid() || z.Kind() != reflect.Map || z.Len() != 0 {
+		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
+	z.SetMapIndex(reflect.ValueOf(0), reflect.ValueOf(""))
+	z.SetMapIndex(reflect.ValueOf(1), reflect.ValueOf("one"))
+	z.SetMapIndex(reflect.ValueOf(2), reflect.ValueOf("2"))
+	if z.Len() != 3 {
+		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
+	for i := 0; i < len(v); i++ {
+		if z.MapIndex(reflect.ValueOf(i)).String() != v[i] {
+			t.Errorf("%s failed for data %#v %T", name, v, v)
+		}
+	}
+}
+
+func TestCreateZero_Struct(t *testing.T) {
+	name := "TestCreateZero_Struct"
+	type MyStruct struct {
+		I int
+		s string
+		B bool
+		A []int
+	}
+	v := MyStruct{I: 103, s: "btnguyen2k", B: true, A: []int{1, 2, 3}}
+	z := CreateZero(reflect.TypeOf(v))
+	if !z.IsValid() || z.Kind() != reflect.Struct {
+		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
+	z.FieldByName("I").Set(reflect.ValueOf(103))
+	// z.FieldByName("s").Set(reflect.ValueOf("btnguyen2k"))
+	z.FieldByName("B").Set(reflect.ValueOf(true))
+	z.FieldByName("A").Set(reflect.ValueOf([]int{1, 2, 3}))
+	if z.FieldByName("I").Int() != int64(v.I) {
+		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
+	if z.FieldByName("B").Bool() != v.B {
+		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
+	if !reflect.DeepEqual(z.FieldByName("A").Interface(), v.A) {
+		t.Errorf("%s failed for data %#v %T", name, v, v)
+	}
 }
 
 /*----------------------------------------------------------------------*/

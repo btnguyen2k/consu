@@ -44,13 +44,11 @@ func (n *node) unwrap() interface{} {
 	return n.value.Interface()
 }
 
+// elem returns the concrete value that this node is currently holding
 func (n *node) elem() reflect.Value {
 	v := n.value
-	if v.Kind() == reflect.Ptr {
+	for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
 		v = v.Elem()
-	}
-	if v.Kind() == reflect.Interface {
-		v = n.value.Elem()
 	}
 	return v
 }
@@ -261,4 +259,37 @@ func (n *node) createChildMap(index string) (*node, error) {
 // createChildSlice creates an empty slice and insert it as a child node
 func (n *node) createChildSlice(index string) (*node, error) {
 	return n.setValue(index, createEmptyGenericSlice())
+}
+
+// createChild creates an empty child and returns it as a node
+func (n *node) createChild(index, nextIndex string) (*node, error) {
+	vNode := n.elem()
+
+	// detect type of element at 'index'
+	var zeroType reflect.Type
+	switch vNode.Kind() {
+	case reflect.Slice, reflect.Array, reflect.Map:
+		zeroType = GetTypeOfElement(vNode.Interface())
+	case reflect.Struct:
+		zeroType = GetTypeOfStructAttibute(vNode.Interface(), index)
+	default:
+		return nil, errors.New("expecting either slice, array, map or struct, but it is {" + vNode.Type().String() + "}")
+	}
+	if zeroType == nil {
+		return nil, errors.New("invalid element type or struct field {" + index + "} does not exist")
+	}
+
+	// create 'zero' value for element at 'index'
+	var zeroValue reflect.Value
+	if zeroType.Kind() == reflect.Interface {
+		if patternIndex.MatchString(nextIndex) {
+			zeroValue = createEmptyGenericSlice()
+		} else {
+			zeroValue = createEmptyGenericMap()
+		}
+	} else {
+		zeroValue = CreateZero(zeroType)
+	}
+
+	return n.setValue(index, zeroValue)
 }
