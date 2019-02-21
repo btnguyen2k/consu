@@ -21,6 +21,7 @@ func Test_createEmptyGenericMap(t *testing.T) {
 }
 
 func TestNode_unwrap(t *testing.T) {
+	name := "TestNode_unwrap"
 	{
 		v := true
 		n := &node{
@@ -31,7 +32,7 @@ func TestNode_unwrap(t *testing.T) {
 		}
 		uv := n.unwrap()
 		if uv.(bool) != v {
-			t.Errorf("TestNode_unwrap failed, expected {%#v}, but received {%#v}", v, uv)
+			t.Errorf("%s failed, expected {%#v}, but received {%#v}", name, v, uv)
 		}
 	}
 	{
@@ -44,7 +45,7 @@ func TestNode_unwrap(t *testing.T) {
 		}
 		uv := n.unwrap()
 		if uv.(int) != v {
-			t.Errorf("TestNode_unwrap failed, expected {%#v}, but received {%#v}", v, uv)
+			t.Errorf("%s failed, expected {%#v}, but received {%#v}", name, v, uv)
 		}
 	}
 	{
@@ -57,7 +58,7 @@ func TestNode_unwrap(t *testing.T) {
 		}
 		uv := n.unwrap()
 		if uv.(float64) != v {
-			t.Errorf("TestNode_unwrap failed, expected {%#v}, but received {%#v}", v, uv)
+			t.Errorf("%s failed, expected {%#v}, but received {%#v}", name, v, uv)
 		}
 	}
 	{
@@ -70,12 +71,13 @@ func TestNode_unwrap(t *testing.T) {
 		}
 		uv := n.unwrap()
 		if uv.(string) != v {
-			t.Errorf("TestNode_unwrap failed, expected {%#v}, but received {%#v}", v, uv)
+			t.Errorf("%s failed, expected {%#v}, but received {%#v}", name, v, uv)
 		}
 	}
 }
 
 func TestNode_nextInvalid(t *testing.T) {
+	name := "TestNode_nextInvalid"
 	{
 		v := false
 		n := &node{
@@ -85,8 +87,8 @@ func TestNode_nextInvalid(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		_, err := n.next("path")
-		if err == nil {
-			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		if err == nil { // primitive type cannot be "next"
+			t.Errorf("%s failed for value {%#v}", name, v)
 		}
 	}
 	{
@@ -98,8 +100,8 @@ func TestNode_nextInvalid(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		_, err := n.next("[0]")
-		if err == nil {
-			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		if err == nil { // primitive type cannot be "next"
+			t.Errorf("%s failed for value {%#v}", name, v)
 		}
 	}
 	{
@@ -111,8 +113,8 @@ func TestNode_nextInvalid(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		_, err := n.next("path")
-		if err == nil {
-			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		if err == nil { // primitive type cannot be "next"
+			t.Errorf("%s failed for value {%#v}", name, v)
 		}
 	}
 	{
@@ -124,8 +126,8 @@ func TestNode_nextInvalid(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		_, err := n.next("[0]")
-		if err == nil {
-			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		if err == nil { // primitive type cannot be "next"
+			t.Errorf("%s failed for value {%#v}", name, v)
 		}
 	}
 	{
@@ -137,8 +139,8 @@ func TestNode_nextInvalid(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		_, err := n.next("1")
-		if err == nil {
-			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		if err == nil { // map key must be string
+			t.Errorf("%s failed for value {%#v}", name, v)
 		}
 	}
 	{
@@ -150,8 +152,92 @@ func TestNode_nextInvalid(t *testing.T) {
 			value:    reflect.ValueOf(v),
 		}
 		_, err := n.next("[a]")
-		if err == nil {
-			t.Errorf("TestNode_nextInvalid failed for value {%#v}", v)
+		if err == nil { // index value must be a number
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+	}
+}
+
+func TestNode_nextEmptyOrNonExist(t *testing.T) {
+	name := "TestNode_nextEmptyOrNonExist"
+	{
+		v := []int{0, 1, 2, 3}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		next, err := n.next("[]")
+		if err != nil || next != nil { // index out-of-bound: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+		next, err = n.next("[-1]")
+		if err != nil || next != nil { // index out-of-bound: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+		next, err = n.next("[99]")
+		if err != nil || next != nil { // index out-of-bound: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+	}
+	{
+		v := [4]int{0, 1, 2, 3}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		next, err := n.next("[]")
+		if err != nil || next != nil { // index out-of-bound: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+		next, err = n.next("[-1]")
+		if err != nil || next != nil { // index out-of-bound: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+		next, err = n.next("[99]")
+		if err != nil || next != nil { // index out-of-bound: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+	}
+	{
+		v := map[string]int{"a": 1, "b": 2, "c": 3}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		next, err := n.next("e")
+		if err != nil || next != nil { // index not exist: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+	}
+	{
+		type MyStruct struct {
+			FieldMap   map[string]interface{}
+			FieldSlice []int
+		}
+		v := MyStruct{}
+		n := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		next, err := n.next("FieldNotExist")
+		if err != nil || next != nil { // field not exist: "next" should be successful, but node should be nil
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+		next, err = n.next("FieldMap")
+		if err != nil || next == nil || !next.value.IsNil() { // next should be successful, but node's value should be 'empty' for uninitialized field
+			t.Errorf("%s failed for value {%#v}", name, v)
+		}
+		next, err = n.next("FieldSlice")
+		if err != nil || next == nil || !next.value.IsNil() { // next should be successful, but node's value should be 'empty' for uninitialized field
+			t.Errorf("%s failed for value {%#v}", name, v)
 		}
 	}
 }
@@ -1251,7 +1337,7 @@ func TestNode_removeValue_Struct(t *testing.T) {
 			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
 		}
 		var path string
-		var node *node
+		var next *node
 		var err error
 
 		if root.value.Elem().Kind() != reflect.Struct {
@@ -1260,41 +1346,47 @@ func TestNode_removeValue_Struct(t *testing.T) {
 
 		path = "fieldPrivate"
 		err = root.removeValue(path)
-		if err == nil {
+		if err == nil { // private field should not be writable
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 
 		path = "FieldInt"
 		err = root.removeValue(path)
-		if err == nil {
+		if err != nil { // removal should be successful
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		next, err = root.next(path)
+		if err != nil || next == nil || next.unwrap() != 0 { // after removal, field's value should be reset to 'zero'
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 
 		path = "FieldString"
 		err = root.removeValue(path)
-		if err == nil {
+		if err != nil { // removal should be successful
+			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
+		}
+		next, err = root.next(path)
+		if err != nil || next == nil || next.unwrap() != "" { // after removal, field's value should be reset to 'zero'
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 
 		path = "FieldPointer"
-		node, _ = root.next(path)
-		if node == nil {
+		err = root.removeValue(path)
+		if err != nil { // removal should be successful
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
-		err = root.removeValue(path)
-		node, _ = root.next(path)
-		if err != nil || node.unwrap().(*int) != nil {
+		next, err = root.next(path)
+		if err != nil || next == nil || next.unwrap() != nil { // after removal, field's value should be reset to 'zero'
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 
 		path = "FieldInterface"
-		node, _ = root.next(path)
-		if node == nil {
+		err = root.removeValue(path)
+		if err != nil { // removal should be successful
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
-		err = root.removeValue(path)
-		node, _ = root.next(path)
-		if err != nil || node.unwrap() != nil {
+		next, err = root.next(path)
+		if err != nil || next == nil || next.unwrap() != nil { // after removal, field's value should be reset to 'zero'
 			t.Errorf("%s failed with data %#v at index {%#v}", name, v, path)
 		}
 	}

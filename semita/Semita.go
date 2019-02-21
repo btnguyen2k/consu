@@ -180,22 +180,6 @@ func NewSemita(data interface{}) *Semita {
 					value:    v,
 				},
 			}
-			// case reflect.Interface:
-			// 	vi := reflect.ValueOf(v.Elem().Interface())
-			// 	switch vi.Kind() {
-			// 	case reflect.Array, reflect.Slice, reflect.Map, reflect.Struct:
-			// 		p := unsafe.Pointer(v.Pointer())
-			// 		r := reflect.NewAt(vi.Type(), p)
-			// 		v := r.Elem()
-			// 		return &Semita{
-			// 			&node{
-			// 				prev:     nil,
-			// 				prevType: nil,
-			// 				key:      "",
-			// 				value:    v,
-			// 			},
-			// 		}
-			// 	}
 		}
 	}
 	return nil
@@ -208,7 +192,7 @@ func (s *Semita) Unwrap() interface{} {
 	// if s.root == nil || s.root.value.Kind() == reflect.Invalid {
 	// 	return nil
 	// }
-	return s.root.value.Interface()
+	return s.root.unwrap()
 }
 
 // seek seeks along the path and returns (prevNode, node, error)

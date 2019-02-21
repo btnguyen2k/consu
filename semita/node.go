@@ -29,6 +29,35 @@ func isExportedField(fieldName string) bool {
 	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
 
+// isNil evaluate 'reflect.Value.isNil' function without panicking
+func isNil(v reflect.Value) bool {
+	k := v.Kind()
+	switch k {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
+// parseIndex parses the index value from string "[<index>]"
+// - returns 'defaultValue' if 'index' is "[]"
+// - return error if <index> cannot be parsed
+func parseIndex(index string, defaultIndex int) (int, error) {
+	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
+		if "[]" != index {
+			var e error
+			i, e := strconv.Atoi(match[1])
+			if e != nil {
+				return -1, e
+			}
+			return i, nil
+		}
+		return defaultIndex, nil
+	}
+	return -1, errors.New("invalid input {" + index + "}")
+}
+
 /*----------------------------------------------------------------------*/
 
 type node struct {
@@ -41,6 +70,12 @@ type node struct {
 
 // unwrap returns the underlying 'value' as an interface
 func (n *node) unwrap() interface{} {
+	switch n.value.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
+		if n.value.IsNil() {
+			return nil
+		}
+	}
 	return n.value.Interface()
 }
 
@@ -54,49 +89,51 @@ func (n *node) elem() reflect.Value {
 }
 
 // next returns a child node located at 'index'
+// - if 'index' points to a non-exist or out-of-bound entry: returns (nil, nil)
+// - if 'index' points to an 'nil' entry: return (node-with-nil-value, nil)
+// - return (nil, error) in case of error
 func (n *node) next(index string) (*node, error) {
 	vNode := n.elem()
 	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
-		// current node should be an array or slice
-		if vNode.Kind() == reflect.Array || vNode.Kind() == reflect.Slice {
-			var i = vNode.Len()
-			if "[]" != index {
-				var e error
-				i, e = strconv.Atoi(match[1])
-				if e != nil {
-					return nil, e
-				}
-			}
-			if i < 0 || i >= vNode.Len() {
-				return nil, nil
-			}
-			return &node{
-				prev:     n,
-				prevType: vNode.Type(),
-				key:      index,
-				value:    vNode.Index(i),
-			}, nil
+		// current node must be an array or slice
+		if vNode.Kind() != reflect.Array && vNode.Kind() != reflect.Slice {
+			return nil, errors.New("invalid type: expecting array or slice, but received {" + vNode.Type().String() + "}")
 		}
-		return nil, errors.New("invalid type {" + vNode.Type().String() + "}")
+		i, e := parseIndex(index, vNode.Len())
+		if e != nil {
+			// error parsing index
+			return nil, e
+		}
+		if i < 0 || i >= vNode.Len() {
+			// out-of-bound
+			return nil, nil
+		}
+		vNext := vNode.Index(i)
+		return &node{
+			prev:     n,
+			prevType: vNode.Type(),
+			key:      index,
+			value:    vNext,
+		}, nil
 	} else if vNode.Kind() == reflect.Map {
 		// map's key must be string
-		if vNode.Type().Key().Kind() != reflect.String {
-			return nil, errors.New("node of type {" + vNode.Type().String() + "} is not supported, map type must be string")
+		keyType := GetTypeOfMapKey(vNode.Interface())
+		if keyType == nil || keyType.Kind() != reflect.String {
+			return nil, errors.New("node of type {" + vNode.Type().String() + "} is not supported, map key must be string")
 		}
-		v := vNode.MapIndex(reflect.ValueOf(index))
-		if v.Kind() == reflect.Invalid {
+		vNext := vNode.MapIndex(reflect.ValueOf(index))
+		if vNext.Kind() == reflect.Invalid {
 			return nil, nil
 		}
 		return &node{
 			prev:     n,
 			prevType: vNode.Type(),
 			key:      index,
-			value:    v,
+			value:    vNext,
 		}, nil
 	} else if vNode.Kind() == reflect.Struct {
 		f := vNode.FieldByName(index)
 		if f.Kind() == reflect.Invalid {
-			// non-exist field
 			return nil, nil
 		}
 		if !isExportedField(index) {
@@ -158,14 +195,14 @@ func (n *node) removeValue(index string) error {
 			// field must exist and is exported
 			return errors.New("{" + vNode.Type().String() + "} does not has exported field {" + index + "}")
 		}
-		if f.Kind() != reflect.Interface && f.Kind() != reflect.Ptr {
-			// field type must match
-			return errors.New("{nil} is not assignable to field {" + f.Type().String() + "}")
-		}
 		if !f.CanSet() {
 			// final check
 			return errors.New("field {" + index + "} is not settable")
 		}
+		// if f.Kind() != reflect.Interface && f.Kind() != reflect.Ptr {
+		// 	// field type must match
+		// 	return errors.New("{nil} is not assignable to field {" + f.Type().String() + "}")
+		// }
 		f.Set(reflect.Zero(f.Type()))
 		return nil
 	}
