@@ -1,46 +1,13 @@
-# consu/semita
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/semita)
-[![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/semita)
-
-Package `semita` provides utility functions to access data from a hierarchy structure.
-
-## Installation
-
-```shell
-$ go get -u github.com/btnguyen2k/consu/semita
-```
-
-
-## Usage
-
-A 'path' is used to specify the location of item in the hierarchy data. Sample of a path `Employees.[1].first_name`, where:
-- `.` (the dot character): path separator
-- `Name`: access attribute of a map/struct specified by 'Name'
-- `[i]`: access i'th element of a slice/array (0-based)
-- The dot right before `[]` can be omitted: `Employees[1].first_name` is equivalent to `Employees.[1].first_name`.
-
-Notes:
-- Supported nested arrays, slices, maps and structs.
-- Struct's un-exported fields can be read, but not written.
-- Unaddressable structs and arrays are read-only.
-
-Example:
-
-(more examples on [project repository](https://github.com/btnguyen2k/consu/tree/master/semita/examples)).
-
-```go
 package main
 
 import (
-"encoding/json"
-"fmt"
-"github.com/btnguyen2k/consu/reddo"
-"github.com/btnguyen2k/consu/semita"
+	"encoding/json"
+	"fmt"
+	"github.com/btnguyen2k/consu/reddo"
+	"github.com/btnguyen2k/consu/semita"
 )
 
-func main() {
+func exampleSimple() {
 	fmt.Println("-========== Semina demo ==========-")
 	data := map[string]interface{}{
 		"name": map[string]interface{}{
@@ -129,19 +96,3 @@ func main() {
 		fmt.Println("Error:", err)
 	}
 }
-```
-
-
-## Documentation
-
-See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita).
-
-
-## History
-
-### 2019-02-22 - v0.1.0
-
-First release:
-- Supported nested arrays, slices, maps and structs.
-- Struct's un-exported fields can be read, but not written.
-- Unaddressable structs and arrays are read-only.

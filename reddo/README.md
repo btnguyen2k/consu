@@ -4,7 +4,7 @@
 [![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/reddo)
 [![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/reddo)
 
-Package reddo provides utility functions to convert values using Golang's reflection.
+Package `reddo` provides utility functions to convert values using Golang's reflection.
 
 ## Installation
 

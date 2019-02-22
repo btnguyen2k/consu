@@ -42,9 +42,10 @@ type (
 	}
 	// Company is struct used by examples
 	Company struct {
-		Name      string
-		Year      int
-		Employees []Employee
+		privateName string
+		Name        string
+		Year        int
+		Employees   []Employee
 	}
 
 	// OptionsMixed is struct used by examples
@@ -61,9 +62,13 @@ type (
 )
 
 // generate sample data where root node is a map, with nested maps and slices
-func sampleDataMapsAndSlices() interface{} {
+func sampleDataMapsAndSlices() map[string]interface{} {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+	_employee0WorkHours := make([]int, len(employee0WorkHours))
+	copy(_employee0WorkHours, employee0WorkHours)
+	_employee1WorkHours := make([]int, len(employee1WorkHours))
+	copy(_employee1WorkHours, employee1WorkHours)
 	return map[string]interface{}{
 		"Name": companyName,
 		"Year": companyYear,
@@ -74,7 +79,7 @@ func sampleDataMapsAndSlices() interface{} {
 				"email":      employee0Email,
 				"age":        employee0Age,
 				"options": map[string]interface{}{
-					"work_hours": employee0WorkHours,
+					"work_hours": _employee0WorkHours,
 					"overtime":   employee0Overtime,
 				},
 				"join_date": d0,
@@ -85,7 +90,7 @@ func sampleDataMapsAndSlices() interface{} {
 				"email":      employee1Email,
 				"age":        employee1Age,
 				"options": map[string]interface{}{
-					"work_hours": employee1WorkHours,
+					"work_hours": _employee1WorkHours,
 					"overtime":   employee1Overtime,
 				},
 				"join_date": d1,
@@ -95,12 +100,17 @@ func sampleDataMapsAndSlices() interface{} {
 }
 
 // generate sample data where root node is a struct, with nested structs and slices
-func sampleDataStructs() interface{} {
+func sampleDataStructs() Company {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+	_employee0WorkHours := make([]int, len(employee0WorkHours))
+	copy(_employee0WorkHours, employee0WorkHours)
+	_employee1WorkHours := make([]int, len(employee1WorkHours))
+	copy(_employee1WorkHours, employee1WorkHours)
 	return Company{
-		Name: companyName,
-		Year: companyYear,
+		privateName: "private-" + companyName,
+		Name:        companyName,
+		Year:        companyYear,
 		Employees: []Employee{
 			{
 				FirstName: employee0FirstName,
@@ -108,7 +118,7 @@ func sampleDataStructs() interface{} {
 				Email:     employee0Email,
 				Age:       employee0Age,
 				Options: Options{
-					WorkHours: employee0WorkHours,
+					WorkHours: _employee0WorkHours,
 					Overtime:  employee0Overtime,
 				},
 				JoinDate: d0,
@@ -119,7 +129,7 @@ func sampleDataStructs() interface{} {
 				Email:     employee1Email,
 				Age:       employee1Age,
 				Options: Options{
-					WorkHours: employee1WorkHours,
+					WorkHours: _employee1WorkHours,
 					Overtime:  employee1Overtime,
 				},
 				JoinDate: d1,
@@ -129,9 +139,13 @@ func sampleDataStructs() interface{} {
 }
 
 // generate sample data where root node is a struct, with nested structs, maps and slices
-func sampleDataMixed() interface{} {
+func sampleDataMixed() CompanyMixed {
 	d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 	d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
+	_employee0WorkHours := make([]int, len(employee0WorkHours))
+	copy(_employee0WorkHours, employee0WorkHours)
+	_employee1WorkHours := make([]int, len(employee1WorkHours))
+	copy(_employee1WorkHours, employee1WorkHours)
 	return CompanyMixed{
 		Name: companyName,
 		Year: companyYear,
@@ -142,7 +156,7 @@ func sampleDataMixed() interface{} {
 				"email":      employee0Email,
 				"age":        employee0Age,
 				"options": OptionsMixed{
-					WorkHours: employee0WorkHours,
+					WorkHours: _employee0WorkHours,
 					Overtime:  employee0Overtime,
 				},
 				"join_date": d0,
@@ -153,7 +167,7 @@ func sampleDataMixed() interface{} {
 				"email":      employee1Email,
 				"age":        employee1Age,
 				"options": OptionsMixed{
-					WorkHours: employee1WorkHours,
+					WorkHours: _employee1WorkHours,
 					Overtime:  employee1Overtime,
 				},
 				"join_date": d1,

@@ -6,8 +6,8 @@ import (
 	"github.com/btnguyen2k/consu/semita"
 )
 
-func testRead(s *semita.Semita) {
-	fmt.Println("-========== Semina demo: READ ==========-")
+func testReadStructs(s *semita.Semita) {
+	fmt.Println("-========== Semina demo: Structs - READ ==========-")
 	var path string
 	var v interface{}
 	var e error
@@ -15,54 +15,63 @@ func testRead(s *semita.Semita) {
 	j, _ := json.Marshal(s.Unwrap())
 	fmt.Printf("Data: %v\n", string(j))
 
+	path = "privateName"
+	v, e = s.GetValue(path)
+	if e == nil {
+		j, _ := json.Marshal(v)
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
+	} else {
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
+	}
+
 	path = "Employees"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path %v: %v\n", path, string(j))
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
 	path = "Employees[0]"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path %v: %v\n", path, string(j))
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees[1].email"
+	path = "Employees[1].Email"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path \"%v\": %v\n", path, string(j))
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at \"%v\": %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees.[0].options.overtime"
+	path = "Employees.[0].Options.Overtime"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path \"%v\": %v\n", path, string(j))
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at \"%v\": %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees[2].age"
+	path = "Employees[2].Age"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path \"%v\": %v\n", path, string(j))
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at \"%v\": %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 }
 
-func testWrite(s *semita.Semita) {
-	fmt.Println("-========== Semina demo: WRITE ==========-")
+func testWriteStructs(s *semita.Semita) {
+	fmt.Println("-========== Semina demo: Structs - WRITE ==========-")
 	var path string
 	var v interface{}
 	var e error
@@ -71,54 +80,36 @@ func testWrite(s *semita.Semita) {
 	fmt.Printf("Data: %v\n", string(j))
 
 	// set new value to an exiting node (map's entry)
-	path = "Employees[0].age"
+	path = "Employees[0].Age"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path %v: %v\n", path, string(j))
+		fmt.Printf("\tValue at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 	s.SetValue(path, 123)
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tNew value at path %v: %v\n", path, string(j))
+		fmt.Printf("\tNew value at path '%v': %v\n", path, string(j))
 	} else {
-		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
-	}
-
-	// create a new node and set its value
-	path = "Employees.[1].senior"
-	v, e = s.GetValue(path)
-	if e == nil {
-		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path %v: %v\n", path, string(j))
-	} else {
-		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
-	}
-	s.SetValue(path, true)
-	v, e = s.GetValue(path)
-	if e == nil {
-		j, _ := json.Marshal(v)
-		fmt.Printf("\tNew value at path %v: %v\n", path, string(j))
-	} else {
-		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
+		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
 	// append new item to slice
 	path = "Employees"
 	v, e = s.GetValue(path)
-	l := len(v.([]map[string]interface{}))
+	l := len(v.([]Employee))
 	if e == nil {
 		j, _ := json.Marshal(v)
 		fmt.Printf("\tValue at path %v (number of items: %v): %v\n", path, l, string(j))
 	} else {
 		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
 	}
-	s.SetValue("Employees[].name", "Mew Employee")
+	s.SetValue("Employees[].Name", "New Employee") // does not work if the wrapped struct is not addressable
 	v, e = s.GetValue(path)
-	l = len(v.([]map[string]interface{}))
+	l = len(v.([]Employee))
 	if e == nil {
 		j, _ := json.Marshal(v)
 		fmt.Printf("\tNew value at path %v (number of items: %v): %v\n", path, l, string(j))
@@ -126,39 +117,35 @@ func testWrite(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
 	}
 
-	// create all nodes along the path
-	path = "a.b[].c.d[]"
-	s.SetValue(path, "value")
-	j, _ = json.Marshal(s.Unwrap())
-	fmt.Printf("\tNew Data: %v\n", string(j))
-
-	// set new value to an exiting node (slice's entry)
-	path = "Employees[0].options.work_hours"
+	// append new item to slice
+	path = "Employees[1].Options.WorkHours"
 	v, e = s.GetValue(path)
+	l = len(v.([]int))
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tValue at path %v: %v\n", path, string(j))
+		fmt.Printf("\tValue at path %v (number of items: %v): %v\n", path, l, string(j))
 	} else {
 		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
 	}
-	s.SetValue(path+"[1]", 981)
+	s.SetValue(path+".[]", 999) // this works for nested slice event if the wrapped struct is not addressable
 	v, e = s.GetValue(path)
+	l = len(v.([]int))
 	if e == nil {
 		j, _ := json.Marshal(v)
-		fmt.Printf("\tNew value at path %v: %v\n", path, string(j))
+		fmt.Printf("\tNew value at path %v (number of items: %v): %v\n", path, l, string(j))
 	} else {
 		fmt.Printf("\tError while getting value at %v: %e\n", path, e)
 	}
 }
 
-func main() {
-	data1 := sampleDataMapsAndSlices()
-	s1 := semita.NewSemita(data1)
-	testRead(s1)
-	testWrite(s1)
+func exampleStructs() {
+	data1 := sampleDataStructs()
+	s1 := semita.NewSemita(data1) // wrap around data
+	testReadStructs(s1)
+	testWriteStructs(s1)
 
-	data2 := sampleDataMapsAndSlices()
-	s2 := semita.NewSemita(&data2)
-	testRead(s2)
-	testWrite(s2)
+	data2 := sampleDataStructs()
+	s2 := semita.NewSemita(&data2) // wrap around a pointer to data
+	testReadStructs(s2)
+	testWriteStructs(s2)
 }
