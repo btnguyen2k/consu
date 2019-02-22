@@ -1,12 +1,14 @@
 // Package semita provides utility functions to access data from a hierarchy structure.
 //
-// A 'path' is used to specify the location of item in the hierarchy data. Sample of a path `Employees.[1].first_name`, where:
-// - `.` (the dot character): path separator
-// - `Name`: access attribute of a map/struct specified by 'Name'
-// - `[i]`: access i'th element of a slice/array (0-based)
-// - The dot right before `[]` can be omitted: `Employees[1].first_name` is equivalent to `Employees.[1].first_name`.
+// A "path" is used to specify the location of item in the hierarchy data. Sample of a path "Employees.[1].first_name", where:
+//
+// - "." (the dot character): path separator
+// - "Name": access attribute of a map/struct specified by "Name"
+// - "[i]": access i'th element of a slice/array (0-based)
+// - The dot right before "[]" can be omitted: "Employees[1].first_name" is equivalent to "Employees.[1].first_name".
 //
 // Notes:
+//
 // - Supported nested arrays, slices, maps and structs.
 // - Struct's un-exported fields can be read, but not written.
 // - Unaddressable structs and arrays are read-only.
@@ -14,7 +16,6 @@
 // Example:
 // (more examples on project repository: https://github.com/btnguyen2k/consu/tree/master/semita/examples)
 //
-// ```go
 // package main
 //
 // import (
@@ -113,7 +114,6 @@
 // 		fmt.Println("Error:", err)
 // 	}
 // }
-// ```
 package semita
 
 import (
