@@ -986,160 +986,360 @@ func TestNode_setValueArray(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
-func TestNode_createChildMap_ArrayAndSlice(t *testing.T) {
+func TestNode_createChildOfMap(t *testing.T) {
+	name := "TestNode_createChildOfMap"
 	{
-		v := genDataArray()
-		root := &node{
-			prev:     nil,
-			prevType: nil,
-			key:      "",
-			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
-		}
-		path := "[0]"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
-		}
-	}
-	{
-		v := genDataSlice()
+		v := map[string]int{}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		path := "[0]"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
+		index := "key"
+		nextIndex := "" // map has specific element type, hence 'nextIndex' is not used
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.unwrap() != 0 {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := map[string]interface{}{}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		index := "key"
+		nextIndex := "[]" // child node should be a slice
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Slice {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := map[string]interface{}{}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		index := "key"
+		nextIndex := "nestedKey" // child node should be a map
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Map {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
 		}
 	}
 }
 
-func TestNode_createChildMap_MapAndStruct(t *testing.T) {
+func TestNode_createChildOfStruct(t *testing.T) {
+	name := "TestNode_createChildOfStruct"
+	type MyStruct struct {
+		FieldInt     int
+		FieldPtr     *string
+		FieldGeneric interface{}
+		fieldPrivate int
+	}
 	{
-		v := genDataMap()
+		v := MyStruct{}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
-			value:    reflect.ValueOf(v),
+			value:    reflect.ValueOf(&v), // for struct: wrapped object must be addressable
 		}
-		path := "xyz"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap_MapAndStruct failed with data %#v at index {%#v}", v, path)
+		index := "NotExist"
+		_, err := root.createChild(index, "")
+		if err == nil { // 'createChild' should fail because field does not exist
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, "")
 		}
 	}
 	{
-		type MyStruct struct {
-			A       interface{}
-			B       interface{}
-			M       interface{}
-			S       interface{}
-			private interface{}
-		}
-		v := MyStruct{
-			A: []int{0, 1, 2, 3, 4, 5},
-			B: [3]string{"a", "b", "c"},
-			M: map[string]interface{}{
-				"x": "x",
-				"y": 19.81,
-				"z": true,
-			},
-			S:       Inner{b: true, f: 1.03, i: 1981, s: "btnguyen2k"},
-			private: 1.2,
-		}
+		v := MyStruct{}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
-			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
+			value:    reflect.ValueOf(&v), // for struct: wrapped object must be addressable
 		}
-		path := "A"
-		node, err := root.createChildMap(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Map || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildMap_MapAndStruct failed with data %#v at index {%#v}", v, path)
+		index := "fieldPrivate"
+		_, err := root.createChild(index, "")
+		if err == nil { // 'createChild' should fail because field is not exported
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, "")
+		}
+	}
+	{
+		v := MyStruct{FieldInt: 2}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: wrapped object must be addressable
+		}
+		index := "FieldInt"
+		nextIndex := "" // struct field has specific element type, hence 'nextIndex' is not used
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.unwrap() != 0 {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		str := "a string"
+		v := MyStruct{FieldPtr: &str}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: wrapped object must be addressable
+		}
+		index := "FieldPtr"
+		nextIndex := "" // struct field has specific element type, hence 'nextIndex' is not used
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.unwrap() != nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := MyStruct{}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: wrapped object must be addressable
+		}
+		index := "FieldGeneric"
+		nextIndex := "[]" // child node should be a slice
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Slice {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := MyStruct{}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for struct: wrapped object must be addressable
+		}
+		index := "FieldGeneric"
+		nextIndex := "nested" // child node should be a map
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Map {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
 		}
 	}
 }
 
-func TestNode_createChildSlice_ArrayAndSlice(t *testing.T) {
+func TestNode_createChildOfSlice(t *testing.T) {
+	name := "TestNode_createChildOfSlice"
 	{
-		v := genDataArray()
-		root := &node{
-			prev:     nil,
-			prevType: nil,
-			key:      "",
-			value:    reflect.ValueOf(&v), // for array: only addressable array is settable
-		}
-		path := "[0]"
-		node, err := root.createChildSlice(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
-		}
-	}
-	{
-		v := genDataSlice()
+		v := []int{0, 1, 2}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
 			value:    reflect.ValueOf(v),
 		}
-		path := "[0]"
-		node, err := root.createChildSlice(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice_ArrayAndSlice failed with data %#v at index {%#v}", v, path)
+		index := "[-1]"
+		nextIndex := "" // slice has specific element type, hence 'nextIndex' is not used
+		_, err := root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is out-of-bound
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		index = "[99]"
+		nextIndex = "" // slice has specific element type, hence 'nextIndex' is not used
+		_, err = root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is out-of-bound
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		index = "[a]"
+		nextIndex = "" // slice has specific element type, hence 'nextIndex' is not used
+		_, err = root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is invalid
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := []int{}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		index := "[]"
+		nextIndex := "" // slice has specific element type, hence 'nextIndex' is not used
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil || root.value.Len() == 0 {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next("[0]")
+		if err != nil || next == nil || next.unwrap() != 0 {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := []interface{}{1, 2, 3}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		index := "[1]"
+		nextIndex := "[]" // child node should be a slice
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Slice {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := []interface{}{"a", "b", "c"}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		index := "[2]"
+		nextIndex := "nestedKey" // child node should be a map
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Map {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
 		}
 	}
 }
 
-func TestNode_createChildSlice_MapAndStruct(t *testing.T) {
+func TestNode_createChildOfArray(t *testing.T) {
+	name := "TestNode_createChildOfArray"
 	{
-		v := genDataMap()
+		v := [3]int{0, 1, 2}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
-			value:    reflect.ValueOf(v),
+			value:    reflect.ValueOf(&v), // for array: wrapped object must be addressable
 		}
-		path := "xyz"
-		node, err := root.createChildSlice(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice_MapAndStruct failed with data %#v at index {%#v}", v, path)
+		index := "[-1]"
+		nextIndex := "" // array has specific element type, hence 'nextIndex' is not used
+		_, err := root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is out-of-bound
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		index = "[99]"
+		nextIndex = "" // array has specific element type, hence 'nextIndex' is not used
+		_, err = root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is out-of-bound
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		index = "[a]"
+		nextIndex = "" // array has specific element type, hence 'nextIndex' is not used
+		_, err = root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is invalid
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		index = "[]"
+		nextIndex = "" // array has specific element type, hence 'nextIndex' is not used
+		_, err = root.createChild(index, nextIndex)
+		if err == nil { // should failed because index is out-of-bound
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
 		}
 	}
 	{
-		type MyStruct struct {
-			A       interface{}
-			B       interface{}
-			M       interface{}
-			S       interface{}
-			private interface{}
-		}
-		v := MyStruct{
-			A: []int{0, 1, 2, 3, 4, 5},
-			B: [3]string{"a", "b", "c"},
-			M: map[string]interface{}{
-				"x": "x",
-				"y": 19.81,
-				"z": true,
-			},
-			S:       Inner{b: true, f: 1.03, i: 1981, s: "btnguyen2k"},
-			private: 1.2,
-		}
+		v := [3]int{1, 2, 3}
 		root := &node{
 			prev:     nil,
 			prevType: nil,
 			key:      "",
-			value:    reflect.ValueOf(&v), // for struct: only addressable struct is settable
+			value:    reflect.ValueOf(&v), // for array: wrapped object must be addressable
 		}
-		path := "A"
-		node, err := root.createChildSlice(path)
-		if node == nil || err != nil || node.value.Elem().Kind() != reflect.Slice || node.value.Elem().Len() != 0 {
-			t.Errorf("TestNode_createChildSlice_MapAndStruct failed with data %#v at index {%#v}", v, path)
+		index := "[1]"
+		nextIndex := "" // array has specific element type, hence 'nextIndex' is not used
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.unwrap() != 0 {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := [3]interface{}{false, 1, "two"}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for array: wrapped object must be addressable
+		}
+		index := "[1]"
+		nextIndex := "[]" // child node should be a slice
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Slice {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+	}
+	{
+		v := [3]interface{}{true, "1", 2.0}
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v), // for array: wrapped object must be addressable
+		}
+		index := "[2]"
+		nextIndex := "nestedKey" // child node should be a map
+		child, err := root.createChild(index, nextIndex)
+		if err != nil || child == nil {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
+		}
+		next, err := root.next(index)
+		if err != nil || next == nil || next.value.Elem().Kind() != reflect.Map {
+			t.Errorf("%s failed with data %#v at index {%v.%v}", name, v, index, nextIndex)
 		}
 	}
 }

@@ -29,16 +29,16 @@ func isExportedField(fieldName string) bool {
 	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
 
-// isNil evaluate 'reflect.Value.isNil' function without panicking
-func isNil(v reflect.Value) bool {
-	k := v.Kind()
-	switch k {
-	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
-		return v.IsNil()
-	default:
-		return false
-	}
-}
+// // isNil evaluate 'reflect.Value.isNil' function without panicking
+// func isNil(v reflect.Value) bool {
+// 	k := v.Kind()
+// 	switch k {
+// 	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
+// 		return v.IsNil()
+// 	default:
+// 		return false
+// 	}
+// }
 
 // parseIndex parses the index value from string "[<index>]"
 // - returns 'defaultValue' if 'index' is "[]"
@@ -214,7 +214,11 @@ func (n *node) removeValue(index string) error {
 // If value is nil (value.Kind is reflect.Invalid), remove the key specified by 'index'.
 func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 	if value.Kind() == reflect.Invalid {
-		return nil, n.removeValue(index)
+		err := n.removeValue(index)
+		if err != nil {
+			return nil,err
+		}
+		return n.next(index)
 	}
 	vNode := n.elem()
 	if match := patternIndex.FindStringSubmatch(index); len(match) > 0 {
