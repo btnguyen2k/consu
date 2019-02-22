@@ -216,7 +216,7 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 	if value.Kind() == reflect.Invalid {
 		err := n.removeValue(index)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
 		return n.next(index)
 	}
