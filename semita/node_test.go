@@ -986,6 +986,38 @@ func TestNode_setValueArray(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
+func TestNode_createChild_Invalid(t *testing.T) {
+	name := "TestNode_createChild_Invalid"
+	{
+		v := "a string"
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(v),
+		}
+		index := "key"
+		_, err := root.createChild(index, "")
+		if err == nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+	{
+		v := 103
+		root := &node{
+			prev:     nil,
+			prevType: nil,
+			key:      "",
+			value:    reflect.ValueOf(&v),
+		}
+		index := "key"
+		_, err := root.createChild(index, "")
+		if err == nil {
+			t.Errorf("%s failed with data %#v", name, v)
+		}
+	}
+}
+
 func TestNode_createChildOfMap(t *testing.T) {
 	name := "TestNode_createChildOfMap"
 	{

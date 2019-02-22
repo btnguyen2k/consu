@@ -292,15 +292,15 @@ func (n *node) setValue(index string, value reflect.Value) (*node, error) {
 	return nil, errors.New("expecting map or struct, but it is {" + vNode.Type().String() + "}")
 }
 
-// createChildMap creates an empty map and insert it as a child node
-func (n *node) createChildMap(index string) (*node, error) {
-	return n.setValue(index, createEmptyGenericMap())
-}
-
-// createChildSlice creates an empty slice and insert it as a child node
-func (n *node) createChildSlice(index string) (*node, error) {
-	return n.setValue(index, createEmptyGenericSlice())
-}
+// // createChildMap creates an empty map and insert it as a child node
+// func (n *node) createChildMap(index string) (*node, error) {
+// 	return n.setValue(index, createEmptyGenericMap())
+// }
+//
+// // createChildSlice creates an empty slice and insert it as a child node
+// func (n *node) createChildSlice(index string) (*node, error) {
+// 	return n.setValue(index, createEmptyGenericSlice())
+// }
 
 // createChild creates an empty child and returns it as a node
 func (n *node) createChild(index, nextIndex string) (*node, error) {
