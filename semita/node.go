@@ -29,17 +29,6 @@ func isExportedField(fieldName string) bool {
 	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
 
-// // isNil evaluate 'reflect.Value.isNil' function without panicking
-// func isNil(v reflect.Value) bool {
-// 	k := v.Kind()
-// 	switch k {
-// 	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
-// 		return v.IsNil()
-// 	default:
-// 		return false
-// 	}
-// }
-
 // parseIndex parses the index value from string "[<index>]"
 // - returns 'defaultValue' if 'index' is "[]"
 // - return error if <index> cannot be parsed
