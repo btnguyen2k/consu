@@ -83,6 +83,15 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 
 ## History
 
+### 2019-03-05 - v0.1.2
+
+- Refactoring:
+  - `ToBool(..)` now returns `(bool, error)`
+  - `ToFloat(..)` now returns `(float64, error)`
+  - `ToInt(..)` now returns `(int64, error)`
+  - `ToUint(..)` now returns `(uint64, error)`
+  - `ToString(..)` now returns `(string, error)`
+
 ### 2019-02-12 - v0.1.1.2
 
 - New (semi)constants `ZeroMap` and `ZeroSlice`

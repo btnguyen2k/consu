@@ -8,31 +8,23 @@ import (
 	"time"
 )
 
-// func ifFailed(t *testing.T, f string, e error) bool {
-// 	if e != nil {
-// 		t.Errorf("%s failed: %e", f, e)
-// 		return true
-// 	}
-// 	return false
-// }
-//
-// /*----------------------------------------------------------------------*/
-
 func testToBool(t *testing.T, input interface{}, expected bool, zero bool) {
 	name := "TestToBool"
-
-	v, e := ToBool(input)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+	{
+		v, e := ToBool(input)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != expected {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
 	}
-
-	v, e = Convert(input, zero)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+	{
+		v, e := Convert(input, zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(bool) != expected {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
 	}
 }
 
@@ -121,19 +113,21 @@ func TestToBool(t *testing.T) {
 
 func testToFloat(t *testing.T, input interface{}, expected float64, zero float64) {
 	name := "TestToFloat"
-
-	v, e := ToFloat(input)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%f] but received [%f]", name, expected, v)
+	{
+		v, e := ToFloat(input)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != expected {
+			t.Errorf("%s failed: expected [%f] but received [%f]", name, expected, v)
+		}
 	}
-
-	v, e = Convert(input, zero)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%f] but received [%f]", name, expected, v)
+	{
+		v, e := Convert(input, zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(float64) != expected {
+			t.Errorf("%s failed: expected [%f] but received [%f]", name, expected, v)
+		}
 	}
 }
 
@@ -207,19 +201,21 @@ func TestToFloat(t *testing.T) {
 
 func testToInt(t *testing.T, input interface{}, expected int64, zero int64) {
 	name := "TestToInt"
-
-	v, e := ToInt(input)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+	{
+		v, e := ToInt(input)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != expected {
+			t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+		}
 	}
-
-	v, e = Convert(input, zero)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+	{
+		v, e := Convert(input, zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(int64) != expected {
+			t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+		}
 	}
 }
 
@@ -312,19 +308,21 @@ const (
 
 func testToUint(t *testing.T, input interface{}, expected uint64, zero uint64) {
 	name := "TestToUint"
-
-	v, e := ToUint(input)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+	{
+		v, e := ToUint(input)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != expected {
+			t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+		}
 	}
-
-	v, e = Convert(input, zero)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+	{
+		v, e := Convert(input, zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(uint64) != expected {
+			t.Errorf("%s failed: expected [%d] but received [%d]", name, expected, v)
+		}
 	}
 }
 
@@ -420,19 +418,21 @@ func TestToUint(t *testing.T) {
 
 func testToString(t *testing.T, input interface{}, expected string, zero string) {
 	name := "TestToString"
-
-	v, e := ToString(input)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%s] but received [%s]", name, expected, v)
+	{
+		v, e := ToString(input)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v != expected {
+			t.Errorf("%s failed: expected [%s] but received [%s]", name, expected, v)
+		}
 	}
-
-	v, e = Convert(input, zero)
-	if e != nil {
-		t.Errorf("%s failed: %e", name, e)
-	} else if v != expected {
-		t.Errorf("%s failed: expected [%s] but received [%s]", name, expected, v)
+	{
+		v, e := Convert(input, zero)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.(string) != expected {
+			t.Errorf("%s failed: expected [%s] but received [%s]", name, expected, v)
+		}
 	}
 }
 

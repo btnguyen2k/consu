@@ -74,7 +74,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1.2"
+	Version = "0.1.2"
 
 	// ZeroBool defines 'zero' value of type bool
 	ZeroBool = false
@@ -113,7 +113,7 @@ var (
 )
 
 /*
-ToBool converts a value to bool. The output is guaranteed to ad-here to type assertion .(bool)
+ToBool converts a value to bool.
 
 	- If v is indeed a bool: its value is returned.
 	- If v is a number (integer, float or complex): return false if its value is 'zero', true otherwise.
@@ -139,7 +139,7 @@ Examples:
 	ToBool("blabla")   returns _,     error
 	ToBool(struct{}{}) returns _,     error
 */
-func ToBool(v interface{}) (interface{}, error) {
+func ToBool(v interface{}) (bool, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -161,7 +161,7 @@ func ToBool(v interface{}) (interface{}, error) {
 }
 
 /*
-ToFloat converts a value to float64. The output is guaranteed to ad-here to type assertion .(float64)
+ToFloat converts a value to float64.
 
 	- If v is a bool: return 1.0 if its value is true, 0.0 otherwise.
 	- If v is a number (integer or float): return its value as float64.
@@ -178,7 +178,7 @@ Examples:
 	ToFloat("blabla")   returns _,     error
 	ToFloat(struct{}{}) returns _,     error
 */
-func ToFloat(v interface{}) (interface{}, error) {
+func ToFloat(v interface{}) (float64, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -202,7 +202,7 @@ func ToFloat(v interface{}) (interface{}, error) {
 }
 
 /*
-ToInt converts a value to int64. The output is guaranteed to ad-here to type assertion .(int64)
+ToInt converts a value to int64.
 
 	- If v is a number (integer or float): return its value as int64.
 	- If v is a bool: return 1 if its value is true, 0 otherwise.
@@ -220,7 +220,7 @@ Examples:
 	ToInt("blabla")   returns _,  error
 	ToInt(struct{}{}) returns _,  error
 */
-func ToInt(v interface{}) (interface{}, error) {
+func ToInt(v interface{}) (int64, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -241,7 +241,7 @@ func ToInt(v interface{}) (interface{}, error) {
 }
 
 /*
-ToUint converts a value to uint64. The output is guaranteed to ad-here to type assertion .(uint64)
+ToUint converts a value to uint64.
 
 	- If v is a number (integer or float): return its value as uint64.
 	- If v is a bool: return 1 if its value is true, 0 otherwise.
@@ -260,7 +260,7 @@ Examples:
 	ToUint("blabla")   returns _,  error
 	ToUint(struct{}{}) returns _,  error
 */
-func ToUint(v interface{}) (interface{}, error) {
+func ToUint(v interface{}) (uint64, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -281,7 +281,7 @@ func ToUint(v interface{}) (interface{}, error) {
 }
 
 /*
-ToString converts a value to string. The output is guaranteed to ad-here to type assertion .(string)
+ToString converts a value to string.
 
 	- If v is a number (integer or float) or bool or string: return its value as string.
 	- Otherwise, return string representation of v (fmt.Sprint(v))
@@ -295,7 +295,7 @@ Examples:
 	ToString("blabla")   returns "blabla", nil
 	ToString(struct{}{}) returns "{}",     nil
 */
-func ToString(v interface{}) (interface{}, error) {
+func ToString(v interface{}) (string, error) {
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
