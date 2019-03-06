@@ -34,10 +34,10 @@ Example:
 package main
 
 import (
-"encoding/json"
-"fmt"
-"github.com/btnguyen2k/consu/reddo"
-"github.com/btnguyen2k/consu/semita"
+    "encoding/json"
+    "fmt"
+    "github.com/btnguyen2k/consu/reddo"
+    "github.com/btnguyen2k/consu/semita"
 )
 
 func main() {
@@ -89,7 +89,7 @@ func main() {
 	}
 
 	// get a value and type
-	yob, err = s.GetValueOfType("yob", reddo.ZeroUint) // yob should be uint64(1981)
+	yob, err = s.GetValueOfType("yob", reddo.TypeUint) // yob should be uint64(1981)
 	if err == nil {
 		fmt.Println("YOB:", yob.(uint64)) // all uint types are returned as uint64
 	} else {
@@ -138,6 +138,10 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita).
 
 
 ## History
+
+### 2019-03-05 - v0.1.1
+
+- Compatible with `consu/reddo-v0.1.2`
 
 ### 2019-02-22 - v0.1.0
 

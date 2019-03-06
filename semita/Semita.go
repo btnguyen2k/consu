@@ -78,7 +78,7 @@ Example: (more examples at https://github.com/btnguyen2k/consu/tree/master/semit
 		}
 
 		// get a value and type
-		yob, err = s.GetValueOfType("yob", reddo.ZeroUint) // yob should be uint64(1981)
+		yob, err = s.GetValueOfType("yob", reddo.TypeUint) // yob should be uint64(1981)
 		if err == nil {
 			fmt.Println("YOB:", yob.(uint64)) // all uint types are returned as uint64
 		} else {
@@ -133,7 +133,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.0"
+	Version = "0.1.1"
 
 	// PathSeparator separates path components
 	PathSeparator = '.'
@@ -396,7 +396,7 @@ func (s *Semita) GetValue(path string) (interface{}, error) {
 }
 
 /*
-GetValueOfType retrieves value located at 'path', converts the value to target's type and returns it.
+GetValueOfType retrieves value located at 'path', converts the value to target type and returns it.
 
 Notes:
 
@@ -408,42 +408,42 @@ Notes:
 
 Example:
 
-	  data := map[string]interface{}{
+	data := map[string]interface{}{
 		"Name": "Monster Corp.",
 		"Year": 2003,
 		"Employees": []map[string]interface{}{
-		  {
-			"first_name": "Mike",
-			"last_name" : "Wazowski",
-			"email"     : "mike.wazowski@monster.com",
-			"age"       : 29,
-			"options"   : map[string]interface{}{
-			  "work_hours": []int{9, 10, 11, 12, 13, 14, 15, 16},
-			  "overtime"  : false,
+			{
+				"first_name": "Mike",
+				"last_name" : "Wazowski",
+				"email"     : "mike.wazowski@monster.com",
+				"age"       : 29,
+				"options"   : map[string]interface{}{
+			  	"work_hours": []int{9, 10, 11, 12, 13, 14, 15, 16},
+			  	"overtime"  : false,
 			},
-		  },
-		  {
-			"first_name": "Sulley",
-			"last_name" : "Sullivan",
-			"email"     : "sulley.sullivan@monster.com",
-			"age"       : 30,
-			"options"   : map[string]interface{}{
-			  "work_hours": []int{13, 14, 15, 16, 17, 18, 19, 20},
-			  "overtime"  :   true,
 			},
-		  },
+			{
+				"first_name": "Sulley",
+				"last_name" : "Sullivan",
+				"email"     : "sulley.sullivan@monster.com",
+				"age"       : 30,
+				"options"   : map[string]interface{}{
+					"work_hours": []int{13, 14, 15, 16, 17, 18, 19, 20},
+					"overtime"  :   true,
+				},
+			},
 		},
-	  }
-	  s := NewSetima(data)
-	  var Name string = s.GetValueOfType("Name", reddo.ZeroString).(string)          // "Monster Corp."
-	  var age int64   = s.GetValueOfType("Employees[0].age", reddo.ZeroInt).(int64)  // 29
+	}
+	s := NewSetima(data)
+	var Name string = s.GetValueOfType("Name", reddo.TypeString).(string)            // "Monster Corp."
+	var age int64   = s.GetValueOfType("Employees[0].age", reddo.TypeInt).(int64)    // 29
 */
-func (s *Semita) GetValueOfType(path string, target interface{}) (interface{}, error) {
+func (s *Semita) GetValueOfType(path string, typ reflect.Type) (interface{}, error) {
 	v, e := s.GetValue(path)
 	if v == nil || e != nil {
 		return v, e
 	}
-	return reddo.Convert(v, target)
+	return reddo.Convert(v, typ)
 }
 
 /*

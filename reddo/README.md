@@ -20,6 +20,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"github.com/btnguyen2k/consu/reddo"
 )
 
@@ -33,8 +34,8 @@ type Def struct {
 }
 
 // convenient method to get value and discarding error
-func getValue(data map[string]interface{}, field string, zero interface{}) interface{} {
-	v, err := reddo.Convert(data[field], zero)
+func getValue(data map[string]interface{}, field string, typ reflect.Type) interface{} {
+	v, err := reddo.Convert(data[field], typ)
 	if err != nil {
 		panic(err)
 	}
@@ -51,18 +52,17 @@ func main() {
 	data["def"] = Def{Abc: Abc{A: 1981}, D: "btnguyen2k"}
 
 	// data["id"] and data["year"] both have type interface{}, we would want the correct type
-	var id = getValue(data, "id", reddo.ZeroString).(string)
-	var year = getValue(data, "year", reddo.ZeroInt).(int64)
-	var yearUint = getValue(data, "year", reddo.ZeroUint).(uint64)
+	var id = getValue(data, "id", reddo.TypeString).(string)
+	var year = getValue(data, "year", reddo.TypeInt).(int64)
+	var yearUint = getValue(data, "year", reddo.TypeUint).(uint64)
 	fmt.Printf("Id is %s, year is %d (%d)\n", id, year, yearUint) // Id is 1, year is 2019 (2019) 
 
-	// we need a 'zero' value of the target type to retrieve the correct value & type from out data store
-	zeroAbc := Abc{}
-	zeroDef := Def{}
-	var abc = getValue(data, "abc", zeroAbc).(Abc)
-	var def = getValue(data, "def", zeroDef).(Def)
+	typeAbc := reflect.TypeOf(Abc{})
+	typeDef := reflect.TypeOf(Def{})
+	var abc = getValue(data, "abc", typeAbc).(Abc)
+	var def = getValue(data, "def", typeDef).(Def)
 	// special case: struct Def 'inherit' struct Abc, hence Def can be 'cast'-ed to Abc
-	var abc2 = getValue(data, "def", zeroAbc).(Abc)
+	var abc2 = getValue(data, "def", typeAbc).(Abc)
 	fmt.Println("data.abc       :", abc)  // data.abc       : {103}
 	fmt.Println("data.def       :", def)  // data.def       : {{1981} btnguyen2k}
 	fmt.Println("data.def as abc:", abc2) // data.def as abc: {1981}
@@ -86,11 +86,16 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 ### 2019-03-05 - v0.1.2
 
 - Refactoring:
-  - `ToBool(..)` now returns `(bool, error)`
-  - `ToFloat(..)` now returns `(float64, error)`
-  - `ToInt(..)` now returns `(int64, error)`
-  - `ToUint(..)` now returns `(uint64, error)`
-  - `ToString(..)` now returns `(string, error)`
+  - `ToBool(...)` now returns `(bool, error)`
+  - `ToFloat(...)` now returns `(float64, error)`
+  - `ToInt(...)` now returns `(int64, error)`
+  - `ToUint(...)` now returns `(uint64, error)`
+  - `ToString(...)` now returns `(string, error)`
+  - `ToStruct(...)` changes its parameters to `ToStruct(v interface{}, t reflect.Type)`. Supplied target type can be slice, array or an element or array/slice.
+  - `ToMap(...)` changes its parameters to `ToMap(v interface{}, t reflect.Type)`.
+  - `Convert(...)` changes its parameters to `Convert(v interface{}, t reflect.Type)`.
+- Remove `Zero...`, add `Type...`
+- Other fixes and enhancements
 
 ### 2019-02-12 - v0.1.1.2
 
