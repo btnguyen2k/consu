@@ -56,7 +56,7 @@ func exampleSimple() {
 	}
 
 	// get a value and type
-	yob, err = s.GetValueOfType("yob", reddo.ZeroUint) // yob should be uint64(1981)
+	yob, err = s.GetValueOfType("yob", reddo.TypeUint) // yob should be uint64(1981)
 	if err == nil {
 		fmt.Println("YOB:", yob.(uint64)) // all uint types are returned as uint64
 	} else {
