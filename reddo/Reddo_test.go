@@ -638,6 +638,133 @@ func TestToTimeString(t *testing.T) {
 	}
 }
 
+// TestToTimeWithLayout tests if strings are converted correctly to time.Time using layout
+func TestToTimeWithLayout(t *testing.T) {
+	name := "TestToTimeWithLayout"
+
+	{
+		// convert 'long(seconds)' to 'time.Time'
+		now := time.Now()
+		input := now.Unix()
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+	{
+		// convert 'long(seconds)' to 'time.Time'
+		now := time.Now()
+		input := strconv.FormatInt(now.Unix(), 10)
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+
+	{
+		// convert 'long(milliseconds)' to 'time.Time'
+		now := time.Now()
+		input := now.UnixNano() / 1000000
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+	{
+		// convert 'long(milliseconds)' to 'time.Time'
+		now := time.Now()
+		input := strconv.FormatInt(now.UnixNano()/1000000, 10)
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+
+	{
+		// convert 'long(microseconds)' to 'time.Time'
+		now := time.Now()
+		input := now.UnixNano() / 1000
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+	{
+		// convert 'long(microseconds)' to 'time.Time'
+		now := time.Now()
+		input := strconv.FormatInt(now.UnixNano()/1000, 10)
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+
+	{
+		// convert 'long(nanoseconds)' to 'time.Time'
+		now := time.Now()
+		input := now.UnixNano()
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+	{
+		// convert 'long(nanoseconds)' to 'time.Time'
+		now := time.Now()
+		input := strconv.FormatInt(now.UnixNano(), 10)
+		v, e := ToTimeWithLayout(input, "")
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+
+	{
+		// invalid input
+		input := "abc"
+		layout := "Jan"
+		_, e := ToTimeWithLayout(input, layout)
+		if e == nil {
+			t.Errorf("%s failed: %e", name, e)
+		}
+	}
+	{
+		// invalid layout
+		input := "2019-01-01"
+		layout := "month"
+		_, e := ToTimeWithLayout(input, layout)
+		if e == nil {
+			t.Errorf("%s failed: %e", name, e)
+		}
+	}
+	{
+		input := "2019-04-29T20:59:10"
+		layout := "2006-01-02T15:04:05"
+		expected := time.Date(2019, 04, 29, 20, 59, 10, 0, time.UTC)
+		v, e := ToTimeWithLayout(input, layout)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != expected.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
+	}
+}
+
 // TestToStruct tests if values are converted correctly to struct
 func TestToStruct(t *testing.T) {
 	name := "TestToStruct"

@@ -74,7 +74,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.2"
+	Version = "0.1.3"
 )
 
 var (
@@ -306,8 +306,8 @@ func ToString(v interface{}) (string, error) {
 ToTime converts a value (v) to 'time.Time'.
 
 	- If v is 'time.Time': return v
-	- If v is integer: depends on how big is v, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
-	- If v is string and convertable to integer: depends on how big is v, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+	- If v is integer: depends on how big v is, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+	- If v is string and convertible to integer: depends on how big v is, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
 	- Otherwise, return error
 
 Availability: This function is available since v0.1.0.
@@ -350,6 +350,34 @@ func ToTime(v interface{}) (time.Time, error) {
 		return time.Unix(0, vi), nil
 	}
 	return zeroTime, errors.New("value of [" + fmt.Sprint(v) + "] cannot be converted to [time.Time]")
+}
+
+/*
+ToTimeWithLayout converts a value (v) to 'time.Time'.
+
+ToTimeWithLayout applies the same conversion rules as ToTime does, plus:
+
+	- If v is string and NOT convertible to integer: 'layout' is used to convert the input to 'time.Time'. Error is returned if conversion fails.
+
+Availability: This function is available since v0.1.3.
+
+Examples:
+
+	ToTimeWithLayout(1547549353, _)                                                       returns Time(Tuesday, January 15, 2019 10:49:13.000 AM GMT), nil
+	ToTimeWithLayout("1547549353123", _)                                                  returns Time(Tuesday, January 15, 2019 10:49:13.123 AM GMT), nil
+	ToTimeWithLayout(-1, _)                                                               returns _, error
+	ToTimeWithLayout("January 15, 2019 20:49:13.123", "January 02, 2006 15:04:05.000")    returns Time(Tuesday, January 15, 2019 08:49:13.123 PM GMT), nil
+*/
+func ToTimeWithLayout(v interface{}, layout string) (time.Time, error) {
+	t, e := ToTime(v)
+	if e == nil {
+		return t, nil
+	}
+	s, e := ToString(v)
+	if e != nil {
+		return zeroTime, e
+	}
+	return time.Parse(layout, s)
 }
 
 func isExportedField(fieldName string) bool {

@@ -128,12 +128,13 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unsafe"
 )
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1"
+	Version = "0.1.2"
 
 	// PathSeparator separates path components
 	PathSeparator = '.'
@@ -444,6 +445,80 @@ func (s *Semita) GetValueOfType(path string, typ reflect.Type) (interface{}, err
 		return v, e
 	}
 	return reddo.Convert(v, typ)
+}
+
+/*
+GetTime returns a 'time.Time' located at 'path'.
+
+Availability: This function is available since v0.1.2.
+
+Notes:
+
+	- Same rules/restrictions as of GetValue function.
+	- If the value located at 'path' is 'time.Time': return it.
+	- If the value is integer: depends on how big it is, treat the value as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+	- If the value is string and convertible to integer: depends on how big it is, treat the value as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+	- Otherwise, return error
+
+Example:
+
+	data := map[string]interface{}{
+		"ValueInt"    : 1547549353,
+		"ValueString" : "1547549353123",
+		"ValueInvalid": -1,
+	}
+	s := NewSetima(data)
+	s.GetTime("ValueInt")        returns Time(Tuesday, January 15, 2019 10:49:13.000 AM GMT), nil
+	s.GetTime("ValueString")     returns Time(Tuesday, January 15, 2019 10:49:13.123 AM GMT), nil
+	s.GetTime("ValueInvalid")    returns _, error
+*/
+func (s *Semita) GetTime(path string) (time.Time, error) {
+	v, e := s.GetValue(path)
+	if v == nil || e != nil {
+		return time.Time{}, e
+	}
+	return reddo.ToTime(v)
+}
+
+/*
+GetTimeWithLayout returns a 'time.Time' located at 'path'.
+
+Availability: This function is available since v0.1.2.
+
+Notes:
+
+	- Same rules/restrictions as of GetTime function, plus:
+	- If the value is string and NOT convertible to integer: 'layout' is used to convert the value to 'time.Time'. Error is returned if conversion fails.
+
+Example:
+
+	data := map[string]interface{}{
+		"ValueInt"    : 1547549353,
+		"ValueString" : "1547549353123",
+		"ValueInvalid": -1,
+		"ValueDateStr": "January 15, 2019 20:49:13.123",
+	}
+	s := NewSetima(data)
+	s.GetTimeWithLayout("ValueInt", _)                                      returns Time(Tuesday, January 15, 2019 10:49:13.000 AM GMT), nil
+	s.GetTimeWithLayout("ValueString", _)                                   returns Time(Tuesday, January 15, 2019 10:49:13.123 AM GMT), nil
+	s.GetTimeWithLayout("ValueInvalid", _)                                  returns _, error
+	s.GetTimeWithLayout("ValueDateStr", "January 02, 2006 15:04:05.000")    returns Time(Tuesday, January 15, 2019 08:49:13.123 PM GMT), nil
+*/
+func (s *Semita) GetTimeWithLayout(path, layout string) (time.Time, error) {
+	zeroTime := time.Time{}
+	v, e := s.GetValue(path)
+	if e != nil {
+		return zeroTime, e
+	}
+	t, e := reddo.ToTime(v)
+	if e == nil {
+		return t, nil
+	}
+	str, e := reddo.ToString(v)
+	if e != nil {
+		return time.Time{}, e
+	}
+	return time.Parse(layout, str)
 }
 
 /*

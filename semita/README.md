@@ -139,6 +139,12 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita).
 
 ## History
 
+### 2019-03-07 - v0.1.2
+
+- Upgrade to `consu/reddo-v0.1.3`:
+  - New functions `GetTime(path string) (time.Time, error)` and `GetTimeWithLayout(path, layout string) (time.Time, error)`
+
+
 ### 2019-03-05 - v0.1.1
 
 - Compatible with `consu/reddo-v0.1.2`

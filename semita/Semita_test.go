@@ -794,6 +794,149 @@ func TestSemita_GetValueStruct(t *testing.T) {
 
 /*----------------------------------------------------------------------*/
 
+func TestSemita_GetTimeError(t *testing.T) {
+	name := "TestSemita_GetTimeError"
+
+	data := map[string]interface{}{
+		"val_int": -1,
+		"val_str": "-1",
+	}
+	s1 := NewSemita(data)
+	s2 := NewSemita(&data)
+
+	{
+		p := "val_int"
+		_, e := s1.GetTime(p)
+		if e == nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		}
+		_, e = s2.GetTime(p)
+		if e == nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		}
+	}
+	{
+		p := "val_str"
+		_, e := s1.GetTime(p)
+		if e == nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		}
+		_, e = s2.GetTime(p)
+		if e == nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		}
+	}
+}
+
+func TestSemita_GetTime(t *testing.T) {
+	name := "TestSemita_GetTime"
+
+	now := time.Now()
+	data := map[string]interface{}{
+		"val_int": now.Unix(),
+		"val_str": strconv.FormatInt(now.Unix(), 10),
+	}
+	s1 := NewSemita(data)
+	s2 := NewSemita(&data)
+
+	{
+		p := "val_int"
+		v, e := s1.GetTime(p)
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+		v, e = s2.GetTime(p)
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+	{
+		p := "val_str"
+		v, e := s1.GetTime(p)
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+		v, e = s2.GetTime(p)
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+}
+
+func TestSemita_GetTimeWithLayout(t *testing.T) {
+	name := "TestSemita_GetTimeWithLayout"
+
+	now := time.Now()
+	input := "2019-04-29T20:59:10"
+	layout := "2006-01-02T15:04:05"
+	expected := time.Date(2019, 04, 29, 20, 59, 10, 0, time.UTC)
+	data := map[string]interface{}{
+		"val_int": now.Unix(),
+		"val_str": strconv.FormatInt(now.Unix(), 10),
+		"input":   input,
+	}
+	s1 := NewSemita(data)
+	s2 := NewSemita(&data)
+
+	{
+		p := "val_int"
+		v, e := s1.GetTimeWithLayout(p, "")
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+		v, e = s2.GetTimeWithLayout(p, "")
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+
+	{
+		p := "val_str"
+		v, e := s1.GetTimeWithLayout(p, "")
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+		v, e = s2.GetTimeWithLayout(p, "")
+		if e != nil {
+			t.Errorf("%s failed with data %v at path %s", name, data, p)
+		} else if v.Unix() != now.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+		}
+	}
+
+	{
+		p := "input"
+		v, e := s1.GetTimeWithLayout(p, layout)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != expected.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
+		v, e = s2.GetTimeWithLayout(p, layout)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != expected.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
 var (
 	companyName = "Monster Corp."
 	companyYear = 2003
