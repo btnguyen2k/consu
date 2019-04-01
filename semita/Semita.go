@@ -134,7 +134,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.2"
+	Version = "0.1.4"
 
 	// PathSeparator separates path components
 	PathSeparator = '.'

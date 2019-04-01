@@ -139,6 +139,11 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita).
 
 ## History
 
+### 2019-04-04 - v0.1.4
+
+- Migrate to Go modular design.
+
+
 ### 2019-03-07 - v0.1.2
 
 - Upgrade to `consu/reddo-v0.1.3`:
