@@ -763,6 +763,18 @@ func TestToTimeWithLayout(t *testing.T) {
 			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
 	}
+	{
+		loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
+		input := "2019-04-29 20:59:10.165067 +0700 +07"
+		layout := "2006-01-02 15:04:05.999999 -0700 -07"
+		expected := time.Date(2019, 04, 29, 20, 59, 10, 0, loc)
+		v, e := ToTimeWithLayout(input, layout)
+		if e != nil {
+			t.Errorf("%s failed: %e", name, e)
+		} else if v.Unix() != expected.Unix() {
+			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		}
+	}
 }
 
 // TestToStruct tests if values are converted correctly to struct

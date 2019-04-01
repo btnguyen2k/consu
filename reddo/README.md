@@ -83,6 +83,11 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 
 ## History
 
+### 2019-04-01 - v0.1.4
+
+- Migrate to Go modular design.
+
+
 ### 2019-03-07 - v0.1.3
 
 - New function `ToTimeWithLayout(v interface{}, layout string) (time.Time, error)`

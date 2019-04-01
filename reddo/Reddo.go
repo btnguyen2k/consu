@@ -74,7 +74,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.3"
+	Version = "0.1.4"
 )
 
 var (
