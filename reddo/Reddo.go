@@ -74,7 +74,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.4"
+	Version = "0.1.4.1"
 )
 
 var (
@@ -298,6 +298,11 @@ func ToString(v interface{}) (string, error) {
 		return strconv.FormatFloat(vV.Float(), 'G', -1, 64), nil
 	case reflect.String:
 		return vV.String(), nil
+	case reflect.Slice, reflect.Array:
+		// since v0.1.4.1: (special case) convert []byte to string
+		if vV.Type().Elem().Kind() == reflect.Uint8 {
+			return string(vV.Interface().([]byte)), nil
+		}
 	}
 	return fmt.Sprint(v), nil
 }
@@ -469,6 +474,10 @@ func ToSlice(v interface{}, t reflect.Type) (interface{}, error) {
 		return ToSlice(v, reflect.SliceOf(t))
 	}
 	vV := reflect.ValueOf(v)
+	if t.Elem().Kind() == reflect.Uint8 && vV.Kind() == reflect.String {
+		// since v0.1.4.1: (special case) converting string to []byte
+		return []byte(v.(string)), nil
+	}
 	switch vV.Kind() {
 	case reflect.Array, reflect.Slice:
 		elementType := t.Elem()                                        // type of slice element

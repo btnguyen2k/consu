@@ -83,6 +83,12 @@ See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
 
 ## History
 
+### 2019-04-02 - v0.1.4.1
+
+- `reddo.ToString(...)`: handle the case converting `[]byte` to `string`.
+- `reddo.ToSlice(...)`: handle the case converting `string` to `[]byte`.
+
+
 ### 2019-04-01 - v0.1.4
 
 - Migrate to Go modular design.
