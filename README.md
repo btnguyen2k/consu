@@ -7,6 +7,7 @@ Collection of helpful utilities in Golang to make your life easier.
 
 ## Sub-packages
 
+- [olaf](olaf/): utility functions to generate unique ID using Twitter Snowflake algorithm.
 - [reddo](reddo/): utility functions to convert values using Golang's reflect.
 - [semita](semita/): utility functions to access data from a hierarchy structure.
 

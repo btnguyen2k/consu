@@ -76,11 +76,6 @@ func main() {
 ```
 
 
-## Documentation
-
-See [GoDoc](https://godoc.org/github.com/btnguyen2k/consu/reddo).
-
-
 ## History
 
 ### 2019-04-02 - v0.1.5
