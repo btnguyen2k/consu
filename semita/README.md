@@ -134,6 +134,12 @@ func main() {
 
 ## History
 
+### 2019-04-12 - v0.1.4.1
+
+- Upgrade to `consu/reddo-v0.1.6`:
+  - Return `zero` value when input is `nil`.
+
+
 ### 2019-04-04 - v0.1.4
 
 - Migrate to Go modular design.
