@@ -78,6 +78,18 @@ func main() {
 
 ## History
 
+### 2019-04-12 - v0.1.6
+
+- Return `zero` value when input is `nil`:
+  - `reddo.ToBool(...)` returns `false`
+  - `reddo.ToFloat(...)`, `reddo.ToInt(...)` and `reddo.ToUint(...)` returns `0`
+  - `reddo.ToStrirng(...)` returns `""`
+  - `reddo.ToTime(...)` and `reddo.ToTimeWithLayout(...)` returns `time.Time{}`
+  - `reddo.ToSlice(...)` returns `nil`
+  - `reddo.ToMap(...)` returns `nil`
+  - `reddo.ToPointer(...)` returns `nil`
+
+
 ### 2019-04-02 - v0.1.5
 
 - `reddo.ToString(...)`: handle the case converting `[]byte` to `string`.

@@ -74,7 +74,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.5"
+	Version = "0.1.6"
 )
 
 var (
@@ -130,6 +130,9 @@ Examples:
 	ToBool(struct{}{})    returns _,     error
 */
 func ToBool(v interface{}) (bool, error) {
+	if v == nil {
+		return false, nil
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -169,6 +172,9 @@ Examples:
 	ToFloat(struct{}{})    returns _,     error
 */
 func ToFloat(v interface{}) (float64, error) {
+	if v == nil {
+		return float64(0), nil
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -211,6 +217,9 @@ Examples:
 	ToInt(struct{}{})    returns _,  error
 */
 func ToInt(v interface{}) (int64, error) {
+	if v == nil {
+		return int64(0), nil
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -251,6 +260,9 @@ Examples:
 	ToUint(struct{}{})    returns _,  error
 */
 func ToUint(v interface{}) (uint64, error) {
+	if v == nil {
+		return uint64(0), nil
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -286,6 +298,9 @@ Examples:
 	ToString(struct{}{})    returns "{}",     nil
 */
 func ToString(v interface{}) (string, error) {
+	if v == nil {
+		return "", nil
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Bool:
@@ -324,6 +339,9 @@ Examples:
 	ToTime(-1)                 returns _, error
 */
 func ToTime(v interface{}) (time.Time, error) {
+	if v == nil {
+		return zeroTime, nil
+	}
 	vV := reflect.ValueOf(v)
 	switch vV.Kind() {
 	case reflect.Struct:
@@ -374,6 +392,9 @@ Examples:
 	ToTimeWithLayout("January 15, 2019 20:49:13.123", "January 02, 2006 15:04:05.000")    returns Time(Tuesday, January 15, 2019 08:49:13.123 PM GMT), nil
 */
 func ToTimeWithLayout(v interface{}, layout string) (time.Time, error) {
+	if v == nil {
+		return zeroTime, nil
+	}
 	t, e := ToTime(v)
 	if e == nil {
 		return t, nil
@@ -467,6 +488,9 @@ Examples:
 	ToSlice([]bool{true,false}, TypeString)                  returns []string{"true","false"}, nil
 */
 func ToSlice(v interface{}, t reflect.Type) (interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
 	if t == nil {
 		return nil, errors.New("cannot detect type of target as it is [nil]")
 	}
@@ -511,6 +535,9 @@ Examples:
 	ToMap(map[string]bool{"a":true,"b":false}, reflect.TypeOf(map[string]int{}))    returns map[string]int{"a":1,"b":0"}, nil
 */
 func ToMap(v interface{}, t reflect.Type) (interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
 	if t == nil {
 		return nil, errors.New("cannot detect type of target as it is [nil]")
 	}
@@ -576,6 +603,9 @@ Example 2:
 	fmt.Println(abc.(Abc))        // i32 is safe to type asserted .(Abc)
 */
 func ToPointer(v interface{}, t reflect.Type) (interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
 	if t == nil {
 		return nil, errors.New("cannot detect type of target as it is [nil]")
 	}
