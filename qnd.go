@@ -3,34 +3,24 @@ package main
 import (
 	"fmt"
 	"github.com/btnguyen2k/consu/reddo"
-	"reflect"
-	"time"
+	"github.com/btnguyen2k/consu/semita"
 )
 
-func toTime(layout, source string) {
-	t, e := time.Parse(layout, source)
-	if e != nil {
-		fmt.Println("Error:", e)
-	} else {
-		fmt.Println(t.UnixNano(), t)
-	}
-}
-
 func main() {
-	s := "Nguyễn Bá Thành"
-	barr := []byte(s)
+	i := 123
+	s, e := reddo.ToString(i)
+	fmt.Println(s, e)
 
-	{
-		v1, err := reddo.ToString(barr)
-		fmt.Println(v1, err)
-		v2, err := reddo.Convert(barr, reddo.TypeString)
-		fmt.Println(v2, err)
-	}
+	m := make(map[string]interface{})
+	m["i"] = 456
+	s, e = reddo.ToString(m["i"])
+	fmt.Println(s, e)
+	s, e = reddo.ToString(m["s"])
+	fmt.Println(s, e)
 
-	{
-		v1, err := reddo.ToSlice(s, reflect.TypeOf(barr))
-		fmt.Println(v1, string(v1.([]byte)), err)
-		v2, err := reddo.Convert(s, reflect.TypeOf(barr))
-		fmt.Println(v2, string(v2.([]byte)), err)
-	}
+	sem := semita.NewSemita(m)
+	s1, e := sem.GetValueOfType("i", reddo.TypeString)
+	fmt.Println(s1, e)
+	s1, e = sem.GetValueOfType("s", reddo.TypeString)
+	fmt.Println(s1, e)
 }
