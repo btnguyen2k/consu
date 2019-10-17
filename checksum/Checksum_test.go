@@ -190,9 +190,9 @@ func TestChecksum_SliceArray(t *testing.T) {
 
 func TestChecksum_Map(t *testing.T) {
 	name := "TestChecksum_Map"
-	v1 := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true,}
-	v2 := map[string]interface{}{"b": 2.3, "d": true, "c": "a string", "a": 1,}
-	v3 := map[string]interface{}{"x": 1, "y": 2.3, "z": "a string", "t": true,}
+	v1 := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true}
+	v2 := map[string]interface{}{"b": 2.3, "d": true, "c": "a string", "a": 1}
+	v3 := map[string]interface{}{"x": 1, "y": 2.3, "z": "a string", "t": true}
 	for i, hf := range hfList {
 		checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 		checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
@@ -219,10 +219,10 @@ type MyStructAllPublic struct {
 func TestChecksum_StructAllPublic(t *testing.T) {
 	name := "TestChecksum_StructAllPublic"
 	a := []interface{}{1, 2.3, true, "a string"}
-	m := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true,}
+	m := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true}
 
-	v1 := MyStructAllPublic{S: "string", N: 1, F: 2.3, A: a, M: m,}
-	v2 := MyStructAllPublic{N: 1, A: a, M: m, F: 2.3, S: "string",}
+	v1 := MyStructAllPublic{S: "string", N: 1, F: 2.3, A: a, M: m}
+	v2 := MyStructAllPublic{N: 1, A: a, M: m, F: 2.3, S: "string"}
 	v3 := MyStructAllPublic{S: "string", N: 1, F: 2.3}
 	for i, hf := range hfList {
 		checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
@@ -250,12 +250,12 @@ type MyStructPubPriv struct {
 func TestChecksum_StructPubPriv(t *testing.T) {
 	name := "TestChecksum_StructPubPriv"
 	a := []interface{}{1, 2.3, true, "a string"}
-	m := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true,}
+	m := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true}
 
-	v1 := MyStructPubPriv{S: "string", N: 1, F: 2.3, a: a, m: m,}
-	v2 := MyStructPubPriv{N: 3, a: a, m: m, F: 1.2, S: "string",}
+	v1 := MyStructPubPriv{S: "string", N: 1, F: 2.3, a: a, m: m}
+	v2 := MyStructPubPriv{N: 3, a: a, m: m, F: 1.2, S: "string"}
 	v3 := MyStructPubPriv{S: "string", N: 1, F: 2.3, a: a, m: m}
-	v4 := MyStructPubPriv{N: 1, F: 2.3, S: "string",}
+	v4 := MyStructPubPriv{N: 1, F: 2.3, S: "string"}
 	for i, hf := range hfList {
 		checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 		checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
