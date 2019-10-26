@@ -47,7 +47,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.0"
+	Version = "0.1.1"
 )
 
 /*
@@ -120,11 +120,15 @@ Checksum calculates checksum of an input using the provided hash function.
 	- If v is a scalar type (bool, int*, uint*, float* or string) or pointer to scala type: checksum value is straightforward calculation.
 	- If v is a slice or array: checksum value is combination of all elements' checksums, in order. If v is empty (has 0 elements), empty []byte is returned.
 	- If v is a map: checksum value is combination of all entries' checksums, order-independent.
-	- If v is a struct: checksum value is combination of all fields' checksums, order-independent.
+	- If v is a struct: if the struct has function `Checksum()` then use it to calculate checksum value, otherwise checksum value is combination of all fields' checksums, order-independent.
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
+	var prv reflect.Value
 	rv := reflect.ValueOf(v)
 	for rv.Kind() == reflect.Ptr {
+		if rv.Elem().Kind() == reflect.Struct {
+			prv = rv
+		}
 		rv = rv.Elem()
 	}
 	switch rv.Kind() {
@@ -155,6 +159,21 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 		}
 		return buf
 	case reflect.Struct:
+		m := rv.MethodByName("Checksum")
+		if !m.IsValid() && prv.IsValid() {
+			m = prv.MethodByName("Checksum")
+		}
+		if m.IsValid() && m.Type().NumIn() == 0 {
+			result := m.Call(nil)
+			arr := make([]interface{}, 0)
+			for _, v := range result {
+				arr = append(arr, v.Interface())
+			}
+			if len(arr) > 0 {
+				return Checksum(hf, arr)
+			}
+		}
+
 		buf := hf([]byte{})
 		for i, n := 0, rv.NumField(); i < n; i++ {
 			// field-name is taking into account

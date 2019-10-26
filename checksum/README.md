@@ -39,7 +39,9 @@ func main() {
 ## Features:
 
 - Calculate checksum of scalar types (`bool`, `int*`, `uint*`, `float*`, `string`) as well as `slice/array` and `map/struct`.
-- `Struct`: be able to calculate checksum of unexported fields.
+- `Struct`:
+  - Be able to calculate checksum of unexported fields.
+  - If the struct has function `Checksum()`, use it instead of reflecting through struct's fields.
 - Supported hash functions: `CRC32`, `MD5`, `SHA1`, `SHA256`, `SHA512`.
 - A value of type integer will have the same checksum regardless it is `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32` or `uint64`.
 E.g. `checksum(int(103)) == checksum(uint64(103))`
@@ -55,6 +57,11 @@ but `checksum(map[string]int{"a":1,"b":2}) != checksum(map[string]int{"x":1,"y":
 
 
 ## History
+
+### 2019-10-26 - v0.1.1
+
+If a struct has function `Checksum()`, use it to calculate checksum instead of reflecting through struct's fields.
+
 
 ### 2019-10-17 - v0.1.0
 

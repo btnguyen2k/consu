@@ -1,6 +1,7 @@
 package checksum
 
 import (
+	"crypto/md5"
 	"fmt"
 	"testing"
 )
@@ -263,6 +264,43 @@ func TestChecksum_StructPubPriv(t *testing.T) {
 		checksum4 := fmt.Sprintf("%x", Checksum(hf, v4))
 		if !(checksum1 != checksum2) || !(checksum1 == checksum3) || !(checksum1 != checksum4) {
 			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v2, v3, v4}, []interface{}{checksum1, checksum2, checksum3, checksum4})
+		}
+
+		csf := csfList[i]
+		if checksum1 != fmt.Sprintf("%x", csf(v1)) {
+			t.Fatalf("%s failed at index %d", name, i)
+		}
+	}
+}
+
+type MyStruct struct {
+	S string
+	N uint
+	F float64
+	s string
+	n int
+	f float32
+}
+
+func (s MyStruct) Checksum() interface{} {
+	h := md5.New()
+	h.Write([]byte(s.S))
+	h.Write(uintToBytes(uint64(s.N)))
+	h.Write(floatToBytes(s.F))
+	result := h.Sum(nil)
+	return result
+}
+
+func TestChecksum_StructChecksum(t *testing.T) {
+	name := "TestChecksum_StructChecksum"
+
+	v1 := &MyStruct{S: "string", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
+	v2 := MyStruct{S: "string", N: 1, F: 2.3, s: "String", n: 2, f: 4.6}
+	for i, hf := range hfList {
+		checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+		checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
+		if !(checksum1 == checksum2) {
+			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v2}, []interface{}{checksum1, checksum2})
 		}
 
 		csf := csfList[i]
