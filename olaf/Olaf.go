@@ -45,7 +45,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1"
+	Version = "0.1.2"
 
 	// Epoch is set to 2019-01-01 00:00:00 UTC.
 	// You may customize this to set a different epoch for your application.
