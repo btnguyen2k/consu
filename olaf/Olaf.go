@@ -74,6 +74,7 @@ type Olaf struct {
 	Epoch      int64 // Twitter snowflake's epoch
 	SequenceId int64 // Twitter snowflake's sequence-id
 	Timestamp  int64 // last 'touch' UNIX timestamp in milliseconds
+	lock       sync.Mutex
 }
 
 // NewOlaf creates a new Olaf with default epoch.
@@ -132,9 +133,8 @@ func (o *Olaf) ExtractTime64Ascii(id64Ascii string) time.Time {
 
 // Id64 generates a 64-bit id.
 func (o *Olaf) Id64() uint64 {
-	var lock sync.Mutex
-	lock.Lock()
-	defer lock.Unlock()
+	o.lock.Lock()
+	defer o.lock.Unlock()
 	timestamp := UnixMilliseconds()
 	sequence := int64(0)
 	for done := false; !done; {
@@ -195,9 +195,8 @@ func (o *Olaf) ExtractTime128Ascii(id128Ascii string) time.Time {
 
 // Id128 generates a 128-bit id.
 func (o *Olaf) Id128() *big.Int {
-	var lock sync.Mutex
-	lock.Lock()
-	defer lock.Unlock()
+	o.lock.Lock()
+	defer o.lock.Unlock()
 	timestamp := UnixMilliseconds()
 	sequence := int64(0)
 	for done := false; !done; {

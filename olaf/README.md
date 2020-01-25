@@ -50,6 +50,11 @@ func main() {
 
 ## History
 
+### 2020-01-25 - v0.1.2
+
+- Bug fixes
+
+
 ### 2019-04-10 - v0.1.1
 
 - Migrate to Go modular design.

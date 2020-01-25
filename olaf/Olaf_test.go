@@ -87,10 +87,13 @@ func TestOlaf_Id64MultiThreads(t *testing.T) {
 	wg.Wait()
 	itemsMap := make(map[uint64]bool)
 	for _, v := range items {
-		_, ok := itemsMap[v]
-		if v == 0 || ok {
-			t.Fatalf("Generated ID is invalid: items[%v]=%v", v, v)
+		itemsMap[v] = true
+		if v == 0 {
+			t.Fatalf("Invalid ID: %d", v)
 		}
+	}
+	if len(items) != numItems || len(itemsMap) != numItems {
+		t.Fatalf("Expected %d but generated %d (%d unique)", numItems, len(items), len(itemsMap))
 	}
 }
 
@@ -153,11 +156,13 @@ func TestOlaf_Id128MultiThreads(t *testing.T) {
 	wg.Wait()
 	itemsMap := make(map[string]bool)
 	for _, v := range items {
-		s := v.String()
-		_, ok := itemsMap[s]
-		if v.Cmp(big.NewInt(0)) == 0 || ok {
-			t.Fatalf("Generated ID is invalid: items[%s]=%v", s, v)
+		itemsMap[v.String()] = true
+		if v.Cmp(big.NewInt(0)) == 0 {
+			t.Fatalf("Invalid ID: %d", v)
 		}
+	}
+	if len(items) != numItems || len(itemsMap) != numItems {
+		t.Fatalf("Expected %d but generated %d (%d unique)", numItems, len(items), len(itemsMap))
 	}
 }
 
