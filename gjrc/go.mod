@@ -1,4 +1,4 @@
-module github.com/btnguyen2k/consu/checksum
+module github.com/btnguyen2k/consu/gjrc
 
 go 1.12
 
