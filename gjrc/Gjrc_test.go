@@ -158,6 +158,22 @@ func TestGjrc_DeleteJson(t *testing.T) {
 	}
 }
 
+func TestGjrc_DeleteJsonError(t *testing.T) {
+	name := "TestGjrc_DeleteJsonError"
+	client := NewGjrc(nil, 10*time.Second)
+	url := "htps://httpbin.org/delete"
+	resp := client.DeleteJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
+	if resp == nil {
+		t.Fatalf("%s failed: nil response", name)
+	}
+	if resp.Error() == nil {
+		t.Fatalf("%s failed: expected error", name)
+	}
+	if resp.HttpResponse() != nil {
+		t.Fatalf("%s failed: expected nil http response", name)
+	}
+}
+
 func TestGjrc_Get(t *testing.T) {
 	name := "TestGjrc_Get"
 	client := NewGjrc(nil, 10*time.Second)
@@ -239,6 +255,49 @@ func TestGjrc_PatchJson(t *testing.T) {
 	}
 }
 
+func TestGjrc_PatchJsonError(t *testing.T) {
+	name := "TestGjrc_PatchJsonError"
+	client := NewGjrc(nil, 10*time.Second)
+	url := "htps://httpbin.org/patch"
+	resp := client.PatchJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
+	if resp == nil {
+		t.Fatalf("%s failed: nil response", name)
+	}
+	if resp.Error() == nil {
+		t.Fatalf("%s failed: expected error", name)
+	}
+	if resp.HttpResponse() != nil {
+		t.Fatalf("%s failed: expected nil http response", name)
+	}
+}
+
+func TestGjrc_Post(t *testing.T) {
+	name := "TestGjrc_Post"
+	client := NewGjrc(nil, 10*time.Second)
+	url := "https://httpbin.org/post"
+	resp := client.Post(url, "application/json", nil)
+	if resp == nil {
+		t.Fatalf("%s failed: nil response", name)
+	}
+
+	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
+	if err != nil {
+		t.Fatalf("%s failed: %e", name, err)
+	}
+	if valUrl != url {
+		t.Fatalf("%s failed: expected %s but received %s", name, url, valUrl)
+	}
+
+	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
+	if err != nil {
+		t.Fatalf("%s failed: %e", name, err)
+	}
+	host := "httpbin.org"
+	if valHost != host {
+		t.Fatalf("%s failed: expected %s but received %s", name, host, valHost)
+	}
+}
+
 func TestGjrc_PostJson(t *testing.T) {
 	name := "TestGjrc_PostJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -290,6 +349,22 @@ func TestGjrc_PostJson(t *testing.T) {
 	v3 := true
 	if val3 != v3 {
 		t.Fatalf("%s failed: expected %#v but received %#v", name, v3, val3)
+	}
+}
+
+func TestGjrc_PostJsonError(t *testing.T) {
+	name := "TestGjrc_PostJsonError"
+	client := NewGjrc(nil, 10*time.Second)
+	url := "htps://httpbin.org/post"
+	resp := client.PostJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
+	if resp == nil {
+		t.Fatalf("%s failed: nil response", name)
+	}
+	if resp.Error() == nil {
+		t.Fatalf("%s failed: expected error", name)
+	}
+	if resp.HttpResponse() != nil {
+		t.Fatalf("%s failed: expected nil http response", name)
 	}
 }
 
@@ -398,5 +473,21 @@ func TestGjrc_PutJson(t *testing.T) {
 	v3 := true
 	if val3 != v3 {
 		t.Fatalf("%s failed: expected %#v but received %#v", name, v3, val3)
+	}
+}
+
+func TestGjrc_PutJsonError(t *testing.T) {
+	name := "TestGjrc_PutJsonError"
+	client := NewGjrc(nil, 10*time.Second)
+	url := "htps://httpbin.org/put"
+	resp := client.PutJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
+	if resp == nil {
+		t.Fatalf("%s failed: nil response", name)
+	}
+	if resp.Error() == nil {
+		t.Fatalf("%s failed: expected error", name)
+	}
+	if resp.HttpResponse() != nil {
+		t.Fatalf("%s failed: expected nil http response", name)
 	}
 }
