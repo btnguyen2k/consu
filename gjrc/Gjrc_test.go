@@ -161,7 +161,7 @@ func TestGjrc_DeleteJson(t *testing.T) {
 func TestGjrc_DeleteJsonError(t *testing.T) {
 	name := "TestGjrc_DeleteJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "htps://httpbin.org/delete"
+	url := "://httpbin.org/delete"
 	resp := client.DeleteJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", name)
@@ -258,7 +258,7 @@ func TestGjrc_PatchJson(t *testing.T) {
 func TestGjrc_PatchJsonError(t *testing.T) {
 	name := "TestGjrc_PatchJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "htps://httpbin.org/patch"
+	url := "://httpbin.org/patch"
 	resp := client.PatchJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", name)
@@ -355,7 +355,7 @@ func TestGjrc_PostJson(t *testing.T) {
 func TestGjrc_PostJsonError(t *testing.T) {
 	name := "TestGjrc_PostJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "htps://httpbin.org/post"
+	url := "://httpbin.org/post"
 	resp := client.PostJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", name)
@@ -479,7 +479,7 @@ func TestGjrc_PutJson(t *testing.T) {
 func TestGjrc_PutJsonError(t *testing.T) {
 	name := "TestGjrc_PutJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "htps://httpbin.org/put"
+	url := "://httpbin.org/put"
 	resp := client.PutJson(url, map[string]interface{}{"key1": "value", "key2": 1, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", name)
