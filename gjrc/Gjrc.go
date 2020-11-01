@@ -60,7 +60,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.0"
+	Version = "0.1.1"
 )
 
 // NewGjrc creates a new Gjrc object.
