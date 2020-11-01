@@ -57,6 +57,11 @@ func main() {
 
 ## History
 
+### 2020-11-01 - v0.1.1
+
+`go.mod` fixed.
+
+
 ### 2020-11-01 - v0.1.0
 
 First release.
