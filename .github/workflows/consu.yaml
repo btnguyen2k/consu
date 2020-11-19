@@ -1,0 +1,14 @@
+name: consu
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  name: Noop
+  runs-on: ubuntu-latest
+  steps:
+  - name: Noop
+    run: echo "Nothing to do"
