@@ -1,8 +1,9 @@
 # consu/checksum
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/checksum?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/checksum)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/checksum)](https://pkg.go.dev/github.com/btnguyen2k/consu/checksum)
 [![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/checksum)
+[![Actions Status](https://github.com/btnguyen2k/consu/workflows/checksum/badge.svg)](https://github.com/btnguyen2k/consu/actions)
 
 Package `checksum` provides utility functions to calculate checksum.
 
