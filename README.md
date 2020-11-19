@@ -1,7 +1,8 @@
 # consu
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu?status.svg)](https://godoc.org/github.com/btnguyen2k/consu)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu)](https://pkg.go.dev/github.com/btnguyen2k/consu)
+[![Actions Status](https://github.com/btnguyen2k/consu/workflows/consu/badge.svg)](https://github.com/btnguyen2k/consu/actions)
 
 Collection of helpful utilities in Golang to make your life easier.
 
