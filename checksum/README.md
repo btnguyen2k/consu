@@ -36,11 +36,11 @@ func main() {
 }
 ```
 
-
 ## Features:
 
 - Calculate checksum of scalar types (`bool`, `int*`, `uint*`, `float*`, `string`) as well as `slice/array` and `map/struct`.
 - `Struct`:
+  - If `time.Time`, its nanosecond is used to calculate checksum (since `v0.1.2`).
   - Be able to calculate checksum of unexported fields.
   - If the struct has function `Checksum()`, use it instead of reflecting through struct's fields.
 - Supported hash functions: `CRC32`, `MD5`, `SHA1`, `SHA256`, `SHA512`.
@@ -59,10 +59,13 @@ but `checksum(map[string]int{"a":1,"b":2}) != checksum(map[string]int{"x":1,"y":
 
 ## History
 
+### 2020-11-20 - v0.1.2
+
+If a struct is `time.Time`, use its nanosecond to calculate checksum.
+
 ### 2019-10-26 - v0.1.1
 
 If a struct has function `Checksum()`, use it to calculate checksum instead of reflecting through struct's fields.
-
 
 ### 2019-10-17 - v0.1.0
 
