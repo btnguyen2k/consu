@@ -1,8 +1,9 @@
 # consu/checksum
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/checksum?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/checksum)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/checksum)](https://pkg.go.dev/github.com/btnguyen2k/consu/checksum)
 [![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/checksum)
+[![Actions Status](https://github.com/btnguyen2k/consu/workflows/checksum/badge.svg)](https://github.com/btnguyen2k/consu/actions)
 
 Package `checksum` provides utility functions to calculate checksum.
 
@@ -35,11 +36,11 @@ func main() {
 }
 ```
 
-
 ## Features:
 
 - Calculate checksum of scalar types (`bool`, `int*`, `uint*`, `float*`, `string`) as well as `slice/array` and `map/struct`.
 - `Struct`:
+  - If `time.Time`, its nanosecond is used to calculate checksum (since `v0.1.2`).
   - Be able to calculate checksum of unexported fields.
   - If the struct has function `Checksum()`, use it instead of reflecting through struct's fields.
 - Supported hash functions: `CRC32`, `MD5`, `SHA1`, `SHA256`, `SHA512`.
@@ -58,10 +59,13 @@ but `checksum(map[string]int{"a":1,"b":2}) != checksum(map[string]int{"x":1,"y":
 
 ## History
 
+### 2020-11-20 - v0.1.2
+
+If a struct is `time.Time`, use its nanosecond to calculate checksum.
+
 ### 2019-10-26 - v0.1.1
 
 If a struct has function `Checksum()`, use it to calculate checksum instead of reflecting through struct's fields.
-
 
 ### 2019-10-17 - v0.1.0
 

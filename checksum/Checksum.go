@@ -42,12 +42,13 @@ import (
 	"hash/crc32"
 	"reflect"
 	"strings"
+	"time"
 	"unsafe"
 )
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1"
+	Version = "0.1.2"
 )
 
 /*
@@ -120,7 +121,10 @@ Checksum calculates checksum of an input using the provided hash function.
 	- If v is a scalar type (bool, int*, uint*, float* or string) or pointer to scala type: checksum value is straightforward calculation.
 	- If v is a slice or array: checksum value is combination of all elements' checksums, in order. If v is empty (has 0 elements), empty []byte is returned.
 	- If v is a map: checksum value is combination of all entries' checksums, order-independent.
-	- If v is a struct: if the struct has function `Checksum()` then use it to calculate checksum value, otherwise checksum value is combination of all fields' checksums, order-independent.
+	- If v is a struct:
+		- if the struct has function `Checksum()` then use it to calculate checksum value.
+		- if v is time.Time then use its nanosecond to calculate checksum value.
+		- otherwise checksum value is combination of all fields' checksums, order-independent.
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
 	var prv reflect.Value
@@ -172,6 +176,11 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 			if len(arr) > 0 {
 				return Checksum(hf, arr)
 			}
+		}
+
+		if rv.Type() == reflect.TypeOf(time.Time{}) {
+			v := []interface{}{"time.Time", rv.Interface().(time.Time).Nanosecond()}
+			return Checksum(hf, v)
 		}
 
 		buf := hf([]byte{})
