@@ -1,6 +1,7 @@
 package olaf
 
 import (
+	"fmt"
 	"math/big"
 	"os"
 	"strconv"
@@ -61,6 +62,7 @@ func _numItems() int {
 	if err != nil || numItems < 1000 {
 		numItems = 1000
 	}
+	fmt.Println("\tOlaf num items:", numItems)
 	return numItems
 }
 
@@ -69,6 +71,7 @@ func _numThreads() int {
 	if err != nil || numThreads < 1 {
 		numThreads = 1000
 	}
+	fmt.Println("\tOlaf num threads:", numThreads)
 	return numThreads
 }
 
