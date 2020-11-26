@@ -25,6 +25,8 @@ jobs:
       run: cd ./gjrc && go test -cover -covermode=atomic -count 1 -coverprofile=../coverage_gjrc.txt -v . && cd ..
     - name: Test olaf
       run: cd ./olaf && go test -cover -covermode=atomic -count 1 -coverprofile=../coverage_olaf.txt -v . && cd ..
+    - name: Test reddo
+      run: cd ./reddo && go test -cover -covermode=atomic -count 1 -coverprofile=../coverage_reddo.txt -v . && cd ..
     - name: Test semita
       run: cd ./semita && go test -cover -covermode=atomic -count 1 -coverprofile=../coverage_semita.txt -v . && cd ..
 

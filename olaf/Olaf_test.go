@@ -2,6 +2,8 @@ package olaf
 
 import (
 	"math/big"
+	"os"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -54,10 +56,26 @@ func TestNewOlafWithEpoch(t *testing.T) {
 	}
 }
 
+func _numItems() int {
+	numItems, err := strconv.Atoi(os.Getenv("OLAF_NUM_ITEMS"))
+	if err != nil || numItems < 1000 {
+		numItems = 1000
+	}
+	return numItems
+}
+
+func _numThreads() int {
+	numThreads, err := strconv.Atoi(os.Getenv("OLAF_NUM_THREADS"))
+	if err != nil || numThreads < 1 {
+		numThreads = 1000
+	}
+	return numThreads
+}
+
 func TestOlaf_Id64(t *testing.T) {
 	o := NewOlaf(1981)
-	const numItems = 10000000
-	items := [numItems]uint64{}
+	numItems := _numItems()
+	items := make([]uint64, numItems)
 	for i := 0; i < numItems; i++ {
 		id := o.Id64()
 		items[i] = id
@@ -68,12 +86,13 @@ func TestOlaf_Id64(t *testing.T) {
 }
 
 func TestOlaf_Id64MultiThreads(t *testing.T) {
-	const numThreads = 4
-	const numItemsPerThread = 10000000 / numThreads
-	const numItems = numItemsPerThread * numThreads
+	numThreads := _numThreads()
+	numItems := _numItems()
+	numItemsPerThread := numItems / numThreads
+	numItems = numItemsPerThread * numThreads
 	var wg sync.WaitGroup
 	wg.Add(numThreads)
-	items := [numItems]uint64{}
+	items := make([]uint64, numItems)
 	o := NewOlaf(1981)
 	for i := 0; i < numThreads; i++ {
 		go func(threadIndex int, wg *sync.WaitGroup) {
@@ -99,8 +118,8 @@ func TestOlaf_Id64MultiThreads(t *testing.T) {
 
 func TestOlaf_Id64Hex(t *testing.T) {
 	o := NewOlaf(1981)
-	const numItems = 10000000
-	items := [numItems]string{}
+	numItems := _numItems()
+	items := make([]string, numItems)
 	for i := 0; i < numItems; i++ {
 		id := o.Id64Hex()
 		items[i] = id
@@ -112,8 +131,8 @@ func TestOlaf_Id64Hex(t *testing.T) {
 
 func TestOlaf_Id64Ascii(t *testing.T) {
 	o := NewOlaf(1981)
-	const numItems = 10000000
-	items := [numItems]string{}
+	numItems := _numItems()
+	items := make([]string, numItems)
 	for i := 0; i < numItems; i++ {
 		id := o.Id64Ascii()
 		items[i] = id
@@ -125,8 +144,8 @@ func TestOlaf_Id64Ascii(t *testing.T) {
 
 func TestOlaf_Id128(t *testing.T) {
 	o := NewOlaf(1981)
-	const numItems = 10000000
-	items := [numItems]*big.Int{}
+	numItems := _numItems()
+	items := make([]*big.Int, numItems)
 	for i := 0; i < numItems; i++ {
 		id := o.Id128()
 		items[i] = id
@@ -137,12 +156,13 @@ func TestOlaf_Id128(t *testing.T) {
 }
 
 func TestOlaf_Id128MultiThreads(t *testing.T) {
-	const numThreads = 4
-	const numItemsPerThread = 10000000 / numThreads
-	const numItems = numItemsPerThread * numThreads
+	numThreads := _numThreads()
+	numItems := _numItems()
+	numItemsPerThread := numItems / numThreads
+	numItems = numItemsPerThread * numThreads
 	var wg sync.WaitGroup
 	wg.Add(numThreads)
-	items := [numItems]*big.Int{}
+	items := make([]*big.Int, numItems)
 	o := NewOlaf(1981)
 	for i := 0; i < numThreads; i++ {
 		go func(threadIndex int, wg *sync.WaitGroup) {
@@ -168,8 +188,8 @@ func TestOlaf_Id128MultiThreads(t *testing.T) {
 
 func TestOlaf_Id128Hex(t *testing.T) {
 	o := NewOlaf(1981)
-	const numItems = 10000000
-	items := [numItems]string{}
+	numItems := _numItems()
+	items := make([]string, numItems)
 	for i := 0; i < numItems; i++ {
 		id := o.Id128Hex()
 		items[i] = id
@@ -181,8 +201,8 @@ func TestOlaf_Id128Hex(t *testing.T) {
 
 func TestOlaf_Id128Ascii(t *testing.T) {
 	o := NewOlaf(1981)
-	const numItems = 10000000
-	items := [numItems]string{}
+	numItems := _numItems()
+	items := make([]string, numItems)
 	for i := 0; i < numItems; i++ {
 		id := o.Id128Ascii()
 		items[i] = id

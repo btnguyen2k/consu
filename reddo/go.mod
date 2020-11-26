@@ -1,3 +1,3 @@
 module github.com/btnguyen2k/consu/reddo
 
-go 1.12
+go 1.13
