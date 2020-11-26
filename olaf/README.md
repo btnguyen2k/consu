@@ -1,8 +1,10 @@
 # Olaf
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/olaf?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/olaf)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/olaf)](https://pkg.go.dev/github.com/btnguyen2k/consu/olaf)
+[![Actions Status](https://github.com/btnguyen2k/consu/workflows/olaf/badge.svg)](https://github.com/btnguyen2k/consu/actions)
 [![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/olaf)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/olaf/graph/badge.svg?token=PWSL21DE1D)](https://codecov.io/gh/btnguyen2k/consu)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
 Golang implementation of Twitter Snowflake.

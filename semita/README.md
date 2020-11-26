@@ -1,8 +1,10 @@
 # consu/semita
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
-[![GoDoc](https://godoc.org/github.com/btnguyen2k/consu/semita?status.svg)](https://godoc.org/github.com/btnguyen2k/consu/semita)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/semita)](https://pkg.go.dev/github.com/btnguyen2k/consu/semita)
+[![Actions Status](https://github.com/btnguyen2k/consu/workflows/semita/badge.svg)](https://github.com/btnguyen2k/consu/actions)
 [![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/semita)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/semita/graph/badge.svg?token=PWSL21DE1D)](https://codecov.io/gh/btnguyen2k/consu)
 
 Package `semita` provides utility functions to access data from a hierarchy structure.
 
