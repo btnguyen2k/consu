@@ -4,7 +4,7 @@
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/reddo)](https://pkg.go.dev/github.com/btnguyen2k/consu/reddo)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/reddo/badge.svg)](https://github.com/btnguyen2k/consu/actions)
 [![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/reddo)
-[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/reddo/graph/badge.svg?token=PWSL21DE1D)](https://codecov.io/gh/btnguyen2k/consu)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/reddo/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/branch/reddo)
 
 Package `reddo` provides utility functions to convert values using Golang's reflection.
 
