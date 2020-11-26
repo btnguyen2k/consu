@@ -20,15 +20,15 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Test checksum
-      run: cd ./checksum && go test -cover -covermode=count -coverprofile=../coverage_checksum.txt -v . && cd ..
+      run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v . && cd ..
     - name: Test gjrc
-      run: cd ./gjrc && go test -cover -covermode=count -coverprofile=../coverage_gjrc.txt -v . && cd ..
+      run: cd ./gjrc && go test -cover -coverprofile=../coverage_gjrc.txt -v . && cd ..
     - name: Test olaf
-      run: export OLAF_NUM_ITEMS=4000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -covermode=count -coverprofile=../coverage_olaf.txt -v . && cd ..
+      run: export OLAF_NUM_ITEMS=4000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -coverprofile=../coverage_olaf.txt -v . && cd ..
     - name: Test reddo
-      run: cd ./reddo && go test -cover -covermode=count -coverprofile=../coverage_reddo.txt -v . && cd ..
+      run: cd ./reddo && go test -cover -coverprofile=../coverage_reddo.txt -v . && cd ..
     - name: Test semita
-      run: cd ./semita && go test -cover -covermode=count -coverprofile=../coverage_semita.txt -v . && cd ..
+      run: cd ./semita && go test -cover -coverprofile=../coverage_semita.txt -v . && cd ..
 
     - name: Upload coverage report
       run: |
