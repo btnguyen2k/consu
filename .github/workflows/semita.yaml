@@ -18,4 +18,4 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
     - name: Run test
-      run: go test -cover -v ./semita
+      run: cd ./semita && go test -cover -v . && cd ..
