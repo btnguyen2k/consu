@@ -37,11 +37,11 @@ func TestWaitTillNextMillisec(t *testing.T) {
 func TestNewOlaf(t *testing.T) {
 	nodeId := int64(1981)
 	o := NewOlaf(nodeId)
-	if o.NodeID != nodeId {
-		t.Fatalf("Invalid Olaf instance, expected NodeId: %d, actual NodeId: %d.", nodeId, o.NodeID)
+	if o.nodeId != nodeId {
+		t.Fatalf("Invalid Olaf instance, expected NodeId: %d, actual NodeId: %d.", nodeId, o.nodeId)
 	}
-	if o.Epoch != Epoch {
-		t.Fatalf("Invalid Olaf instance, expected Epoch: %d, actual Epoch: %d.", Epoch, o.Epoch)
+	if o.epoch != Epoch {
+		t.Fatalf("Invalid Olaf instance, expected epoch: %d, actual epoch: %d.", Epoch, o.epoch)
 	}
 }
 
@@ -49,11 +49,11 @@ func TestNewOlafWithEpoch(t *testing.T) {
 	nodeId := int64(1981)
 	epoch := int64(123456789)
 	o := NewOlafWithEpoch(nodeId, epoch)
-	if o.NodeID != nodeId {
-		t.Fatalf("Invalid Olaf instance, expected NodeId: %d, actual NodeId: %d.", nodeId, o.NodeID)
+	if o.nodeId != nodeId {
+		t.Fatalf("Invalid Olaf instance, expected NodeId: %d, actual NodeId: %d.", nodeId, o.nodeId)
 	}
-	if o.Epoch != epoch {
-		t.Fatalf("Invalid Olaf instance, expected Epoch: %d, actual Epoch: %d.", epoch, o.Epoch)
+	if o.epoch != epoch {
+		t.Fatalf("Invalid Olaf instance, expected epoch: %d, actual epoch: %d.", epoch, o.epoch)
 	}
 }
 
@@ -78,14 +78,19 @@ func _numThreads() int {
 func TestOlaf_Id64(t *testing.T) {
 	o := NewOlaf(1981)
 	numItems := _numItems()
-	items := make([]uint64, numItems)
+	items := make([]uint64, numItems, numItems)
+	tstart := time.Now()
 	for i := 0; i < numItems; i++ {
-		id := o.Id64()
-		items[i] = id
-		if i > 0 && items[i] <= items[i-1] {
-			t.Fatalf("Generated ID is invalid: items[%d]=%d must be less than items[%d]=%d.", i-1, items[i-1], i, items[i])
+		items[i] = o.Id64()
+	}
+	for i := 1; i < numItems; i++ {
+		if items[i-1] >= items[i] {
+			t.Fatalf("Generated ID is invalid: id[%d]=%d must be less than id[%d]=%d.", i-1, items[i-1], i, items[i])
 		}
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id64MultiThreads(t *testing.T) {
@@ -95,8 +100,9 @@ func TestOlaf_Id64MultiThreads(t *testing.T) {
 	numItems = numItemsPerThread * numThreads
 	var wg sync.WaitGroup
 	wg.Add(numThreads)
-	items := make([]uint64, numItems)
+	items := make([]uint64, numItems, numItems)
 	o := NewOlaf(1981)
+	tstart := time.Now()
 	for i := 0; i < numThreads; i++ {
 		go func(threadIndex int, wg *sync.WaitGroup) {
 			startIndex := threadIndex * numItemsPerThread
@@ -117,45 +123,63 @@ func TestOlaf_Id64MultiThreads(t *testing.T) {
 	if len(items) != numItems || len(itemsMap) != numItems {
 		t.Fatalf("Expected %d but generated %d (%d unique)", numItems, len(items), len(itemsMap))
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id64Hex(t *testing.T) {
 	o := NewOlaf(1981)
 	numItems := _numItems()
-	items := make([]string, numItems)
+	items := make([]string, numItems, numItems)
+	tstart := time.Now()
 	for i := 0; i < numItems; i++ {
-		id := o.Id64Hex()
-		items[i] = id
-		if i > 0 && items[i] <= items[i-1] {
-			t.Fatalf("Generated ID is invalid: items[%d]=%s must be less than items[%d]=%s.", i-1, items[i-1], i, items[i])
+		items[i] = o.Id64Hex()
+	}
+	for i := 1; i < numItems; i++ {
+		if items[i-1] >= items[i] {
+			t.Fatalf("Generated ID is invalid: id[%d]=%s must be less than id[%d]=%s.", i-1, items[i-1], i, items[i])
 		}
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id64Ascii(t *testing.T) {
 	o := NewOlaf(1981)
 	numItems := _numItems()
-	items := make([]string, numItems)
+	items := make([]string, numItems, numItems)
+	tstart := time.Now()
 	for i := 0; i < numItems; i++ {
-		id := o.Id64Ascii()
-		items[i] = id
-		if i > 0 && items[i] <= items[i-1] {
-			t.Fatalf("Generated ID is invalid: items[%d]=%s must be less than items[%d]=%s.", i-1, items[i-1], i, items[i])
+		items[i] = o.Id64Ascii()
+	}
+	for i := 1; i < numItems; i++ {
+		if items[i-1] >= items[i] {
+			t.Fatalf("Generated ID is invalid: id[%d]=%s must be less than id[%d]=%s.", i-1, items[i-1], i, items[i])
 		}
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id128(t *testing.T) {
 	o := NewOlaf(1981)
 	numItems := _numItems()
-	items := make([]*big.Int, numItems)
+	items := make([]*big.Int, numItems, numItems)
+	tstart := time.Now()
 	for i := 0; i < numItems; i++ {
-		id := o.Id128()
-		items[i] = id
-		if i > 0 && items[i].Cmp(items[i-1]) <= 0 {
-			t.Fatalf("Generated ID is invalid: items[%d]=%s must be less than items[%d]=%s.", i-1, items[i-1].String(), i, items[i].String())
+		items[i] = o.Id128()
+	}
+	for i := 1; i < numItems; i++ {
+		if items[i].Cmp(items[i-1]) <= 0 {
+			t.Fatalf("Generated ID is invalid: id[%d]=%s must be less than id[%d]=%s.", i-1, items[i-1].String(), i, items[i].String())
 		}
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id128MultiThreads(t *testing.T) {
@@ -165,8 +189,9 @@ func TestOlaf_Id128MultiThreads(t *testing.T) {
 	numItems = numItemsPerThread * numThreads
 	var wg sync.WaitGroup
 	wg.Add(numThreads)
-	items := make([]*big.Int, numItems)
+	items := make([]*big.Int, numItems, numItems)
 	o := NewOlaf(1981)
+	tstart := time.Now()
 	for i := 0; i < numThreads; i++ {
 		go func(threadIndex int, wg *sync.WaitGroup) {
 			startIndex := threadIndex * numItemsPerThread
@@ -187,32 +212,45 @@ func TestOlaf_Id128MultiThreads(t *testing.T) {
 	if len(items) != numItems || len(itemsMap) != numItems {
 		t.Fatalf("Expected %d but generated %d (%d unique)", numItems, len(items), len(itemsMap))
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id128Hex(t *testing.T) {
 	o := NewOlaf(1981)
 	numItems := _numItems()
-	items := make([]string, numItems)
+	items := make([]string, numItems, numItems)
+	tstart := time.Now()
 	for i := 0; i < numItems; i++ {
-		id := o.Id128Hex()
-		items[i] = id
-		if i > 0 && items[i] <= items[i-1] {
-			t.Fatalf("Generated ID is invalid: items[%d]=%s must be less than items[%d]=%s.", i-1, items[i-1], i, items[i])
+		items[i] = o.Id128Hex()
+	}
+	for i := 1; i < numItems; i++ {
+		if items[i-1] >= items[i] {
+			t.Fatalf("Generated ID is invalid: id[%d]=%s must be less than id[%d]=%s.", i-1, items[i-1], i, items[i])
 		}
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_Id128Ascii(t *testing.T) {
 	o := NewOlaf(1981)
 	numItems := _numItems()
-	items := make([]string, numItems)
+	items := make([]string, numItems, numItems)
+	tstart := time.Now()
 	for i := 0; i < numItems; i++ {
-		id := o.Id128Ascii()
-		items[i] = id
-		if i > 0 && items[i] <= items[i-1] {
-			t.Fatalf("Generated ID is invalid: items[%d]=%s must be less than items[%d]=%s.", i-1, items[i-1], i, items[i])
+		items[i] = o.Id128Ascii()
+	}
+	for i := 1; i < numItems; i++ {
+		if items[i-1] >= items[i] {
+			t.Fatalf("Generated ID is invalid: id[%d]=%s must be less than id[%d]=%s.", i-1, items[i-1], i, items[i])
 		}
 	}
+	d := time.Now().UnixNano() - tstart.UnixNano()
+	rate := float64(numItems) / float64(d) * 1e9
+	fmt.Printf("\t[INFO] generated %d IDs in %d ms (rate: %.2f/sec)\n", numItems, d/1e6, rate)
 }
 
 func TestOlaf_ExtractTime64(t *testing.T) {

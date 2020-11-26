@@ -24,7 +24,7 @@ jobs:
     - name: Test gjrc
       run: cd ./gjrc && go test -cover -coverprofile=../coverage_gjrc.txt -v . && cd ..
     - name: Test olaf
-      run: export OLAF_NUM_ITEMS=4000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -coverprofile=../coverage_olaf.txt -v . && cd ..
+      run: export OLAF_NUM_ITEMS=10000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -coverprofile=../coverage_olaf.txt -v . && cd ..
     - name: Test reddo
       run: cd ./reddo && go test -cover -coverprofile=../coverage_reddo.txt -v . && cd ..
     - name: Test semita
