@@ -69,7 +69,7 @@ func _numItems() int {
 func _numThreads() int {
 	numThreads, err := strconv.Atoi(os.Getenv("OLAF_NUM_THREADS"))
 	if err != nil || numThreads < 1 {
-		numThreads = 1000
+		numThreads = 1
 	}
 	fmt.Println("\tOlaf num threads:", numThreads)
 	return numThreads
