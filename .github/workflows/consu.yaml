@@ -21,6 +21,8 @@ jobs:
 
     - name: Test checksum
       run: go test -cover -covermode=atomic -count 1 -coverprofile=coverage_checksum.txt -v ./checksum
+    - name: Test gjrc
+      run: go test -cover -covermode=atomic -count 1 -coverprofile=coverage_gjrc.txt -v ./gjrc
 
     - name: Upload coverage report
       run: |
@@ -28,5 +30,9 @@ jobs:
         if [ -f coverage_checksum.txt ]; then
           cat coverage_checksum.txt >> coverage.txt
           rm coverage_checksum.txt
+        fi
+        if [ -f coverage_gjrc.txt ]; then
+          cat coverage_gjrc.txt >> coverage.txt
+          rm coverage_gjrc.txt
         fi
         bash <(curl -s https://codecov.io/bash)
