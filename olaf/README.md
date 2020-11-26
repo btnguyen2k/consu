@@ -24,6 +24,7 @@ package main
 
 import (
     "fmt"
+
     "github.com/btnguyen2k/consu/olaf"
 )
 
@@ -52,16 +53,18 @@ func main() {
 
 ## History
 
+### 2020-01-25 - v0.1.3
+
+- Bug fixes & unit tests
+
 ### 2020-01-25 - v0.1.2
 
 - Bug fixes
-
 
 ### 2019-04-10 - v0.1.1
 
 - Migrate to Go modular design.
 - Merged as a submodule of `github.com/btnguyen2k/consu`
-
 
 ### 2019-01-03 - v0.1.0
 

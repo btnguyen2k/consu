@@ -20,16 +20,16 @@ Sample usage:
 		id64 := o.Id64()
 		id64Hex := o.Id64Hex()
 		id64Ascii := o.Id64Ascii()
-		fmt.Println("ID 64-bit (int)   : ", id64, " / Timestamp: ", o.ExtractTime64(id64))
-		fmt.Println("ID 64-bit (hex)   : ", id64Hex, " / Timestamp: ", o.ExtractTime64Hex(id64Hex))
-		fmt.Println("ID 64-bit (ascii) : ", id64Ascii, " / Timestamp: ", o.ExtractTime64Ascii(id64Ascii))
+		fmt.Println("ID 64-bit (int)   : ", id64, " / timestamp: ", o.ExtractTime64(id64))
+		fmt.Println("ID 64-bit (hex)   : ", id64Hex, " / timestamp: ", o.ExtractTime64Hex(id64Hex))
+		fmt.Println("ID 64-bit (ascii) : ", id64Ascii, " / timestamp: ", o.ExtractTime64Ascii(id64Ascii))
 
 		id128 := o.Id128()
 		id128Hex := o.Id128Hex()
 		id128Ascii := o.Id128Ascii()
-		fmt.Println("ID 128-bit (int)  : ", id128.String(), " / Timestamp: ", o.ExtractTime128(id128))
-		fmt.Println("ID 128-bit (hex)  : ", id128Hex, " / Timestamp: ", o.ExtractTime128Hex(id128Hex))
-		fmt.Println("ID 128-bit (ascii): ", id128Ascii, " / Timestamp: ", o.ExtractTime128Ascii(id128Ascii))
+		fmt.Println("ID 128-bit (int)  : ", id128.String(), " / timestamp: ", o.ExtractTime128(id128))
+		fmt.Println("ID 128-bit (hex)  : ", id128Hex, " / timestamp: ", o.ExtractTime128Hex(id128Hex))
+		fmt.Println("ID 128-bit (ascii): ", id128Ascii, " / timestamp: ", o.ExtractTime128Ascii(id128Ascii))
 	}
 */
 package olaf
@@ -45,7 +45,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.2"
+	Version = "0.1.3"
 
 	// Epoch is set to 2019-01-01 00:00:00 UTC.
 	// You may customize this to set a different epoch for your application.
@@ -68,12 +68,12 @@ const (
 
 // Olaf wraps configurations for Twitter Snowflake IDs.
 type Olaf struct {
-	NodeID     int64 // original node-id
-	nodeId64   int64 // node-id  for 64-bit ids
-	nodeId128  int64 // node-id  for 128-bit ids
-	Epoch      int64 // Twitter snowflake's epoch
-	SequenceId int64 // Twitter snowflake's sequence-id
-	Timestamp  int64 // last 'touch' UNIX timestamp in milliseconds
+	nodeId     int64 // original node-id
+	nodeId64   int64 // node-id for 64-bit ids
+	nodeId128  int64 // node-id for 128-bit ids
+	epoch      int64 // epoch as UNIX timestamp in milliseconds
+	sequenceId int64 // sequence-id of current batch
+	timestamp  int64 // last 'touch' UNIX timestamp in milliseconds
 	lock       sync.Mutex
 }
 
@@ -84,14 +84,14 @@ func NewOlaf(nodeId int64) *Olaf {
 
 // NewOlafWithEpoch creates a new Olaf with custom epoch.
 func NewOlafWithEpoch(nodeId int64, epoch int64) *Olaf {
-	olaf := Olaf{}
-	olaf.NodeID = nodeId
-	olaf.nodeId64 = nodeId & maskNodeId64
-	olaf.nodeId128 = nodeId & maskNodeId128
-	olaf.Epoch = epoch
-	olaf.SequenceId = 0
-	olaf.Timestamp = 0
-	return &olaf
+	return &Olaf{
+		nodeId:     nodeId,
+		nodeId64:   nodeId & maskNodeId64,
+		nodeId128:  nodeId & maskNodeId128,
+		epoch:      epoch,
+		sequenceId: 0,
+		timestamp:  0,
+	}
 }
 
 /*----------------------------------------------------------------------*/
@@ -113,7 +113,7 @@ func WaitTillNextMillisec(currentMillisec int64) int64 {
 
 // ExtractTime64 extracts time metadata from a 64-bit id.
 func (o *Olaf) ExtractTime64(id64 uint64) time.Time {
-	timestamp := id64>>shiftTimestamp64 + uint64(o.Epoch)
+	timestamp := id64>>shiftTimestamp64 + uint64(o.epoch)
 	sec := timestamp / 1000
 	nsec := (timestamp % 1000) * 1000000
 	return time.Unix(int64(sec), int64(nsec))
@@ -139,23 +139,23 @@ func (o *Olaf) Id64() uint64 {
 	sequence := int64(0)
 	for done := false; !done; {
 		done = true
-		for timestamp < o.Timestamp {
+		for timestamp < o.timestamp {
 			timestamp = WaitTillNextMillisec(timestamp)
 		}
-		if timestamp == o.Timestamp {
+		if timestamp == o.timestamp {
 			// increase sequence
-			sequence = atomic.AddInt64(&o.SequenceId, 1)
+			sequence = atomic.AddInt64(&o.sequenceId, 1)
 			if sequence > maxSequenceId64 {
 				// reset sequence
-				o.SequenceId = 0
+				sequence = 0
 				timestamp = WaitTillNextMillisec(timestamp)
 				done = false
 			}
 		}
 	}
-	o.SequenceId = sequence
-	o.Timestamp = timestamp
-	result := ((timestamp - o.Epoch) << shiftTimestamp64) | (o.nodeId64 << shiftNodeId64) | sequence
+	o.sequenceId = sequence
+	o.timestamp = timestamp
+	result := ((timestamp - o.epoch) << shiftTimestamp64) | (o.nodeId64 << shiftNodeId64) | sequence
 	return uint64(result)
 }
 
@@ -201,22 +201,22 @@ func (o *Olaf) Id128() *big.Int {
 	sequence := int64(0)
 	for done := false; !done; {
 		done = true
-		for timestamp < o.Timestamp {
+		for timestamp < o.timestamp {
 			timestamp = WaitTillNextMillisec(timestamp)
 		}
-		if timestamp == o.Timestamp {
+		if timestamp == o.timestamp {
 			// increase sequence
-			sequence = atomic.AddInt64(&o.SequenceId, 1)
+			sequence = atomic.AddInt64(&o.sequenceId, 1)
 			if sequence > maxSequenceId128 {
 				// reset sequence
-				o.SequenceId = 0
+				sequence = 0
 				timestamp = WaitTillNextMillisec(timestamp)
 				done = false
 			}
 		}
 	}
-	o.SequenceId = sequence
-	o.Timestamp = timestamp
+	o.sequenceId = sequence
+	o.timestamp = timestamp
 	high := timestamp
 	low := (o.nodeId128 << shiftNodeId128) | sequence
 	h := big.NewInt(high)
