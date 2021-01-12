@@ -3,7 +3,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/reddo)](https://pkg.go.dev/github.com/btnguyen2k/consu/reddo)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/reddo/badge.svg)](https://github.com/btnguyen2k/consu/actions)
-[![GoCover](https://img.shields.io/badge/coverage-GoCover-YellowGreen.svg)](https://gocover.io/github.com/btnguyen2k/consu/reddo)
 [![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/reddo/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/branch/reddo)
 
 Package `reddo` provides utility functions to convert values using Golang's reflection.
@@ -79,6 +78,15 @@ func main() {
 
 
 ## History
+
+### 2021-01-12 - v0.1.7
+
+- Bug fix: ToMap causes panic if map key or value is nil.
+- Bug fix: ToSlice causes panic if an element is nil.
+- Add `ZeroMode`:
+  - If `reddo.ZeroMode=true`: `zero` value is returned when input is `nil`.
+  - If `reddo.ZeroMode=false`: error is returned by `ToBool`, `ToFloat`, `ToInt`, `ToUint`, `ToString`, `ToTime`/`ToTimeWithLayout` and `ToStruct`
+
 
 ### 2019-04-12 - v0.1.6
 
