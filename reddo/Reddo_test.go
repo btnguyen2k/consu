@@ -30,8 +30,8 @@ func testToBool(t *testing.T, input interface{}, expected bool) {
 
 // TestToBool tests if values are converted correctly to bool
 func TestToBool(t *testing.T) {
-	var inputList = []interface{}{nil, false, true}
-	var expectedList = []bool{false, false, true}
+	var inputList = []interface{}{false, true}
+	var expectedList = []bool{false, true}
 	for i, n := 0, len(inputList); i < n; i++ {
 		testToBool(t, inputList[i], expectedList[i])
 	}
@@ -79,14 +79,14 @@ func TestToBool(t *testing.T) {
 		input := "blabla"
 		_, e := ToBool(input)
 		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertable to bool!", input)
+			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
 		}
 	}
 	{
 		input := "blabla"
 		_, e := Convert(input, TypeBool)
 		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertable to bool!", input)
+			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
 		}
 	}
 
@@ -95,7 +95,7 @@ func TestToBool(t *testing.T) {
 		}{}
 		_, e := ToBool(input)
 		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertable to bool!", input)
+			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
 		}
 	}
 	{
@@ -103,7 +103,32 @@ func TestToBool(t *testing.T) {
 		}{}
 		_, e := Convert(input, TypeBool)
 		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertable to bool!", input)
+			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
+		}
+	}
+
+	{
+		ZeroMode = true
+		v, e := ToBool(nil)
+		if v != false || e != nil {
+			t.Fatalf("TestToBool failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = ToBool(nil)
+		if e == nil {
+			t.Fatalf("TestToBool failed: [nil] should not be convertible to bool when ZeroMode=false!")
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, TypeBool)
+		if v != false || e != nil {
+			t.Fatalf("TestToBool failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = Convert(nil, TypeBool)
+		if e == nil {
+			t.Fatalf("TestToBool failed: [nil] should not be convertible to bool when ZeroMode=false!")
 		}
 	}
 }
@@ -156,8 +181,8 @@ func TestToFloat(t *testing.T) {
 		testToFloat(t, inputList[i], expectedList[i])
 	}
 
-	inputList = []interface{}{nil, "0", "0.0", "0.001", "-0.001", "-1.2", "3.4", "-1E9", "1e9", "-1e-9", "1E-9"}
-	expectedList = []float64{0.0, 0.0, 0.0, 0.001, -0.001, -1.2, 3.4, -1e9, 1e9, -1e-9, 1e-9}
+	inputList = []interface{}{"0", "0.0", "0.001", "-0.001", "-1.2", "3.4", "-1E9", "1e9", "-1e-9", "1E-9"}
+	expectedList = []float64{0.0, 0.0, 0.001, -0.001, -1.2, 3.4, -1e9, 1e9, -1e-9, 1e-9}
 	for i, n := 0, len(inputList); i < n; i++ {
 		testToFloat(t, inputList[i], expectedList[i])
 	}
@@ -166,14 +191,14 @@ func TestToFloat(t *testing.T) {
 		input := "blabla"
 		_, e := ToFloat(input)
 		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertable to float!", input)
+			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
 		}
 	}
 	{
 		input := "blabla"
 		_, e := Convert(input, TypeFloat)
 		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertable to float!", input)
+			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
 		}
 	}
 
@@ -182,7 +207,7 @@ func TestToFloat(t *testing.T) {
 		}{}
 		_, e := ToFloat(input)
 		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertable to float!", input)
+			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
 		}
 	}
 	{
@@ -190,7 +215,32 @@ func TestToFloat(t *testing.T) {
 		}{}
 		_, e := Convert(input, TypeFloat)
 		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertable to float!", input)
+			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
+		}
+	}
+
+	{
+		ZeroMode = true
+		v, e := ToFloat(nil)
+		if v != 0.0 || e != nil {
+			t.Fatalf("TestToFloat failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = ToFloat(nil)
+		if e == nil {
+			t.Fatalf("TestToFloat failed: [nil] should not be convertible to float when ZeroMode=false!")
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, TypeFloat)
+		if v != 0.0 || e != nil {
+			t.Fatalf("TestToFloat failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = Convert(nil, TypeFloat)
+		if e == nil {
+			t.Fatalf("TestToFloat failed: [nil] should not be convertible to float when ZeroMode=false!")
 		}
 	}
 }
@@ -243,8 +293,8 @@ func TestToInt(t *testing.T) {
 		testToInt(t, inputList[i], expectedList[i])
 	}
 
-	inputList = []interface{}{nil, "0", "-1", "2", "-3", "4"}
-	expectedList = []int64{0, 0, -1, 2, -3, 4}
+	inputList = []interface{}{"0", "-1", "2", "-3", "4"}
+	expectedList = []int64{0, -1, 2, -3, 4}
 	for i, n := 0, len(inputList); i < n; i++ {
 		testToInt(t, inputList[i], expectedList[i])
 	}
@@ -253,14 +303,14 @@ func TestToInt(t *testing.T) {
 		input := "-1.2"
 		_, e := ToInt(input)
 		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertable to int!", input)
+			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
 		}
 	}
 	{
 		input := "3.4"
 		_, e := Convert(input, TypeInt)
 		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertable to int!", input)
+			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
 		}
 	}
 
@@ -268,14 +318,14 @@ func TestToInt(t *testing.T) {
 		input := "blabla"
 		_, e := ToInt(input)
 		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertable to int!", input)
+			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
 		}
 	}
 	{
 		input := "blabla"
 		_, e := Convert(input, TypeInt)
 		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertable to int!", input)
+			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
 		}
 	}
 
@@ -284,7 +334,7 @@ func TestToInt(t *testing.T) {
 		}{}
 		_, e := ToInt(input)
 		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertable to int!", input)
+			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
 		}
 	}
 	{
@@ -292,7 +342,32 @@ func TestToInt(t *testing.T) {
 		}{}
 		_, e := Convert(input, TypeInt)
 		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertable to int!", input)
+			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
+		}
+	}
+
+	{
+		ZeroMode = true
+		v, e := ToInt(nil)
+		if v != 0 || e != nil {
+			t.Fatalf("TestToInt failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = ToInt(nil)
+		if e == nil {
+			t.Fatalf("TestToInt failed: [nil] should not be convertible to int when ZeroMode=false!")
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, TypeInt)
+		if v != int64(0) || e != nil {
+			t.Fatalf("TestToInt failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = Convert(nil, TypeInt)
+		if e == nil {
+			t.Fatalf("TestToInt failed: [nil] should not be convertible to int when ZeroMode=false!")
 		}
 	}
 }
@@ -349,8 +424,8 @@ func TestToUint(t *testing.T) {
 		testToUint(t, inputList[i], expectedList[i])
 	}
 
-	inputList = []interface{}{nil, "0", "1", "2", "3", "4"}
-	expectedList = []uint64{0, 0, 1, 2, 3, 4}
+	inputList = []interface{}{"0", "1", "2", "3", "4"}
+	expectedList = []uint64{0, 1, 2, 3, 4}
 	for i, n := 0, len(inputList); i < n; i++ {
 		testToUint(t, inputList[i], expectedList[i])
 	}
@@ -359,21 +434,21 @@ func TestToUint(t *testing.T) {
 		input := "-1"
 		_, e := ToUint(input)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
 		}
 	}
 	{
 		input := "-1.2"
 		_, e := ToUint(input)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
 		}
 	}
 	{
 		input := "3.4"
 		_, e := Convert(input, TypeUint)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
 		}
 	}
 
@@ -381,14 +456,14 @@ func TestToUint(t *testing.T) {
 		input := "blabla"
 		_, e := ToUint(input)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
 		}
 	}
 	{
 		input := "blabla"
 		_, e := Convert(input, TypeUint)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
 		}
 	}
 
@@ -397,7 +472,7 @@ func TestToUint(t *testing.T) {
 		}{}
 		_, e := ToUint(input)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
 		}
 	}
 	{
@@ -405,7 +480,32 @@ func TestToUint(t *testing.T) {
 		}{}
 		_, e := Convert(input, TypeUint)
 		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertable to uint!", input)
+			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
+		}
+	}
+
+	{
+		ZeroMode = true
+		v, e := ToUint(nil)
+		if v != uint64(0) || e != nil {
+			t.Fatalf("TestToUint failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = ToUint(nil)
+		if e == nil {
+			t.Fatalf("TestToUint failed: [nil] should not be convertible to uint when ZeroMode=false!")
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, TypeUint)
+		if v != uint64(0) || e != nil {
+			t.Fatalf("TestToUint failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = Convert(nil, TypeUint)
+		if e == nil {
+			t.Fatalf("TestToUint failed: [nil] should not be convertible to uint when ZeroMode=false!")
 		}
 	}
 }
@@ -465,8 +565,8 @@ func TestToString(t *testing.T) {
 		testToString(t, inputList[i], expected)
 	}
 
-	inputList = []interface{}{nil, []byte("a string"), "0", "-1", "2", "-3", "4", "a", "b", "c", ""}
-	expectedList = []string{"", "a string", "0", "-1", "2", "-3", "4", "a", "b", "c", ""}
+	inputList = []interface{}{[]byte("a string"), "0", "-1", "2", "-3", "4", "a", "b", "c", ""}
+	expectedList = []string{"a string", "0", "-1", "2", "-3", "4", "a", "b", "c", ""}
 	for i, n := 0, len(inputList); i < n; i++ {
 		testToString(t, inputList[i], expectedList[i])
 	}
@@ -475,6 +575,31 @@ func TestToString(t *testing.T) {
 		input := struct {
 		}{}
 		testToString(t, input, fmt.Sprint(input))
+	}
+
+	{
+		ZeroMode = true
+		v, e := ToString(nil)
+		if v != "" || e != nil {
+			t.Fatalf("TestToString failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = ToString(nil)
+		if e == nil {
+			t.Fatalf("TestToString failed: [nil] should not be convertible to string when ZeroMode=false!")
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, TypeString)
+		if v != "" || e != nil {
+			t.Fatalf("TestToString failed: %#v / %s", v, e)
+		}
+		ZeroMode = false
+		_, e = Convert(nil, TypeString)
+		if e == nil {
+			t.Fatalf("TestToString failed: [nil] should not be convertible to string when ZeroMode=false!")
+		}
 	}
 }
 
@@ -485,7 +610,7 @@ func TestToTimeError(t *testing.T) {
 		input := -1
 		_, err := ToStruct(input, TypeTime)
 		if err == nil {
-			t.Fatalf("TestToTime failed: [%#v] should not be convertable to time.Time!", input)
+			t.Fatalf("TestToTime failed: [%#v] should not be convertible to time.Time!", input)
 		}
 	}
 
@@ -493,7 +618,7 @@ func TestToTimeError(t *testing.T) {
 		input := "-1"
 		_, err := ToStruct(input, TypeTime)
 		if err == nil {
-			t.Fatalf("TestToTime failed: [%#v] should not be convertable to time.Time!", input)
+			t.Fatalf("TestToTime failed: [%#v] should not be convertible to time.Time!", input)
 		}
 	}
 
@@ -501,7 +626,7 @@ func TestToTimeError(t *testing.T) {
 		input := "-1.abc"
 		_, err := ToStruct(input, TypeTime)
 		if err == nil {
-			t.Fatalf("TestToTime failed: [%#v] should not be convertable to time.Time!", input)
+			t.Fatalf("TestToTime failed: [%#v] should not be convertible to time.Time!", input)
 		}
 	}
 
@@ -510,7 +635,7 @@ func TestToTimeError(t *testing.T) {
 		}{}
 		_, err := ToStruct(input, TypeTime)
 		if err == nil {
-			t.Fatalf("TestToTime failed: [%#v] should not be convertable to time.Time!", input)
+			t.Fatalf("TestToTime failed: [%#v] should not be convertible to time.Time!", input)
 		}
 	}
 }
@@ -641,11 +766,36 @@ func TestToTimeString(t *testing.T) {
 // TestToTimeNil tests if nil is converted correctly to time.Time
 func TestToTimeNil(t *testing.T) {
 	name := "TestToTimeNil"
-	v, e := ToTime(nil)
-	if e != nil {
-		t.Fatalf("%s failed: %e", name, e)
-	} else if v.Unix() != zeroTime.Unix() {
-		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, zeroTime, v)
+
+	{
+		ZeroMode = true
+		v, e := ToTime(nil)
+		if e != nil {
+			t.Fatalf("%s failed: %e", name, e)
+		} else if v.Unix() != zeroTime.Unix() {
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, zeroTime, v)
+		}
+
+		ZeroMode = false
+		_, e = ToTime(nil)
+		if e == nil {
+			t.Fatalf("%s failed: [nil] should not be convertible to time.Time when ZeroMode=false!", name)
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, TypeTime)
+		if e != nil {
+			t.Fatalf("%s failed: %e", name, e)
+		} else if v.(time.Time).Unix() != zeroTime.Unix() {
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, zeroTime, v)
+		}
+
+		ZeroMode = false
+		_, e = Convert(nil, TypeTime)
+		if e == nil {
+			t.Fatalf("%s failed: [nil] should not be convertible to time.Time when ZeroMode=false!", name)
+		}
 	}
 }
 
@@ -654,12 +804,18 @@ func TestToTimeWithLayout(t *testing.T) {
 	name := "TestToTimeWithLayout"
 
 	{
-		// convert nil to 'time.Time'
+		ZeroMode = true
 		v, e := ToTimeWithLayout(nil, "")
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
 		} else if v.Unix() != zeroTime.Unix() {
 			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, zeroTime, v)
+		}
+
+		ZeroMode = false
+		_, e = ToTimeWithLayout(nil, "")
+		if e == nil {
+			t.Fatalf("%s failed: [nil] should not be convertible to time.Time when ZeroMode=false!", name)
 		}
 	}
 
@@ -811,15 +967,60 @@ func TestToStruct(t *testing.T) {
 
 	type Abc struct{ Key1 int }
 	typeAbc := reflect.TypeOf(Abc{})
+	zeroAbc := Abc{}
 
 	type Def struct {
 		Abc
 		Key2 string
 	}
 	typeDef := reflect.TypeOf(Def{})
+	zeroDef := Def{}
 
 	{
-		// Abc is convertable to Abc
+		ZeroMode = true
+		v, e := ToStruct(nil, typeAbc)
+		if e != nil {
+			t.Fatalf("%s failed: %e", name, e)
+		} else if v != zeroAbc {
+			t.Fatalf("%s failed: expected %#v but received %#v", name, zeroAbc, v)
+		}
+		v, e = ToStruct(nil, typeDef)
+		if e != nil {
+			t.Fatalf("%s failed: %e", name, e)
+		} else if v != zeroDef {
+			t.Fatalf("%s failed: expected %#v but received %#v", name, zeroDef, v)
+		}
+
+		ZeroMode = false
+		_, e = ToStruct(nil, typeAbc)
+		if e == nil {
+			t.Fatalf("%s failed: [nil] should not be convertible to struct Abc when ZeroMode=false!", name)
+		}
+	}
+	{
+		ZeroMode = true
+		v, e := Convert(nil, typeAbc)
+		if e != nil {
+			t.Fatalf("%s failed: %e", name, e)
+		} else if v != zeroAbc {
+			t.Fatalf("%s failed: expected %#v but received %#v", name, zeroAbc, v)
+		}
+		v, e = Convert(nil, typeDef)
+		if e != nil {
+			t.Fatalf("%s failed: %e", name, e)
+		} else if v != zeroDef {
+			t.Fatalf("%s failed: expected %#v but received %#v", name, zeroDef, v)
+		}
+
+		ZeroMode = false
+		_, e = Convert(nil, typeAbc)
+		if e == nil {
+			t.Fatalf("%s failed: [nil] should not be convertible to struct Abc when ZeroMode=false!", name)
+		}
+	}
+
+	{
+		// Abc is convertible to Abc
 		input := Abc{}
 		v, e := ToStruct(input, typeAbc)
 		if e != nil {
@@ -829,7 +1030,7 @@ func TestToStruct(t *testing.T) {
 		}
 	}
 	{
-		// Abc is convertable to Abc
+		// Abc is convertible to Abc
 		input := Abc{}
 		v, e := Convert(input, typeAbc)
 		if e != nil {
@@ -840,24 +1041,24 @@ func TestToStruct(t *testing.T) {
 	}
 
 	{
-		// Abc is NOT convertable to Def
+		// Abc is NOT convertible to Def
 		input := Abc{}
 		_, e := ToStruct(input, typeDef)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to struct Def!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to struct Def!", name, input)
 		}
 	}
 	{
-		// Abc is NOT convertable to Def
+		// Abc is NOT convertible to Def
 		input := Abc{}
 		_, e := Convert(input, typeDef)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to struct Def!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to struct Def!", name, input)
 		}
 	}
 
 	{
-		// Def is convertable to Def
+		// Def is convertible to Def
 		input := Def{}
 		v, e := ToStruct(input, typeDef)
 		if e != nil {
@@ -867,7 +1068,7 @@ func TestToStruct(t *testing.T) {
 		}
 	}
 	{
-		// Def is convertable to Def
+		// Def is convertible to Def
 		input := Def{}
 		v, e := Convert(input, typeDef)
 		if e != nil {
@@ -878,7 +1079,7 @@ func TestToStruct(t *testing.T) {
 	}
 
 	{
-		// Def is convertable to Abc
+		// Def is convertible to Abc
 		input := Def{}
 		v, e := ToStruct(input, typeAbc)
 		if e != nil {
@@ -888,7 +1089,7 @@ func TestToStruct(t *testing.T) {
 		}
 	}
 	{
-		// Def is convertable to Abc
+		// Def is convertible to Abc
 		input := Def{}
 		v, e := Convert(input, typeAbc)
 		if e != nil {
@@ -902,21 +1103,21 @@ func TestToStruct(t *testing.T) {
 		input := Abc{}
 		_, e := ToStruct(input, TypeString)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to string!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to string!", name, input)
 		}
 	}
 	{
-		input := ""
+		input := "a string"
 		_, e := ToStruct(input, typeAbc)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to struct Abc!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to struct Abc!", name, input)
 		}
 	}
 	{
-		input := ""
+		input := "another string"
 		_, e := Convert(input, typeAbc)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to struct Abc!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to struct Abc!", name, input)
 		}
 	}
 }
@@ -992,6 +1193,26 @@ func TestToSlice(t *testing.T) {
 	}
 
 	{
+		ZeroMode = true
+		input := []interface{}{1, "2", 3.4, false, nil}
+		testToSlice(t, input, []int{1, 2, 3, 0, 0}, reflect.TypeOf([]int{}))
+		testToSlice(t, input, []float64{1.0, 2.0, 3.4, 0.0, 0.0}, reflect.TypeOf([]float64{}))
+		now := time.Now()
+		input = []interface{}{1, "2", 3.4, false, now, nil}
+		testToSlice(t, input, []interface{}{1, "2", 3.4, false, now, nil}, reflect.TypeOf([]interface{}{}))
+
+		ZeroMode = false
+		input = []interface{}{1, "2", 3.4, false, nil}
+		_, e := ToSlice(input, reflect.TypeOf([]int{}))
+		if e == nil {
+			t.Fatalf("%s failed: input %#v should result error", name, input)
+		}
+		// nil value can be converted to interface{}(nil)!
+		input = []interface{}{1, "2", 3.4, false, now, nil}
+		testToSlice(t, input, []interface{}{1, "2", 3.4, false, now, nil}, reflect.TypeOf([]interface{}{}))
+	}
+
+	{
 		input := []bool{true, false}
 		testToSlice(t, input, []int{1, 0}, reflect.TypeOf([0]int{}))
 	}
@@ -1008,36 +1229,29 @@ func TestToSlice(t *testing.T) {
 		input := ""
 		_, e := ToSlice(input, reflect.TypeOf([0]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
 		}
 	}
 	{
 		input := ""
 		_, e := Convert(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
 		}
 	}
-	// {
-	// 	input := []bool{true, false}
-	// 	_, e := ToSlice(input, TypeString)
-	// 	if e == nil {
-	// 		t.Fatalf("%s failed: [%#v] should not be convertable to string!", name, input)
-	// 	}
-	// }
 
 	{
 		input := []string{"a", "b", "c"}
 		_, e := ToSlice(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
 		}
 	}
 	{
 		input := []string{"a", "b", "c"}
 		_, e := Convert(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
 		}
 	}
 }
@@ -1061,44 +1275,50 @@ func testToMap(t *testing.T, input interface{}, expected interface{}, typ reflec
 	}
 
 	if e != nil {
-		t.Fatalf("%s failed: %e", name, e)
+		t.Fatalf("%s failed: %e / ZeroMode: %v / Input: %#v", name, e, ZeroMode, input)
 	} else {
-		from := reflect.ValueOf(v)
-		to := reflect.ValueOf(expected)
-		if from.Len() != to.Len() {
+		if !reflect.DeepEqual(expected, v) {
 			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
-		for _, k := range from.MapKeys() {
-			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-				t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-			}
-		}
-		for _, k := range to.MapKeys() {
-			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-				t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-			}
-		}
+		// from := reflect.ValueOf(v)
+		// to := reflect.ValueOf(expected)
+		// if from.Len() != to.Len() {
+		// 	t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		// }
+		// for _, k := range from.MapKeys() {
+		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		// 	}
+		// }
+		// for _, k := range to.MapKeys() {
+		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		// 	}
+		// }
 	}
 
 	v, e = Convert(input, typ)
 	if e != nil {
 		t.Fatalf("%s failed: %e", name, e)
 	} else {
-		from := reflect.ValueOf(v)
-		to := reflect.ValueOf(expected)
-		if from.Len() != to.Len() {
+		if !reflect.DeepEqual(expected, v) {
 			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
-		for _, k := range from.MapKeys() {
-			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-				t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-			}
-		}
-		for _, k := range to.MapKeys() {
-			if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-				t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-			}
-		}
+		// from := reflect.ValueOf(v)
+		// to := reflect.ValueOf(expected)
+		// if from.Len() != to.Len() {
+		// 	t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		// }
+		// for _, k := range from.MapKeys() {
+		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		// 	}
+		// }
+		// for _, k := range to.MapKeys() {
+		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
+		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+		// 	}
+		// }
 	}
 }
 
@@ -1107,8 +1327,43 @@ func TestToMap(t *testing.T) {
 	name := "TestToMap"
 
 	{
-		testToMap(t, nil, nil, reflect.TypeOf(map[string]interface{}{}))
-		testToMap(t, map[string]bool{"1": true, "0": false}, map[int]string{0: "false", 1: "true"}, nil)
+		typeMap := reflect.TypeOf(map[string]interface{}{})
+
+		ZeroMode = true
+		testToMap(t, nil, nil, nil)
+		testToMap(t, map[string]bool{"1": true, "0": false}, map[int]string{0: "-false-", 1: "-true-"}, nil)
+		testToMap(t, nil, nil, typeMap)
+		testToMap(t, map[int]bool{1: true, 0: false}, map[string]interface{}{"1": true, "0": false}, typeMap)
+		testToMap(t, map[int]interface{}{0: false, 1: "one", 2: 2}, map[string]interface{}{"0": false, "1": "one", "2": 2}, typeMap)
+
+		ZeroMode = false
+		testToMap(t, nil, nil, nil)
+		testToMap(t, map[string]bool{"1": true, "0": false}, map[int]string{0: "-false-", 1: "-true-"}, nil)
+		testToMap(t, nil, nil, typeMap)
+		testToMap(t, map[int]bool{1: true, 0: false}, map[string]interface{}{"1": true, "0": false}, typeMap)
+		testToMap(t, map[int]interface{}{0: false, 1: "one", 2: 2}, map[string]interface{}{"0": false, "1": "one", "2": 2}, typeMap)
+	}
+	{
+		ZeroMode = true
+		typeMap := reflect.TypeOf(map[string]interface{}{})
+		now := time.Now()
+		testToMap(t,
+			map[interface{}]interface{}{0: false, "1": "one", 2: 2, "3": now, nil: "nil key",
+				"map": map[string]interface{}{"true": true, "false": "false", "nil": nil}, "mapnil": nil,
+				"list": []interface{}{1, "2", true, nil}, "listnil": nil},
+			map[string]interface{}{"0": false, "1": "one", "2": 2, "3": now, "": "nil key",
+				"map": map[string]interface{}{"true": true, "false": "false", "nil": nil}, "mapnil": nil,
+				"list": []interface{}{1, "2", true, nil}, "listnil": nil},
+			typeMap)
+
+		ZeroMode = false
+		input := map[interface{}]interface{}{0: false, "1": "one", 2: 2, "3": now, nil: "nil key",
+			"map": map[string]interface{}{"true": true, "false": "false", "nil": nil}, "mapnil": nil,
+			"list": []interface{}{1, "2", true, nil}, "listnil": nil}
+		_, err := ToMap(input, typeMap)
+		if err == nil {
+			t.Fatalf("%s failed: input %#v should result error", name, input)
+		}
 	}
 
 	{
@@ -1120,7 +1375,7 @@ func TestToMap(t *testing.T) {
 		input := map[string]bool{"one": true, "0": false}
 		_, e := ToMap(input, reflect.TypeOf(map[int]string{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to map[int]string!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map[int]string!", name, input)
 		}
 	}
 
@@ -1128,7 +1383,7 @@ func TestToMap(t *testing.T) {
 		input := map[bool]string{true: "1", false: "zero"}
 		_, e := ToMap(input, reflect.TypeOf(map[bool]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to map[bool]int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map[bool]int!", name, input)
 		}
 	}
 
@@ -1136,21 +1391,21 @@ func TestToMap(t *testing.T) {
 		input := ""
 		_, e := ToMap(input, reflect.TypeOf(map[int]string{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to map!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map!", name, input)
 		}
 	}
 	{
 		input := ""
 		_, e := Convert(input, reflect.TypeOf(map[int]string{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to map!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map!", name, input)
 		}
 	}
 	{
 		input := map[string]bool{"1": true, "0": false}
 		_, e := ToMap(input, TypeString)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to string!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to string!", name, input)
 		}
 	}
 }
@@ -1171,6 +1426,13 @@ func TestToPointer(t *testing.T) {
 		input := 1
 		output, e := ToPointer(&input, nil)
 		if output != nil || e == nil {
+			t.Fatalf("%s failed: %v - %e", name, output, e)
+		}
+	}
+	{
+		zero := int32(0)
+		output, e := ToPointer(nil, reflect.TypeOf(&zero))
+		if output != nil || e != nil {
 			t.Fatalf("%s failed: %v - %e", name, output, e)
 		}
 	}
@@ -1234,7 +1496,7 @@ func TestToPointer(t *testing.T) {
 		zero := float64(0)
 		_, e := ToPointer(&a, reflect.TypeOf(&zero))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to [%#v]!", name, &a, &zero)
+			t.Fatalf("%s failed: [%#v] should not be convertible to [%#v]!", name, &a, &zero)
 		}
 	}
 
@@ -1243,7 +1505,7 @@ func TestToPointer(t *testing.T) {
 		zero := int64(0)
 		_, e := ToPointer(a, reflect.TypeOf(&zero))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to [%#v]!", name, a, &zero)
+			t.Fatalf("%s failed: [%#v] should not be convertible to [%#v]!", name, a, &zero)
 		}
 	}
 
@@ -1252,7 +1514,7 @@ func TestToPointer(t *testing.T) {
 		zero := int64(0)
 		_, e := ToPointer(&a, reflect.TypeOf(&zero))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to [%#v]!", name, &a, zero)
+			t.Fatalf("%s failed: [%#v] should not be convertible to [%#v]!", name, &a, zero)
 		}
 	}
 
@@ -1302,23 +1564,42 @@ func TestConvert(t *testing.T) {
 	name := "TestConvert"
 
 	{
+		ZeroMode = true
 		v, e := Convert("", nil)
+		if e != nil || v != "" {
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, "", v)
+		}
+		ZeroMode = false
+		v, e = Convert("", nil)
 		if e != nil || v != "" {
 			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, "", v)
 		}
 	}
 	{
-		_, e := Convert(nil, TypeString)
+		ZeroMode = true
+		v, e := Convert(nil, TypeString)
+		if v != "" || e != nil {
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, "", v)
+		}
+
+		ZeroMode = false
+		_, e = Convert(nil, TypeString)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to [%#v]!", name, nil, "")
+			t.Fatalf("%s failed: [%#v] should not be convertible to [%#v]!", name, nil, "")
 		}
 	}
 	{
+		ZeroMode = true
 		input := ""
 		zero := func() {}
 		_, e := Convert(input, reflect.TypeOf(zero))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertable to func!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to func!", name, input)
+		}
+		ZeroMode = false
+		_, e = Convert(input, reflect.TypeOf(zero))
+		if e == nil {
+			t.Fatalf("%s failed: [%#v] should not be convertible to func!", name, input)
 		}
 	}
 }
