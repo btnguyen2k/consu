@@ -108,12 +108,25 @@ var (
 )
 
 var (
-	ErrorNilToBool   = errors.New("cannot convert nil to bool")
-	ErrorNilToFloat  = errors.New("cannot convert nil to float")
-	ErrorNilToInt    = errors.New("cannot convert nil to int")
-	ErrorNilToUint   = errors.New("cannot convert nil to uint")
+	// ErrorNilToBool is returned by ToBool when ZeroMode=false
+	ErrorNilToBool = errors.New("cannot convert nil to bool")
+
+	// ErrorNilToFloat is returned by ToFloat when ZeroMode=false
+	ErrorNilToFloat = errors.New("cannot convert nil to float")
+
+	// ErrorNilToInt is returned by ToInt when ZeroMode=false
+	ErrorNilToInt = errors.New("cannot convert nil to int")
+
+	// ErrorNilToUint is returned by ToUint when ZeroMode=false
+	ErrorNilToUint = errors.New("cannot convert nil to uint")
+
+	// ErrorNilToString is returned by ToString when ZeroMode=false
 	ErrorNilToString = errors.New("cannot convert nil to string")
-	ErrorNilToTime   = errors.New("cannot convert nil to time.Time")
+
+	// ErrorNilToTime is returned by ToTime when ZeroMode=false
+	ErrorNilToTime = errors.New("cannot convert nil to time.Time")
+
+	// ErrorNilToStruct is returned by ToStruct when ZeroMode=false
 	ErrorNilToStruct = errors.New("cannot convert nil to struct")
 )
 
