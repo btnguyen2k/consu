@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/btnguyen2k/consu/semita"
 )
 
@@ -138,7 +139,7 @@ func exampleMixed() {
 
 	data2 := sampleDataMixed()
 	s2 := semita.NewSemita(&data2) // wrap around a pointer to data
-	semita.PathSeparator = '.'    // reset path separator
+	semita.PathSeparator = '.'     // reset path separator
 	// testReadMixed(s2)
 	testWriteMixed(s2)
 }

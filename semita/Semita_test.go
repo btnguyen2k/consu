@@ -1225,7 +1225,7 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[0]" + s + "options"+s+"work_hours"
+		p := "Employees[0]" + s + "options" + s + "work_hours"
 		v, e := s1.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1256,7 +1256,7 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees" + s + "[1]" + s + "options"+s+"overtime"
+		p := "Employees" + s + "[1]" + s + "options" + s + "overtime"
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1366,7 +1366,7 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"Age"
+		p := "Employees" + s + "[0]" + s + "Age"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1387,7 +1387,7 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[1]"+s+"Email"
+		p := "Employees[1]" + s + "Email"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1408,7 +1408,7 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[0]"+s+"Options"+s+"WorkHours"
+		p := "Employees[0]" + s + "Options" + s + "WorkHours"
 		v, e := s1.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1439,7 +1439,7 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[1]"+s+"Options"+s+"Overtime"
+		p := "Employees" + s + "[1]" + s + "Options" + s + "Overtime"
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1460,7 +1460,7 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"JoinDate"
+		p := "Employees" + s + "[0]" + s + "JoinDate"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1481,7 +1481,7 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[1]"+s+"JoinDate"
+		p := "Employees[1]" + s + "JoinDate"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1549,7 +1549,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"age"
+		p := "Employees" + s + "[0]" + s + "age"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1570,7 +1570,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[1]"+s+"email"
+		p := "Employees[1]" + s + "email"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1591,7 +1591,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[0]"+s+"options"+s+"WorkHours"
+		p := "Employees[0]" + s + "options" + s + "WorkHours"
 		v, e := s1.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1622,7 +1622,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[1]"+s+"options"+s+"Overtime"
+		p := "Employees" + s + "[1]" + s + "options" + s + "Overtime"
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1643,7 +1643,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"join_date"
+		p := "Employees" + s + "[0]" + s + "join_date"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -1664,7 +1664,7 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[1]"+s+"join_date"
+		p := "Employees[1]" + s + "join_date"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -2020,7 +2020,7 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"Age"
+		p := "Employees" + s + "[0]" + s + "Age"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
@@ -2059,7 +2059,7 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[1]"+s+"Email"
+		p := "Employees[1]" + s + "Email"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
@@ -2098,7 +2098,7 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[0]"+s+"Options"+s+"WorkHours"+s+"[0]"
+		p := "Employees[0]" + s + "Options" + s + "WorkHours" + s + "[0]"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
@@ -2137,7 +2137,7 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[1]"+s+"Options"+s+"Overtime"
+		p := "Employees" + s + "[1]" + s + "Options" + s + "Overtime"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
@@ -2176,7 +2176,7 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"JoinDate"
+		p := "Employees" + s + "[0]" + s + "JoinDate"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
@@ -2290,7 +2290,7 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"age"
+		p := "Employees" + s + "[0]" + s + "age"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
@@ -2329,7 +2329,7 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[1]"+s+"email"
+		p := "Employees[1]" + s + "email"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
@@ -2368,7 +2368,7 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees[0]"+s+"options"+s+"WorkHours"+s+"[0]"
+		p := "Employees[0]" + s + "options" + s + "WorkHours" + s + "[0]"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
@@ -2407,7 +2407,7 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[0]"+s+"join_date"
+		p := "Employees" + s + "[0]" + s + "join_date"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
@@ -2455,7 +2455,7 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[]"+s+"age" // append to end of slice
+		p := "Employees" + s + "[]" + s + "age" // append to end of slice
 		data := generateDataMap()
 		s1 := NewSemita(data)
 		data2 := generateDataMap().(map[string]interface{})
@@ -2474,7 +2474,7 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 		if l2 != l1+1 {
 			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
-		_p := "Employees[" + strconv.Itoa(l2-1) + "]"+s+"age"
+		_p := "Employees[" + strconv.Itoa(l2-1) + "]" + s + "age"
 		v, e := s1.GetValueOfType(_p, reddo.TypeInt)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -2497,7 +2497,7 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 		if l2 != l1+1 {
 			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
-		_p = "Employees[" + strconv.Itoa(l2-1) + "]"+s+"age"
+		_p = "Employees[" + strconv.Itoa(l2-1) + "]" + s + "age"
 		v, e = s2.GetValueOfType(_p, reddo.TypeUint)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
@@ -2510,7 +2510,7 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "a"+s+"b"+s+"c"+s+"d" // create all nodes for maps
+		p := "a" + s + "b" + s + "c" + s + "d" // create all nodes for maps
 		data := generateDataMap()
 		s1 := NewSemita(data)
 		data2 := generateDataMap().(map[string]interface{})
@@ -2549,8 +2549,8 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "a[]"+s+"b"+s+"c[]"+s+"d" // create all nodes for maps & slices
-		_p := "a[0]"+s+"b"+s+"c[0]"+s+"d"
+		p := "a[]" + s + "b" + s + "c[]" + s + "d" // create all nodes for maps & slices
+		_p := "a[0]" + s + "b" + s + "c[0]" + s + "d"
 		data := generateDataMap()
 		s1 := NewSemita(data)
 		data2 := generateDataMap().(map[string]interface{})
@@ -2594,7 +2594,7 @@ func TestSemita_SetValue_MultiLevelMixed_CreateNodes(t *testing.T) {
 	for _, sept := range []byte("./:;") {
 		PathSeparator = sept
 		s := string(sept)
-		p := "Employees"+s+"[]"+s+"age" // append to end of slice
+		p := "Employees" + s + "[]" + s + "age" // append to end of slice
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
@@ -2620,7 +2620,7 @@ func TestSemita_SetValue_MultiLevelMixed_CreateNodes(t *testing.T) {
 		if l2 != l1+1 {
 			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
-		_p := "Employees[" + strconv.Itoa(l2-1) + "]"+s+"age"
+		_p := "Employees[" + strconv.Itoa(l2-1) + "]" + s + "age"
 		v, e := s2.GetValueOfType(_p, reddo.TypeUint)
 		if e != nil {
 			t.Fatalf("%s failed: %e", name, e)
