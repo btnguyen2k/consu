@@ -132,11 +132,13 @@ func testWriteMixed(s *semita.Semita) {
 func exampleMixed() {
 	data1 := sampleDataMixed()
 	s1 := semita.NewSemita(data1) // wrap around data
+	semita.PathSeparator = '.'    // reset path separator
 	// testReadMixed(s1)
 	testWriteMixed(s1)
 
 	data2 := sampleDataMixed()
 	s2 := semita.NewSemita(&data2) // wrap around a pointer to data
+	semita.PathSeparator = '.'    // reset path separator
 	// testReadMixed(s2)
 	testWriteMixed(s2)
 }

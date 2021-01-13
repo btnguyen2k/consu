@@ -17,6 +17,7 @@ Notes:
 	- Supported nested arrays, slices, maps and structs.
 	- Struct's un-exported fields can be read, but not written.
 	- Unaddressable structs and arrays are read-only.
+	- The path separator can be change via semita.PathSeparator variable (default value is '.')
 
 Example: (more examples at https://github.com/btnguyen2k/consu/tree/master/semita/examples)
 
@@ -123,21 +124,24 @@ package semita
 
 import (
 	"errors"
-	"github.com/btnguyen2k/consu/reddo"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 	"unsafe"
+
+	"github.com/btnguyen2k/consu/reddo"
 )
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.4.1"
+	Version = "0.1.5"
+)
 
+var (
 	// PathSeparator separates path components
-	PathSeparator = '.'
+	PathSeparator byte = '.'
 )
 
 var (
@@ -203,7 +207,7 @@ func GetTypeOfStructAttibute(s interface{}, attr string) reflect.Type {
 /*
 CreateZero create 'zero' value of specified type
 
-	- if 't' is primitive type (bool, ints, uints, floats, complexes, string, uintptr and unsafe-pointer): 'zero' value is created via reflect.Zero(t)
+	- if 't' is primitive type (bool, int, uint, float, complex, string, uintptr and unsafe-pointer): 'zero' value is created via reflect.Zero(t)
 	- if 't' is array or slice: returns empty slice of type 't'
 	- if 't' is map: returns empty map of type 't'
 	- if 't' is struct: returns empty struct of type 't'

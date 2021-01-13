@@ -3,11 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/btnguyen2k/consu/reddo"
+
 	"github.com/btnguyen2k/consu/semita"
 )
 
 func exampleSimple() {
+	semita.PathSeparator = '.' // reset path separator
+
 	fmt.Println("-========== Semina demo ==========-")
 	data := map[string]interface{}{
 		"name": map[string]interface{}{
