@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/btnguyen2k/consu/semita"
 )
 
@@ -33,6 +34,7 @@ func testReadMapsAndSlices(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
+	semita.PathSeparator = '.'
 	path = "Employees[1].email"
 	v, e = s.GetValue(path)
 	if e == nil {
@@ -42,7 +44,8 @@ func testReadMapsAndSlices(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees.[0].options.overtime"
+	semita.PathSeparator = '/'
+	path = "Employees/[0]/options/overtime"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
@@ -51,7 +54,8 @@ func testReadMapsAndSlices(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees[2].age"
+	semita.PathSeparator = ':'
+	path = "Employees[2]:age"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
@@ -154,11 +158,15 @@ func testWriteMapsAndSlices(s *semita.Semita) {
 func exampleMapsAndSlices() {
 	data1 := sampleDataMapsAndSlices()
 	s1 := semita.NewSemita(data1) // wrap around data
+	semita.PathSeparator = '.'    // reset path separator
 	testReadMapsAndSlices(s1)
+	semita.PathSeparator = '.' // reset path separator
 	testWriteMapsAndSlices(s1)
 
 	data2 := sampleDataMapsAndSlices()
 	s2 := semita.NewSemita(&data2) // wrap around a pointer to data
+	semita.PathSeparator = '.'     // reset path separator
 	testReadMapsAndSlices(s2)
+	semita.PathSeparator = '.' // reset path separator
 	testWriteMapsAndSlices(s2)
 }

@@ -26,6 +26,7 @@ Notes:
 - Supported nested arrays, slices, maps and structs.
 - Struct's un-exported fields can be read, but not written.
 - Unaddressable structs and arrays are read-only.
+- The path separator can be change via `PathSeparator` variable (default value is `.`)
 
 Example:
 
@@ -134,6 +135,11 @@ func main() {
 
 
 ## History
+
+### 2021-01-13 - v0.1.5
+
+- `PathSeparator` is now configurable (default value is `.`).
+
 
 ### 2019-04-12 - v0.1.4.1
 

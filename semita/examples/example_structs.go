@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/btnguyen2k/consu/semita"
 )
 
@@ -42,6 +43,7 @@ func testReadStructs(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
+	semita.PathSeparator = '.'
 	path = "Employees[1].Email"
 	v, e = s.GetValue(path)
 	if e == nil {
@@ -51,7 +53,8 @@ func testReadStructs(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees.[0].Options.Overtime"
+	semita.PathSeparator = '/'
+	path = "Employees/[0]/Options/Overtime"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
@@ -60,7 +63,8 @@ func testReadStructs(s *semita.Semita) {
 		fmt.Printf("\tError while getting value at '%v': %e\n", path, e)
 	}
 
-	path = "Employees[2].Age"
+	semita.PathSeparator = ':'
+	path = "Employees[2]:Age"
 	v, e = s.GetValue(path)
 	if e == nil {
 		j, _ := json.Marshal(v)
@@ -141,11 +145,15 @@ func testWriteStructs(s *semita.Semita) {
 func exampleStructs() {
 	data1 := sampleDataStructs()
 	s1 := semita.NewSemita(data1) // wrap around data
+	semita.PathSeparator = '.'    // reset path separator
 	testReadStructs(s1)
+	semita.PathSeparator = '.' // reset path separator
 	testWriteStructs(s1)
 
 	data2 := sampleDataStructs()
 	s2 := semita.NewSemita(&data2) // wrap around a pointer to data
+	semita.PathSeparator = '.'     // reset path separator
 	testReadStructs(s2)
+	semita.PathSeparator = '.' // reset path separator
 	testWriteStructs(s2)
 }

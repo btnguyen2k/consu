@@ -1,12 +1,13 @@
 package semita
 
 import (
-	"github.com/btnguyen2k/consu/reddo"
 	"reflect"
 	"strconv"
 	"testing"
 	"time"
 	"unsafe"
+
+	"github.com/btnguyen2k/consu/reddo"
 )
 
 /*----------------------------------------------------------------------*/
@@ -14,18 +15,22 @@ import (
 func testSplitPath(t *testing.T, path string, expected []string) {
 	tokens := SplitPath(path)
 	if len(tokens) != len(expected) {
-		t.Errorf("TestSplitPath failed for data [%s], expected %#v but received %#v.", path, expected, tokens)
+		t.Fatalf("TestSplitPath failed for data [%s], expected %#v but received %#v.", path, expected, tokens)
 	}
 }
 
 // TestSplitPath tests if a path is correctly split into components
 func TestSplitPath(t *testing.T) {
-	testSplitPath(t, "a.b.c.[i].d", []string{"a", "b", "c", "[i]", "d"})
-	testSplitPath(t, "a.b.c[i].d", []string{"a", "b", "c", "[i]", "d"})
-	testSplitPath(t, "a.b.c.[i].[j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
-	testSplitPath(t, "a.b.c[i].[j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
-	testSplitPath(t, "a.b.c[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
-	testSplitPath(t, "a.b.c.[i][j].d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		testSplitPath(t, "a"+s+"b"+s+"c"+s+"[i]"+s+"d", []string{"a", "b", "c", "[i]", "d"})
+		testSplitPath(t, "a"+s+"b"+s+"c[i]"+s+"d", []string{"a", "b", "c", "[i]", "d"})
+		testSplitPath(t, "a"+s+"b"+s+"c"+s+"[i]"+s+"[j]"+s+"d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+		testSplitPath(t, "a"+s+"b"+s+"c[i]"+s+"[j]"+s+"d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+		testSplitPath(t, "a"+s+"b"+s+"c[i][j]"+s+"d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+		testSplitPath(t, "a"+s+"b"+s+"c"+s+"[i][j]"+s+"d", []string{"a", "b", "c", "[i]", "[j]", "d"})
+	}
 }
 
 /*----------------------------------------------------------------------*/
@@ -34,7 +39,7 @@ func TestCreateZero_Invalid(t *testing.T) {
 	{
 		z := CreateZero(nil)
 		if z.IsValid() {
-			t.Errorf("%s failed", name)
+			t.Fatalf("%s failed", name)
 		}
 	}
 	{
@@ -42,7 +47,7 @@ func TestCreateZero_Invalid(t *testing.T) {
 		v := &temp
 		z := CreateZero(reflect.TypeOf(v))
 		if z.IsValid() {
-			t.Errorf("%s failed for data %#v %T", name, v, v)
+			t.Fatalf("%s failed for data %#v %T", name, v, v)
 		}
 	}
 }
@@ -54,7 +59,7 @@ func TestCreateZero_Primitives(t *testing.T) {
 		for _, v := range vList {
 			z := CreateZero(reflect.TypeOf(v))
 			if !z.IsValid() || z.Interface() != v {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -63,7 +68,7 @@ func TestCreateZero_Primitives(t *testing.T) {
 		for _, v := range vList {
 			z := CreateZero(reflect.TypeOf(v))
 			if !z.IsValid() || z.Interface() != v {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -72,7 +77,7 @@ func TestCreateZero_Primitives(t *testing.T) {
 		for _, v := range vList {
 			z := CreateZero(reflect.TypeOf(v))
 			if !z.IsValid() || z.Interface() != v {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -81,7 +86,7 @@ func TestCreateZero_Primitives(t *testing.T) {
 		for _, v := range vList {
 			z := CreateZero(reflect.TypeOf(v))
 			if !z.IsValid() || z.Interface() != v {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -90,7 +95,7 @@ func TestCreateZero_Primitives(t *testing.T) {
 		for _, v := range vList {
 			z := CreateZero(reflect.TypeOf(v))
 			if !z.IsValid() || z.Interface() != v {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -99,7 +104,7 @@ func TestCreateZero_Primitives(t *testing.T) {
 		for _, v := range vList {
 			z := CreateZero(reflect.TypeOf(v))
 			if !z.IsValid() || z.Interface() != v {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -111,20 +116,20 @@ func TestCreateZero_SliceAndArray(t *testing.T) {
 		v := []int{1, 2, 3}
 		z := CreateZero(reflect.TypeOf(v))
 		if !z.IsValid() || z.Kind() != reflect.Slice || z.Len() != 0 {
-			t.Errorf("%s failed for data %#v %T", name, v, v)
+			t.Fatalf("%s failed for data %#v %T", name, v, v)
 		}
 		z = reflect.Append(z, reflect.ValueOf(0))
 		z = reflect.Append(z, reflect.ValueOf(0))
 		z = reflect.Append(z, reflect.ValueOf(0))
 		if z.Len() != 3 {
-			t.Errorf("%s failed for data %#v %T", name, v, v)
+			t.Fatalf("%s failed for data %#v %T", name, v, v)
 		}
 		for i := 0; i < len(v); i++ {
 			z.Index(i).Set(reflect.ValueOf(v[i]))
 		}
 		for i := 0; i < len(v); i++ {
 			if z.Index(i).Int() != int64(v[i]) {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -132,21 +137,21 @@ func TestCreateZero_SliceAndArray(t *testing.T) {
 		v := [4]string{"0", "a", "false", "true"}
 		z := CreateZero(reflect.TypeOf(v))
 		if !z.IsValid() || z.Kind() != reflect.Slice || z.Len() != 0 {
-			t.Errorf("%s failed for data %#v %T", name, v, v)
+			t.Fatalf("%s failed for data %#v %T", name, v, v)
 		}
 		z = reflect.Append(z, reflect.ValueOf(""))
 		z = reflect.Append(z, reflect.ValueOf(""))
 		z = reflect.Append(z, reflect.ValueOf(""))
 		z = reflect.Append(z, reflect.ValueOf(""))
 		if z.Len() != 4 {
-			t.Errorf("%s failed for data %#v %T", name, v, v)
+			t.Fatalf("%s failed for data %#v %T", name, v, v)
 		}
 		for i := 0; i < len(v); i++ {
 			z.Index(i).Set(reflect.ValueOf(v[i]))
 		}
 		for i := 0; i < len(v); i++ {
 			if z.Index(i).String() != v[i] {
-				t.Errorf("%s failed for data %#v %T", name, v, v)
+				t.Fatalf("%s failed for data %#v %T", name, v, v)
 			}
 		}
 	}
@@ -157,17 +162,17 @@ func TestCreateZero_Map(t *testing.T) {
 	v := map[int]string{0: "", 1: "one", 2: "2"}
 	z := CreateZero(reflect.TypeOf(v))
 	if !z.IsValid() || z.Kind() != reflect.Map || z.Len() != 0 {
-		t.Errorf("%s failed for data %#v %T", name, v, v)
+		t.Fatalf("%s failed for data %#v %T", name, v, v)
 	}
 	z.SetMapIndex(reflect.ValueOf(0), reflect.ValueOf(""))
 	z.SetMapIndex(reflect.ValueOf(1), reflect.ValueOf("one"))
 	z.SetMapIndex(reflect.ValueOf(2), reflect.ValueOf("2"))
 	if z.Len() != 3 {
-		t.Errorf("%s failed for data %#v %T", name, v, v)
+		t.Fatalf("%s failed for data %#v %T", name, v, v)
 	}
 	for i := 0; i < len(v); i++ {
 		if z.MapIndex(reflect.ValueOf(i)).String() != v[i] {
-			t.Errorf("%s failed for data %#v %T", name, v, v)
+			t.Fatalf("%s failed for data %#v %T", name, v, v)
 		}
 	}
 }
@@ -183,20 +188,20 @@ func TestCreateZero_Struct(t *testing.T) {
 	v := MyStruct{I: 103, s: "btnguyen2k", B: true, A: []int{1, 2, 3}}
 	z := CreateZero(reflect.TypeOf(v))
 	if !z.IsValid() || z.Kind() != reflect.Struct {
-		t.Errorf("%s failed for data %#v %T", name, v, v)
+		t.Fatalf("%s failed for data %#v %T", name, v, v)
 	}
 	z.FieldByName("I").Set(reflect.ValueOf(103))
 	// z.FieldByName("s").Set(reflect.ValueOf("btnguyen2k"))
 	z.FieldByName("B").Set(reflect.ValueOf(true))
 	z.FieldByName("A").Set(reflect.ValueOf([]int{1, 2, 3}))
 	if z.FieldByName("I").Int() != int64(v.I) {
-		t.Errorf("%s failed for data %#v %T", name, v, v)
+		t.Fatalf("%s failed for data %#v %T", name, v, v)
 	}
 	if z.FieldByName("B").Bool() != v.B {
-		t.Errorf("%s failed for data %#v %T", name, v, v)
+		t.Fatalf("%s failed for data %#v %T", name, v, v)
 	}
 	if !reflect.DeepEqual(z.FieldByName("A").Interface(), v.A) {
-		t.Errorf("%s failed for data %#v %T", name, v, v)
+		t.Fatalf("%s failed for data %#v %T", name, v, v)
 	}
 }
 
@@ -208,44 +213,44 @@ func TestGetTypeOfMapKey(t *testing.T) {
 		v := map[bool]string{true: "true", false: "false"}
 		typ := GetTypeOfMapKey(v)
 		if typ == nil || typ.Kind() != reflect.Bool {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfMapKey(&v)
 		if typ == nil || typ.Kind() != reflect.Bool {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := map[int]string{1: "one", 2: "two"}
 		typ := GetTypeOfMapKey(v)
 		if typ == nil || typ.Kind() != reflect.Int {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfMapKey(&v)
 		if typ == nil || typ.Kind() != reflect.Int {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := map[uint]string{1: "1", 2: "2"}
 		typ := GetTypeOfMapKey(v)
 		if typ == nil || typ.Kind() != reflect.Uint {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfMapKey(&v)
 		if typ == nil || typ.Kind() != reflect.Uint {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := map[string]string{"1": "one", "2": "two"}
 		typ := GetTypeOfMapKey(v)
 		if typ == nil || typ.Kind() != reflect.String {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfMapKey(&v)
 		if typ == nil || typ.Kind() != reflect.String {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 
@@ -253,11 +258,11 @@ func TestGetTypeOfMapKey(t *testing.T) {
 		v := "this is not a map"
 		typ := GetTypeOfMapKey(v)
 		if typ != nil {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfMapKey(&v)
 		if typ != nil {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 }
@@ -268,44 +273,44 @@ func TestGetTypeOfElement(t *testing.T) {
 		v := map[string]bool{"true": true, "false": false}
 		typ := GetTypeOfElement(v)
 		if typ == nil || typ.Kind() != reflect.Bool {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfElement(&v)
 		if typ == nil || typ.Kind() != reflect.Bool {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := []int{1, 2, 3}
 		typ := GetTypeOfElement(v)
 		if typ == nil || typ.Kind() != reflect.Int {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfElement(&v)
 		if typ == nil || typ.Kind() != reflect.Int {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := [4]uint{0, 1, 2, 3}
 		typ := GetTypeOfElement(v)
 		if typ == nil || typ.Kind() != reflect.Uint {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfElement(&v)
 		if typ == nil || typ.Kind() != reflect.Uint {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := "a string"
 		typ := GetTypeOfElement(v)
 		if typ == nil || typ.Kind() != reflect.String {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfElement(&v)
 		if typ == nil || typ.Kind() != reflect.String {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 }
@@ -322,62 +327,62 @@ func TestGetTypeOfStructAttibute(t *testing.T) {
 	{
 		typ := GetTypeOfStructAttibute(v, "FieldInt")
 		if typ == nil || typ.Kind() != reflect.Int {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfStructAttibute(&v, "FieldInt")
 		if typ == nil || typ.Kind() != reflect.Int {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		typ := GetTypeOfStructAttibute(v, "FieldBool")
 		if typ == nil || typ.Kind() != reflect.Bool {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfStructAttibute(&v, "FieldBool")
 		if typ == nil || typ.Kind() != reflect.Bool {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		typ := GetTypeOfStructAttibute(v, "FieldString")
 		if typ == nil || typ.Kind() != reflect.String {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfStructAttibute(&v, "FieldString")
 		if typ == nil || typ.Kind() != reflect.String {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		typ := GetTypeOfStructAttibute(v, "fieldPrivate")
 		if typ == nil || typ.Kind() != reflect.Interface {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfStructAttibute(&v, "fieldPrivate")
 		if typ == nil || typ.Kind() != reflect.Interface {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		typ := GetTypeOfStructAttibute(v, "invalid")
 		if typ != nil {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfStructAttibute(&v, "invalid")
 		if typ != nil {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 	{
 		v := "this is not a struct"
 		typ := GetTypeOfStructAttibute(v, "invalid")
 		if typ != nil {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 		typ = GetTypeOfStructAttibute(&v, "invalid")
 		if typ != nil {
-			t.Errorf("%s failed with data %#v", name, v)
+			t.Fatalf("%s failed with data %#v", name, v)
 		}
 	}
 }
@@ -392,7 +397,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 == nil || s2 == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 	{
@@ -400,7 +405,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 == nil || s2 == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 	{
@@ -408,7 +413,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 == nil || s2 == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 	{
@@ -420,7 +425,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 == nil || s2 == nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 
@@ -429,7 +434,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 != nil || s2 != nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 	{
@@ -437,7 +442,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 != nil || s2 != nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 	{
@@ -445,7 +450,7 @@ func TestNewSemita(t *testing.T) {
 		s1 := NewSemita(data)
 		s2 := NewSemita(&data)
 		if s1 != nil || s2 != nil {
-			t.Errorf("TestNewSemita failed for data %#v", data)
+			t.Fatalf("TestNewSemita failed for data %#v", data)
 		}
 	}
 }
@@ -456,13 +461,13 @@ func TestSemita_Unwrap(t *testing.T) {
 	s1 := NewSemita(data)
 	d1 := s1.Unwrap().(map[string]interface{})
 	if !reflect.DeepEqual(data, d1) {
-		t.Errorf("TestSemita_Unwrap failed for data %#v", data)
+		t.Fatalf("TestSemita_Unwrap failed for data %#v", data)
 	}
 
 	s2 := NewSemita(&data)
 	d2 := s2.Unwrap().(map[string]interface{})
 	if !reflect.DeepEqual(data, d2) {
-		t.Errorf("TestSemita_Unwrap failed for data %#v", data)
+		t.Fatalf("TestSemita_Unwrap failed for data %#v", data)
 	}
 }
 
@@ -479,7 +484,7 @@ func TestSemita_GetValueInvalid(t *testing.T) {
 		p := "[1]"
 		_, e := s.GetValue(p)
 		if e == nil {
-			t.Errorf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
+			t.Fatalf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
 		}
 	}
 	{
@@ -496,7 +501,7 @@ func TestSemita_GetValueInvalid(t *testing.T) {
 		p := "[1]"
 		_, e := s.GetValue(p)
 		if e == nil {
-			t.Errorf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
+			t.Fatalf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
 		}
 	}
 
@@ -506,7 +511,7 @@ func TestSemita_GetValueInvalid(t *testing.T) {
 		p := "1"
 		_, e := s.GetValue(p)
 		if e == nil {
-			t.Errorf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
+			t.Fatalf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
 		}
 	}
 	{
@@ -515,7 +520,7 @@ func TestSemita_GetValueInvalid(t *testing.T) {
 		p := "1"
 		_, e := s.GetValue(p)
 		if e == nil {
-			t.Errorf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
+			t.Fatalf("TestSemita_GetValueInvalid getting value at [%#v] for data %#v", p, data)
 		}
 	}
 }
@@ -532,58 +537,62 @@ func TestSemita_GetValueArray(t *testing.T) {
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[-1]"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[999]"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[]"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueArray failed with data %#v at index {%#v}", v, p)
 	}
 
-	for _, p = range []string{"[4].[0]", "[5][1]", "[6].z", "[7].A.[0]", "[7].B[1]", "[7].M.z", "[7].S.s"} {
-		n, err = s1.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueArray failed with data %#v at path {%#v}", v, p)
-		}
-		n, err = s2.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueArray failed with data %#v at path {%#v}", v, p)
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		for _, p = range []string{"[4]" + s + "[0]", "[5][1]", "[6]" + s + "z", "[7]" + s + "A" + s + "[0]", "[7]" + s + "B[1]", "[7]" + s + "M" + s + "z", "[7]" + s + "S" + s + "s"} {
+			n, err = s1.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueArray failed with data %#v at path {%#v}", v, p)
+			}
+			n, err = s2.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueArray failed with data %#v at path {%#v}", v, p)
+			}
 		}
 	}
 }
@@ -600,58 +609,62 @@ func TestSemita_GetValueSlice(t *testing.T) {
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[-1]"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[999]"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[]"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// index out-of-bound: silent nil should be return
-		t.Errorf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueSlice failed with data %#v at index {%#v}", v, p)
 	}
 
-	for _, p = range []string{"[4].[0]", "[5][1]", "[6].z", "[7].A.[0]", "[7].B[1]", "[7].M.z", "[7].S.s"} {
-		n, err = s1.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueSlice failed with data %#v at path {%#v}", v, p)
-		}
-		n, err = s2.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueSlice failed with data %#v at path {%#v}", v, p)
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		for _, p = range []string{"[4]" + s + "[0]", "[5][1]", "[6]" + s + "z", "[7]" + s + "A" + s + "[0]", "[7]" + s + "B[1]", "[7]" + s + "M" + s + "z", "[7]" + s + "S" + s + "s"} {
+			n, err = s1.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueSlice failed with data %#v at path {%#v}", v, p)
+			}
+			n, err = s2.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueSlice failed with data %#v at path {%#v}", v, p)
+			}
 		}
 	}
 }
@@ -668,58 +681,62 @@ func TestSemita_GetValueMap(t *testing.T) {
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[999]"
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[]"
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "not exist"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// non-exists entry
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// non-exists entry
-		t.Errorf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueMap failed with data %#v at index {%#v}", v, p)
 	}
 
-	for _, p = range []string{"a.[0]", "b[1]", "m.z", "s.A.[0]", "s.B[1]", "s.M.z", "s.S.s"} {
-		n, err = s1.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueMap failed with data %#v at path {%#v}", v, p)
-		}
-		n, err = s2.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueMap failed with data %#v at path {%#v}", v, p)
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		for _, p = range []string{"a" + s + "[0]", "b[1]", "m" + s + "z", "s" + s + "A" + s + "[0]", "s" + s + "B[1]", "s" + s + "M" + s + "z", "s" + s + "S" + s + "s"} {
+			n, err = s1.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueMap failed with data %#v at path {%#v}", v, p)
+			}
+			n, err = s2.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueMap failed with data %#v at path {%#v}", v, p)
+			}
 		}
 	}
 }
@@ -736,58 +753,62 @@ func TestSemita_GetValueStruct(t *testing.T) {
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[999]"
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "[]"
 	n, err = s1.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err == nil {
 		// invalid type
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 
 	p = "not exist"
 	n, err = s1.GetValue(p)
 	if n != nil || err != nil {
 		// non-exists entry
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 	n, err = s2.GetValue(p)
 	if n != nil || err != nil {
 		// non-exists entry
-		t.Errorf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
+		t.Fatalf("TestSemita_GetValueStruct failed with data %#v at index {%#v}", v, p)
 	}
 
-	for _, p := range []string{"A.[0]", "B[1]", "M.z", "S.s", "private"} {
-		n, err = s1.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueStruct failed with data %#v at path {%#v}", v, p)
-		}
-		n, err = s2.GetValue(p)
-		if n == nil || err != nil {
-			t.Errorf("TestSemita_GetValueStruct failed with data %#v at path {%#v}", v, p)
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		for _, p := range []string{"A" + s + "[0]", "B[1]", "M" + s + "z", "S" + s + "s", "private"} {
+			n, err = s1.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueStruct failed with data %#v at path {%#v}", v, p)
+			}
+			n, err = s2.GetValue(p)
+			if n == nil || err != nil {
+				t.Fatalf("TestSemita_GetValueStruct failed with data %#v at path {%#v}", v, p)
+			}
 		}
 	}
 }
@@ -808,22 +829,22 @@ func TestSemita_GetTimeError(t *testing.T) {
 		p := "val_int"
 		_, e := s1.GetTime(p)
 		if e == nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		}
 		_, e = s2.GetTime(p)
 		if e == nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		}
 	}
 	{
 		p := "val_str"
 		_, e := s1.GetTime(p)
 		if e == nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		}
 		_, e = s2.GetTime(p)
 		if e == nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		}
 	}
 }
@@ -843,30 +864,30 @@ func TestSemita_GetTime(t *testing.T) {
 		p := "val_int"
 		v, e := s1.GetTime(p)
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 		v, e = s2.GetTime(p)
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 	{
 		p := "val_str"
 		v, e := s1.GetTime(p)
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 		v, e = s2.GetTime(p)
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 }
@@ -890,15 +911,15 @@ func TestSemita_GetTimeWithLayout(t *testing.T) {
 		p := "val_int"
 		v, e := s1.GetTimeWithLayout(p, "")
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 		v, e = s2.GetTimeWithLayout(p, "")
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -906,15 +927,15 @@ func TestSemita_GetTimeWithLayout(t *testing.T) {
 		p := "val_str"
 		v, e := s1.GetTimeWithLayout(p, "")
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 		v, e = s2.GetTimeWithLayout(p, "")
 		if e != nil {
-			t.Errorf("%s failed with data %v at path %s", name, data, p)
+			t.Fatalf("%s failed with data %v at path %s", name, data, p)
 		} else if v.Unix() != now.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
 		}
 	}
 
@@ -922,15 +943,15 @@ func TestSemita_GetTimeWithLayout(t *testing.T) {
 		p := "input"
 		v, e := s1.GetTimeWithLayout(p, layout)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 		} else if v.Unix() != expected.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
 		v, e = s2.GetTimeWithLayout(p, layout)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 		} else if v.Unix() != expected.Unix() {
-			t.Errorf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
 		}
 	}
 }
@@ -1100,7 +1121,7 @@ func TestSemita_GetValueOfType_Invalid(t *testing.T) {
 	{
 		v, _ := s1.GetValueOfType(p, reddo.TypeString)
 		if v != nil {
-			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+			t.Fatalf("%s getting value at {%#v} for data {%#v}", name, p, data)
 		}
 	}
 
@@ -1109,7 +1130,7 @@ func TestSemita_GetValueOfType_Invalid(t *testing.T) {
 	{
 		v, _ := s2.GetValueOfType(p, reddo.TypeString)
 		if v != nil {
-			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+			t.Fatalf("%s getting value at {%#v} for data {%#v}", name, p, data)
 		}
 	}
 }
@@ -1125,162 +1146,174 @@ func TestSemita_GetValueOfType_MultiLevelMap(t *testing.T) {
 		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != companyName {
-			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+			t.Fatalf("%s getting value at {%#v} for data {%#v}", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != companyName {
-			t.Errorf("%s getting value at {%#v} for data {%#v}", name, p, data)
+			t.Fatalf("%s getting value at {%#v} for data {%#v}", name, p, data)
 		}
 	}
 	{
 		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(companyYear) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(companyYear) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees.[0].age"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees" + s + "[0]" + s + "age"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(employee0Age) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(employee0Age) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[1].email"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]" + s + "email"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != employee1Email {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != employee1Email {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[0].options.work_hours"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[0]" + s + "options"+s+"work_hours"
 		v, e := s1.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if len(v.([]int)) != len(employee0WorkHours) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
 			if employee0WorkHours[i] != v.([]int)[i] {
-				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+				t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 			}
 		}
 		v, e = s2.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if len(v.([]int)) != len(employee0WorkHours) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
 			if employee0WorkHours[i] != v.([]int)[i] {
-				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+				t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 			}
 		}
 	}
-	{
-		p := "Employees.[1].options.overtime"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees" + s + "[1]" + s + "options"+s+"overtime"
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != employee1Overtime {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != employee1Overtime {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees.[0].join_date"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees" + s + "[0]" + s + "join_date"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[1].join_date"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]" + s + "join_date"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -1296,162 +1329,174 @@ func TestSemita_GetValueOfType_MultiLevelStruct(t *testing.T) {
 		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != companyName {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != companyName {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
 		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(companyYear) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(companyYear) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees.[0].Age"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"Age"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(employee0Age) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(employee0Age) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[1].Email"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]"+s+"Email"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != employee1Email {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != employee1Email {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[0].Options.WorkHours"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[0]"+s+"Options"+s+"WorkHours"
 		v, e := s1.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if len(v.([]int)) != len(employee0WorkHours) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
 			if employee0WorkHours[i] != v.([]int)[i] {
-				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+				t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 			}
 		}
 		v, e = s2.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if len(v.([]int)) != len(employee0WorkHours) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
 			if employee0WorkHours[i] != v.([]int)[i] {
-				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+				t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 			}
 		}
 	}
-	{
-		p := "Employees.[1].Options.Overtime"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[1]"+s+"Options"+s+"Overtime"
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != employee1Overtime {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != employee1Overtime {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees.[0].JoinDate"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"JoinDate"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[1].JoinDate"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]"+s+"JoinDate"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -1467,162 +1512,174 @@ func TestSemita_GetValueOfType_MultiLevelMixed(t *testing.T) {
 		p := "Name"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != companyName {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != companyName {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
 		p := "Year"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(companyYear) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(companyYear) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees.[0].age"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"age"
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(employee0Age) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(employee0Age) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[1].email"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]"+s+"email"
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != employee1Email {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != employee1Email {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[0].options.WorkHours"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[0]"+s+"options"+s+"WorkHours"
 		v, e := s1.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if len(v.([]int)) != len(employee0WorkHours) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
 			if employee0WorkHours[i] != v.([]int)[i] {
-				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+				t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 			}
 		}
 		v, e = s2.GetValueOfType(p, reflect.TypeOf([]int{}))
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if len(v.([]int)) != len(employee0WorkHours) {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		for i, n := 0, len(employee0WorkHours); i < n; i++ {
 			if employee0WorkHours[i] != v.([]int)[i] {
-				t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+				t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 			}
 		}
 	}
-	{
-		p := "Employees.[1].options.Overtime"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[1]"+s+"options"+s+"Overtime"
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != employee1Overtime {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != employee1Overtime {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees.[0].join_date"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"join_date"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
-		p := "Employees[1].join_date"
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]"+s+"join_date"
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s getting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s getting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -1642,31 +1699,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1679,31 +1736,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1716,31 +1773,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1753,31 +1810,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1790,31 +1847,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1827,31 +1884,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1866,31 +1923,31 @@ func TestSemita_SetValue_MultiLevelMap(t *testing.T) {
 		vSet1 := d1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := d0
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -1911,22 +1968,22 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		// v, e := s1.GetValueOfType(p, reddo.TypeString)
 		// ifFailed(t, name, e)
 		// if v.(string) != vSet1 {
-		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// 	t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		// }
 
 		vSet2 := "2"
 		e := s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -1942,209 +1999,219 @@ func TestSemita_SetValue_MultiLevelStruct(t *testing.T) {
 		// v, e := s1.GetValueOfType(p, reddo.TypeString)
 		// ifFailed(t, name, e)
 		// if v.(string) != vSet1 {
-		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// 	t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		// }
 
 		vSet2 := 2
 		e := s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"Age"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
 		s2 := NewSemita(&data2)
-		p := "Employees.[0].Age"
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]"+s+"Email"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
 		s2 := NewSemita(&data2)
-		p := "Employees[1].Email"
 
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[0]"+s+"Options"+s+"WorkHours"+s+"[0]"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
 		s2 := NewSemita(&data2)
-		p := "Employees[0].Options.WorkHours.[0]"
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[1]"+s+"Options"+s+"Overtime"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
 		s2 := NewSemita(&data2)
-		p := "Employees.[1].Options.Overtime"
 
 		vSet1 := !employee1Overtime
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := !vSet1
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeBool)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(bool) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"JoinDate"
 		data := generateDataStruct()
 		s1 := NewSemita(data)
 		data2 := generateDataStruct().(Company)
 		s2 := NewSemita(&data2)
-		p := "Employees.[0].JoinDate"
 		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
 
 		vSet1 := d1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := d0
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -2165,22 +2232,22 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 		// v, e := s1.GetValueOfType(p, reddo.TypeString)
 		// ifFailed(t, name, e)
 		// if v.(string) != vSet1 {
-		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// 	t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		// }
 
 		vSet2 := "2"
 		e := s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 	{
@@ -2193,214 +2260,189 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 		// vSet1 := 1
 		// e := s1.SetValue(p, vSet1)
 		// if e != nil {
-		// 	t.Errorf("%s failed: %e", name, e)
+		// 	t.Fatalf("%s failed: %e", name, e)
 		// 	t.FailNow()
 		// }
 		// v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		// if e != nil {
-		// 	t.Errorf("%s failed: %e", name, e)
+		// 	t.Fatalf("%s failed: %e", name, e)
 		// 	t.FailNow()
 		// }
 		// if v.(int64) != int64(vSet1) {
-		// 	t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+		// 	t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		// }
 
 		vSet2 := 2
 		e := s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"age"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
 		s2 := NewSemita(&data2)
-		p := "Employees.[0].age"
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[1]"+s+"email"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
 		s2 := NewSemita(&data2)
-		p := "Employees[1].email"
 
 		vSet1 := "1"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := "2"
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != vSet2 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees[0]"+s+"options"+s+"WorkHours"+s+"[0]"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
 		s2 := NewSemita(&data2)
-		p := "Employees[0].options.WorkHours.[0]"
 
 		vSet1 := 1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 2
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	// {
-	// 	p := "Employees.[1].options.Overtime"
-	//
-	// 	vSet1 := !employee1Overtime
-	// 	e := s1.SetValue(p, vSet1)
-	// 	if e != nil {
-	// 		t.Errorf("%s failed: %e", name, e)
-	// 		t.FailNow()
-	// 	}
-	// 	v, e := s1.GetValueOfType(p, reddo.TypeBool)
-	// 	if e != nil {
-	// 		t.Errorf("%s failed: %e", name, e)
-	// 		t.FailNow()
-	// 	}
-	// 	if v.(bool) != vSet1 {
-	// 		t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
-	// 	}
-	//
-	// 	vSet2 := !vSet1
-	// 	e = s2.SetValue(p, vSet2)
-	// 	if e != nil {
-	// 		t.Errorf("%s failed: %e", name, e)
-	// 		t.FailNow()
-	// 	}
-	// 	v, e = s2.GetValueOfType(p, reddo.TypeBool)
-	// 	if e != nil {
-	// 		t.Errorf("%s failed: %e", name, e)
-	// 		t.FailNow()
-	// 	}
-	// 	if v.(bool) != vSet2 {
-	// 		t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
-	// 	}
-	// }
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[0]"+s+"join_date"
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
 		s2 := NewSemita(&data2)
-		p := "Employees.[0].join_date"
 		d0, _ := time.Parse(employee0JoinDateFormat, employee0JoinDate)
 		d1, _ := time.Parse(employee1JoinDateFormat, employee1JoinDate)
 
 		vSet1 := d1
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee1JoinDateFormat) != employee1JoinDate {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := d0
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeTime)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(time.Time).Format(employee0JoinDateFormat) != employee0JoinDate {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -2410,34 +2452,36 @@ func TestSemita_SetValue_MultiLevelMixed(t *testing.T) {
 func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 	name := "TestSemita_SetValue_MultiLevelMap_CreateNodes"
 
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[]"+s+"age" // append to end of slice
 		data := generateDataMap()
 		s1 := NewSemita(data)
 		data2 := generateDataMap().(map[string]interface{})
 		s2 := NewSemita(&data2)
-		p := "Employees.[].age" // append to end of slice
 
 		_v, _ := s1.GetValueOfType("Employees", reflect.TypeOf([]interface{}{}))
 		l1 := len(_v.([]interface{}))
 		vSet1 := 19
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		_v, _ = s1.GetValueOfType("Employees", reflect.TypeOf([]interface{}{}))
 		l2 := len(_v.([]interface{}))
 		if l2 != l1+1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
-		_p := "Employees[" + strconv.Itoa(l2-1) + "].age"
+		_p := "Employees[" + strconv.Itoa(l2-1) + "]"+s+"age"
 		v, e := s1.GetValueOfType(_p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(int64) != int64(vSet1) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		_v, _ = s2.GetValueOfType("Employees", reflect.TypeOf([]interface{}{}))
@@ -2445,97 +2489,101 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 		vSet2 := 81
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		_v, _ = s2.GetValueOfType("Employees", reflect.TypeOf([]interface{}{}))
 		l2 = len(_v.([]interface{}))
 		if l2 != l1+1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
-		_p = "Employees[" + strconv.Itoa(l2-1) + "].age"
+		_p = "Employees[" + strconv.Itoa(l2-1) + "]"+s+"age"
 		v, e = s2.GetValueOfType(_p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "a"+s+"b"+s+"c"+s+"d" // create all nodes for maps
 		data := generateDataMap()
 		s1 := NewSemita(data)
 		data2 := generateDataMap().(map[string]interface{})
 		s2 := NewSemita(&data2)
-		p := "a.b.c.d" // create all nodes for maps
 
 		vSet1 := "19"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if strconv.Itoa(int(v.(int64))) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 81
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != strconv.Itoa(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "a[]"+s+"b"+s+"c[]"+s+"d" // create all nodes for maps & slices
+		_p := "a[0]"+s+"b"+s+"c[0]"+s+"d"
 		data := generateDataMap()
 		s1 := NewSemita(data)
 		data2 := generateDataMap().(map[string]interface{})
 		s2 := NewSemita(&data2)
-		p := "a[].b.c[].d" // create all nodes for maps & slices
-		_p := "a[0].b.c[0].d"
 
 		vSet1 := "19"
 		e := s1.SetValue(p, vSet1)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e := s1.GetValueOfType(_p, reddo.TypeInt)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if strconv.Itoa(int(v.(int64))) != vSet1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 
 		vSet2 := 81
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		v, e = s2.GetValueOfType(_p, reddo.TypeString)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(string) != strconv.Itoa(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
@@ -2543,18 +2591,20 @@ func TestSemita_SetValue_MultiLevelMap_CreateNodes(t *testing.T) {
 func TestSemita_SetValue_MultiLevelMixed_CreateNodes(t *testing.T) {
 	name := "TestSemita_SetValue_MultiLevelMixed_CreateNodes"
 
-	{
+	for _, sept := range []byte("./:;") {
+		PathSeparator = sept
+		s := string(sept)
+		p := "Employees"+s+"[]"+s+"age" // append to end of slice
 		data := generateDataMixed()
 		s1 := NewSemita(data)
 		data2 := generateDataMixed().(CompanyMixed)
 		s2 := NewSemita(&data2)
-		p := "Employees.[].age" // append to end of slice
 
 		vSet1 := 19
 		e := s1.SetValue(p, vSet1)
 		if e == nil {
 			// s1 is not reference to strut --> can not append
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 		}
 
 		_v, _ := s2.GetValueOfType("Employees", reflect.TypeOf([]interface{}{}))
@@ -2562,22 +2612,22 @@ func TestSemita_SetValue_MultiLevelMixed_CreateNodes(t *testing.T) {
 		vSet2 := 81
 		e = s2.SetValue(p, vSet2)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		_v, _ = s2.GetValueOfType("Employees", reflect.TypeOf([]interface{}{}))
 		l2 := len(_v.([]interface{}))
 		if l2 != l1+1 {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
-		_p := "Employees[" + strconv.Itoa(l2-1) + "].age"
+		_p := "Employees[" + strconv.Itoa(l2-1) + "]"+s+"age"
 		v, e := s2.GetValueOfType(_p, reddo.TypeUint)
 		if e != nil {
-			t.Errorf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", name, e)
 			t.FailNow()
 		}
 		if v.(uint64) != uint64(vSet2) {
-			t.Errorf("%s setting value at [%#v] for data %#v", name, p, data)
+			t.Fatalf("%s setting value at [%#v] for data %#v", name, p, data)
 		}
 	}
 }
