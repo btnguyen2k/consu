@@ -135,12 +135,12 @@ var zeroTime = time.Time{}
 /*
 ToBool converts a value to bool.
 
-	- If v is nil: return false if ZeroMode is true, error otherwise.
-	- If v is indeed a bool: its value is returned.
-	- If v is a number (integer, float or complex): return false if its value is 'zero', true otherwise.
-	- If v is a pointer: return false if it is nil, true otherwise.
-	- If v is a string: return result from strconv.ParseBool(string).
-	- Otherwise, return error
+  - If v is nil: return false if ZeroMode is true, error otherwise.
+  - If v is indeed a bool: its value is returned.
+  - If v is a number (integer, float or complex): return false if its value is 'zero', true otherwise.
+  - If v is a pointer: return false if it is nil, true otherwise.
+  - If v is a string: return result from strconv.ParseBool(string).
+  - Otherwise, return error
 
 Examples:
 
@@ -192,11 +192,11 @@ func ToBool(v interface{}) (bool, error) {
 /*
 ToFloat converts a value to float64.
 
-	- If v is nil: return 0.0 if ZeroMode is true, error otherwise.
-	- If v is a bool: return 1.0 if its value is true, 0.0 otherwise.
-	- If v is a number (integer or float): return its value as float64.
-	- If v is a string: return result from strconv.ParseFloat(string).
-	- Otherwise, return error
+  - If v is nil: return 0.0 if ZeroMode is true, error otherwise.
+  - If v is a bool: return 1.0 if its value is true, 0.0 otherwise.
+  - If v is a number (integer or float): return its value as float64.
+  - If v is a string: return result from strconv.ParseFloat(string).
+  - Otherwise, return error
 
 Examples:
 
@@ -242,11 +242,11 @@ func ToFloat(v interface{}) (float64, error) {
 /*
 ToInt converts a value to int64.
 
-	- If v is nil: return 0 if ZeroMode is true, error otherwise.
-	- If v is a number (integer or float): return its value as int64.
-	- If v is a bool: return 1 if its value is true, 0 otherwise.
-	- If v is a string: return result from strconv.ParseInt(string).
-	- Otherwise, return error
+  - If v is nil: return 0 if ZeroMode is true, error otherwise.
+  - If v is a number (integer or float): return its value as int64.
+  - If v is a bool: return 1 if its value is true, 0 otherwise.
+  - If v is a string: return result from strconv.ParseInt(string).
+  - Otherwise, return error
 
 Examples:
 
@@ -290,11 +290,11 @@ func ToInt(v interface{}) (int64, error) {
 /*
 ToUint converts a value to uint64.
 
-	- If v is nil: return 0 if ZeroMode is true, error otherwise.
-	- If v is a number (integer or float): return its value as uint64.
-	- If v is a bool: return 1 if its value is true, 0 otherwise.
-	- If v is a string: return result from strconv.ParseUint(string).
-	- Otherwise, return error
+  - If v is nil: return 0 if ZeroMode is true, error otherwise.
+  - If v is a number (integer or float): return its value as uint64.
+  - If v is a bool: return 1 if its value is true, 0 otherwise.
+  - If v is a string: return result from strconv.ParseUint(string).
+  - Otherwise, return error
 
 Examples:
 
@@ -339,9 +339,9 @@ func ToUint(v interface{}) (uint64, error) {
 /*
 ToString converts a value to string.
 
-	- If v is nil: return "" if ZeroMode is true, error otherwise.
-	- If v is a number (integer or float) or bool or string: return its value as string.
-	- Otherwise, return string representation of v (fmt.Sprint(v))
+  - If v is nil: return "" if ZeroMode is true, error otherwise.
+  - If v is a number (integer or float) or bool or string: return its value as string.
+  - Otherwise, return string representation of v (fmt.Sprint(v))
 
 Examples:
 
@@ -385,11 +385,11 @@ func ToString(v interface{}) (string, error) {
 /*
 ToTime converts a value (v) to 'time.Time'.
 
-	- If v is nil: return zero-time if ZeroMode is true, error otherwise.
-	- If v is 'time.Time': return v.
-	- If v is integer: depends on how big v is, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
-	- If v is string and convertible to integer: depends on how big v is, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
-	- Otherwise, return error
+  - If v is nil: return zero-time if ZeroMode is true, error otherwise.
+  - If v is 'time.Time': return v.
+  - If v is integer: depends on how big v is, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+  - If v is string and convertible to integer: depends on how big v is, treat v as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+  - Otherwise, return error
 
 Availability: This function is available since v0.1.0.
 
@@ -408,18 +408,15 @@ func ToTime(v interface{}) (time.Time, error) {
 		}
 		return zeroTime, ErrorNilToTime
 	}
-	vV := reflect.ValueOf(v)
-	switch vV.Kind() {
-	case reflect.Struct:
-		if vV.Type().PkgPath() == "time" && vV.Type().Name() == "Time" {
-			// same type, just cast it
-			return vV.Interface().(time.Time), nil
-		}
-		return zeroTime, errors.New("value of type [" + fmt.Sprint(vV.Type()) + "] cannot be converted to [time.Time]")
+	vTyp := reflect.ValueOf(v).Type()
+	if vTyp == TypeTime {
+		// same type, just cast it
+		return v.(time.Time), nil
 	}
+
 	v, e := ToInt(v)
 	if e != nil {
-		return zeroTime, errors.New("value of type [" + fmt.Sprint(vV.Type()) + "] cannot be converted to [time.Time]")
+		return zeroTime, errors.New("value of type [" + fmt.Sprint(vTyp) + "] cannot be converted to [time.Time]")
 	}
 	vi := v.(int64)
 	if vi >= 0 && vi <= 99999999999 {
@@ -446,7 +443,7 @@ ToTimeWithLayout converts a value (v) to 'time.Time'.
 
 ToTimeWithLayout applies the same conversion rules as ToTime does, plus:
 
-	- If v is string and NOT convertible to integer: 'layout' is used to convert the input to 'time.Time'. Error is returned if conversion fails.
+  - If v is string and NOT convertible to integer: 'layout' is used to convert the input to 'time.Time'. Error is returned if conversion fails.
 
 Availability: This function is available since v0.1.3.
 
@@ -484,12 +481,12 @@ func isExportedField(fieldName string) bool {
 /*
 ToStruct converts a value (v) to struct of type specified by (t) (t must be a struct). The output is guaranteed to have the same type as (t).
 
-	- If v is nil: return zero-value of type (t) if ZeroMode=true, error otherwise.
-	- If v is a struct:
-		a) If v and t are same type, simply cast v to the specified type and return it
-		b) Otherwise, loop through v's fields. If there is an exported field that is same type as t, return it
-		c) (since v0.1.1) special case: if t is 'time.Time', return result from ToTime(v)
-	- Otherwise, return error
+  - If v is nil: return zero-value of type (t) if ZeroMode=true, error otherwise.
+  - If v is a struct:
+    a) If v and t are same type, simply cast v to the specified type and return it
+    b) Otherwise, loop through v's fields. If there is an exported field that is same type as t, return it
+    c) (since v0.1.1) special case: if t is 'time.Time', return result from ToTime(v)
+  - Otherwise, return error
 
 Examples:
 
@@ -554,14 +551,14 @@ func ToStruct(v interface{}, t reflect.Type) (interface{}, error) {
 ToSlice converts a value (v) to slice of type specified by (t) (t can be a slice or array, or an element of slice/array).
 The output is guaranteed to have the same type as (t).
 
-	- If v is nil: return nil regardless ZeroMode.
-	- If v is an array or slice: convert each element of v to the correct type (specified by t), put them into a slice, and finally return it.
-	- Otherwise, return error
+  - If v is nil: return nil regardless ZeroMode.
+  - If v is an array or slice: convert each element of v to the correct type (specified by t), put them into a slice, and finally return it.
+  - Otherwise, return error
 
 Notes:
 
-	- Array/slice is converted to slice.
-	- Element type is converted as well, for example: []int can be converted to []string
+  - Array/slice is converted to slice.
+  - Element type is converted as well, for example: []int can be converted to []string
 
 Examples:
 
@@ -610,13 +607,13 @@ func ToSlice(v interface{}, t reflect.Type) (interface{}, error) {
 ToMap converts a value (v) to map where types of key & value are specified by (t) (t must be a map).
 The output is guaranteed to have the same type as (t).
 
-	- If v is nil: return nil regardless ZeroMode.
-	- If v is a map: convert each element {key:value} of v to the correct type (specified by t), put them into a map, and finally return it.
-	- Otherwise, return error
+  - If v is nil: return nil regardless ZeroMode.
+  - If v is a map: convert each element {key:value} of v to the correct type (specified by t), put them into a map, and finally return it.
+  - Otherwise, return error
 
 Notes:
 
-	- Element type is converted as well, for example: map[int]int can be converted to map[string]string
+  - Element type is converted as well, for example: map[int]int can be converted to map[string]string
 
 Examples:
 
@@ -724,16 +721,16 @@ func ToPointer(v interface{}, t reflect.Type) (interface{}, error) {
 /*
 Convert converts a value (v) to specified type (t):
 
-	- If t is a bool: see ToBool(...)
-	- If t is an integer (int, int8, int16, int32, int64): see ToInt(...)
-	- If t is an unsigned-integer (uint, uint8, uint16, uint32, uint64, uintptr): see ToUint(...)
-	- If t is a float (float32, float64): see ToFloat(...)
-	- If t is a string: see ToString(...)
-	- If t is a struct: see ToStruct(...)
-	- If t is an array or a slice: see ToSlice(v...)
-	- If t is a map: see ToMap(...)
-	- If t is a pointer: see ToPointer(...)
-	- (special case) If t is nil: this function return (v, nil)
+  - If t is a bool: see ToBool(...)
+  - If t is an integer (int, int8, int16, int32, int64): see ToInt(...)
+  - If t is an unsigned-integer (uint, uint8, uint16, uint32, uint64, uintptr): see ToUint(...)
+  - If t is a float (float32, float64): see ToFloat(...)
+  - If t is a string: see ToString(...)
+  - If t is a struct: see ToStruct(...)
+  - If t is an array or a slice: see ToSlice(v...)
+  - If t is a map: see ToMap(...)
+  - If t is a pointer: see ToPointer(...)
+  - (special case) If t is nil: this function return (v, nil)
 */
 func Convert(v interface{}, t reflect.Type) (interface{}, error) {
 	if t == nil {
