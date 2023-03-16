@@ -137,7 +137,7 @@ func (s *jsonHttpServer) Shutdown() error {
 func newJsonHttpServer(port int) *jsonHttpServer {
 	rand.Seed(time.Now().UnixMilli())
 	if port <= 0 {
-		port = 1024 + rand.Intn(65000-1024)
+		port = 1024 + rand.Intn(10000-1024)
 	}
 	return &jsonHttpServer{listenPort: port}
 }
