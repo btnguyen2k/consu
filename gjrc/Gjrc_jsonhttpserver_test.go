@@ -1,12 +1,13 @@
 package gjrc
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
+	"net"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"strings"
 	"time"
@@ -110,7 +111,7 @@ func (s *jsonHttpServer) servePUT(w http.ResponseWriter, r *http.Request) {
 
 type jsonHttpServer struct {
 	listenPort int
-	server     http.Server
+	server     *httptest.Server
 }
 
 func (s *jsonHttpServer) ListenAndServe() error {
@@ -124,14 +125,25 @@ func (s *jsonHttpServer) ListenAndServe() error {
 	srvmx.HandleFunc("/put", s.servePUT)
 	srvmx.HandleFunc("/delay", s.serveDELAY)
 
-	s.server.Addr = fmt.Sprintf("127.0.0.1:%d", s.listenPort)
-	s.server.Handler = srvmx
-	fmt.Printf("\t[INFO] Starting server on port %d...\n", s.listenPort)
-	return s.server.ListenAndServe()
+	s.server = httptest.NewUnstartedServer(srvmx)
+	var err error
+	s.server.Listener, err = net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", s.listenPort))
+	if err != nil {
+		return err
+	}
+	s.server.Start()
+	return nil
+
+	// s.server.Addr = fmt.Sprintf("127.0.0.1:%d", s.listenPort)
+	// s.server.Handler = srvmx
+	// fmt.Printf("\t[INFO] Starting server on port %d...\n", s.listenPort)
+	// return s.server.ListenAndServe()
 }
 
 func (s *jsonHttpServer) Shutdown() error {
-	return s.server.Shutdown(context.Background())
+	s.server.Close()
+	return nil
+	// return s.server.Shutdown(context.Background())
 }
 
 func newJsonHttpServer(port int) *jsonHttpServer {
