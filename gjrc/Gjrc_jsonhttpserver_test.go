@@ -124,8 +124,9 @@ func (s *jsonHttpServer) ListenAndServe() error {
 	srvmx.HandleFunc("/put", s.servePUT)
 	srvmx.HandleFunc("/delay", s.serveDELAY)
 
-	s.server.Addr = fmt.Sprintf(":%d", s.listenPort)
+	s.server.Addr = fmt.Sprintf("127.0.0.1:%d", s.listenPort)
 	s.server.Handler = srvmx
+	fmt.Printf("\t[INFO] Starting server on port %d...\n", s.listenPort)
 	return s.server.ListenAndServe()
 }
 
