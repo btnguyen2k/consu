@@ -50,8 +50,16 @@ func TestGjrcResponse_Error(t *testing.T) {
 
 func TestGjrcResponse_StatusCode(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrcResponse_StatusCode"
 	client := NewGjrc(nil, 10*time.Second)
@@ -70,8 +78,16 @@ func TestGjrcResponse_StatusCode(t *testing.T) {
 
 func TestGjrcResponse_Body(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrcResponse_Body"
 	client := NewGjrc(nil, 10*time.Second)
@@ -97,8 +113,16 @@ func TestGjrcResponse_Body(t *testing.T) {
 
 func TestGjrcResponse_HttpResponse(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrcResponse_HttpResponse"
 	client := NewGjrc(nil, 10*time.Second)
@@ -149,8 +173,16 @@ var (
 
 func TestGjrc_DeleteJson(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_DeleteJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -206,8 +238,16 @@ func TestGjrc_DeleteJsonError(t *testing.T) {
 
 func TestGjrc_Get(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_Get"
 	client := NewGjrc(nil, 10*time.Second)
@@ -247,8 +287,16 @@ func TestGjrc_Get(t *testing.T) {
 
 func TestGjrc_PatchJson(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_PatchJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -304,8 +352,16 @@ func TestGjrc_PatchJsonError(t *testing.T) {
 
 func TestGjrc_PostJson(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_PostJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -361,8 +417,16 @@ func TestGjrc_PostJsonError(t *testing.T) {
 
 func TestGjrc_PostForm(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_PostForm"
 	client := NewGjrc(nil, 10*time.Second)
@@ -429,8 +493,16 @@ func TestGjrc_PostForm(t *testing.T) {
 
 func TestGjrc_PutJson(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_PutJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -488,8 +560,16 @@ func TestGjrc_PutJsonError(t *testing.T) {
 
 func TestGjrc_Timeout_Default1(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_TimeoutDefault1"
 	client := NewGjrc(nil, 5*time.Second)
@@ -508,8 +588,16 @@ func TestGjrc_Timeout_Default1(t *testing.T) {
 
 func TestGjrc_Timeout_Default2(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_Timeout_Default2"
 	client := NewGjrc(nil, 5*time.Second)
@@ -526,8 +614,16 @@ func TestGjrc_Timeout_Default2(t *testing.T) {
 
 func TestGjrc_Timeout_Custom1(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_Timeout_Custom1"
 	client := NewGjrc(nil, 10*time.Second)
@@ -546,8 +642,16 @@ func TestGjrc_Timeout_Custom1(t *testing.T) {
 
 func TestGjrc_Timeout_Custom2(t *testing.T) {
 	s := newJsonHttpServer(0)
-	go s.ListenAndServe()
-	defer s.Shutdown()
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 
 	testName := "TestGjrc_Timeout_Custom2"
 	client := NewGjrc(nil, 10*time.Second)
