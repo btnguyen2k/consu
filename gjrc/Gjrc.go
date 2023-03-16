@@ -46,12 +46,14 @@ package gjrc
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -60,16 +62,47 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.1"
+	Version = "0.2.0"
 )
 
 // NewGjrc creates a new Gjrc object.
-// It reuses the http.Client if supplied. Otherwise, a new client is created with specific timeout.
+// It reuses the http.Client if supplied (then timeout is ignored). Otherwise, a new client is created with the
+// specified timeout.
 func NewGjrc(httpClient *http.Client, timeout time.Duration) *Gjrc {
 	if httpClient == nil {
 		httpClient = &http.Client{Timeout: timeout}
 	}
 	return &Gjrc{httpClient: httpClient}
+}
+
+// RequestMeta captures the metadata to be sent along with the request.
+//
+// Available since v0.2.0
+type RequestMeta struct {
+	Header  http.Header
+	Timeout time.Duration
+}
+
+// Merge merges metadata from another instance into this one.
+func (rm RequestMeta) Merge(other RequestMeta) RequestMeta {
+	if other.Timeout > 0 {
+		rm.Timeout = other.Timeout
+	}
+	if rm.Header == nil {
+		rm.Header = http.Header{}
+	}
+	for k := range other.Header {
+		rm.Header[k] = other.Header[k]
+		// rm.Header.Set(k, other.Header.Get(k))
+	}
+	return rm
+}
+
+func mergeMetadata(starter RequestMeta, others ...RequestMeta) RequestMeta {
+	for _, m := range others {
+		starter = starter.Merge(m)
+	}
+	return starter
 }
 
 // Gjrc sends HTTP requests and wraps the HTTP response in a GjrcResponse.
@@ -88,30 +121,83 @@ func (c *Gjrc) Do(req *http.Request) *GjrcResponse {
 	return c.buildResponse(c.httpClient.Do(req))
 }
 
+/*----------------------------------------------------------------------*/
+
 // Post sends a POST request and returns a GjrcResponse capturing the HTTP response.
-func (c *Gjrc) Post(url, contentType string, body io.Reader) *GjrcResponse {
-	return c.buildResponse(c.httpClient.Post(url, contentType, body))
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) Post(url, contentType string, body io.Reader, metadata ...RequestMeta) *GjrcResponse {
+	h := http.Header{}
+	h.Set("Content-Type", contentType)
+	meta := mergeMetadata(RequestMeta{Header: h}, metadata...)
+
+	ctx := context.Background()
+	if meta.Timeout > 0 {
+		ctx, _ = context.WithTimeout(ctx, meta.Timeout)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
+	if err != nil {
+		return c.buildResponse(nil, err)
+	}
+
+	for k := range meta.Header {
+		req.Header.Set(k, meta.Header.Get(k))
+	}
+
+	return c.Do(req)
 }
 
-// PostForm sends a POST request with content type "application/x-www-form-urlencoded" and
-// returns a GjrcResponse capturing the HTTP response.
-func (c *Gjrc) PostForm(url string, data url.Values) *GjrcResponse {
-	return c.buildResponse(c.httpClient.PostForm(url, data))
+// PostForm sends a POST request with content type "application/x-www-form-urlencoded" and returns a GjrcResponse
+// capturing the HTTP response.
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) PostForm(url string, data url.Values, metadata ...RequestMeta) *GjrcResponse {
+	return c.Post(url, "application/x-www-form-urlencoded", strings.NewReader(data.Encode()), metadata...)
 }
 
 // Get sends a GET request and returns a GjrcResponse capturing the HTTP response.
-func (c *Gjrc) Get(url string) *GjrcResponse {
-	return c.buildResponse(c.httpClient.Get(url))
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) Get(url string, metadata ...RequestMeta) *GjrcResponse {
+	meta := mergeMetadata(RequestMeta{}, metadata...)
+
+	ctx := context.Background()
+	if meta.Timeout > 0 {
+		ctx, _ = context.WithTimeout(ctx, meta.Timeout)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return c.buildResponse(nil, err)
+	}
+
+	for k := range meta.Header {
+		req.Header.Set(k, meta.Header.Get(k))
+	}
+
+	return c.Do(req)
 }
 
-func (c *Gjrc) buildJsonRequest(method, url string, bodyObj interface{}) (*http.Request, error) {
+/*----------------------------------------------------------------------*/
+
+func (c *Gjrc) buildJsonRequest(method, url string, bodyObj interface{}, metadata ...RequestMeta) (*http.Request, error) {
+	h := http.Header{}
+	h.Set("Content-Type", "application/json")
+	meta := mergeMetadata(RequestMeta{Header: h}, metadata...)
+
 	buf := make([]byte, 0)
 	if bodyObj != nil {
 		buf, _ = json.Marshal(bodyObj)
 	}
-	req, err := http.NewRequest(method, url, bytes.NewReader(buf))
-	if req != nil {
-		req.Header.Set("Content-Type", "application/json")
+	ctx := context.Background()
+	if meta.Timeout > 0 {
+		ctx, _ = context.WithTimeout(ctx, meta.Timeout)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewReader(buf))
+	if err != nil {
+		return nil, err
+	}
+	for k := range meta.Header {
+		req.Header.Set(k, meta.Header.Get(k))
 	}
 	return req, err
 }
@@ -120,8 +206,10 @@ func (c *Gjrc) buildJsonRequest(method, url string, bodyObj interface{}) (*http.
 // returns a GjrcResponse capturing the HTTP response.
 //
 // Note: bodyObj is marshalled to JSON string and sent along the request.
-func (c *Gjrc) DeleteJson(url string, bodyObj interface{}) *GjrcResponse {
-	req, err := c.buildJsonRequest("DELETE", url, bodyObj)
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) DeleteJson(url string, bodyObj interface{}, metadata ...RequestMeta) *GjrcResponse {
+	req, err := c.buildJsonRequest(http.MethodDelete, url, bodyObj, metadata...)
 	if err != nil {
 		return c.buildResponse(nil, err)
 	}
@@ -132,8 +220,10 @@ func (c *Gjrc) DeleteJson(url string, bodyObj interface{}) *GjrcResponse {
 // returns a GjrcResponse capturing the HTTP response.
 //
 // Note: bodyObj is marshalled to JSON string and sent along the request.
-func (c *Gjrc) PatchJson(url string, bodyObj interface{}) *GjrcResponse {
-	req, err := c.buildJsonRequest("PATCH", url, bodyObj)
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) PatchJson(url string, bodyObj interface{}, metadata ...RequestMeta) *GjrcResponse {
+	req, err := c.buildJsonRequest(http.MethodPatch, url, bodyObj, metadata...)
 	if err != nil {
 		return c.buildResponse(nil, err)
 	}
@@ -144,8 +234,10 @@ func (c *Gjrc) PatchJson(url string, bodyObj interface{}) *GjrcResponse {
 // returns a GjrcResponse capturing the HTTP response.
 //
 // Note: bodyObj is marshalled to JSON string and sent along the request.
-func (c *Gjrc) PostJson(url string, bodyObj interface{}) *GjrcResponse {
-	req, err := c.buildJsonRequest("POST", url, bodyObj)
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) PostJson(url string, bodyObj interface{}, metadata ...RequestMeta) *GjrcResponse {
+	req, err := c.buildJsonRequest(http.MethodPost, url, bodyObj, metadata...)
 	if err != nil {
 		return c.buildResponse(nil, err)
 	}
@@ -156,8 +248,10 @@ func (c *Gjrc) PostJson(url string, bodyObj interface{}) *GjrcResponse {
 // returns a GjrcResponse capturing the HTTP response.
 //
 // Note: bodyObj is marshalled to JSON string and sent along the request.
-func (c *Gjrc) PutJson(url string, bodyObj interface{}) *GjrcResponse {
-	req, err := c.buildJsonRequest("PUT", url, bodyObj)
+//
+// metadata is added since v0.2.0
+func (c *Gjrc) PutJson(url string, bodyObj interface{}, metadata ...RequestMeta) *GjrcResponse {
+	req, err := c.buildJsonRequest(http.MethodPut, url, bodyObj, metadata...)
 	if err != nil {
 		return c.buildResponse(nil, err)
 	}
