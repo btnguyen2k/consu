@@ -10,6 +10,7 @@ Collection of helpful utilities in Golang to make your life easier.
 ## Sub-packages
 
 - [checksum](checksum/): utility functions to calculate checksum.
+- [g18](g18/): utility functions for Go v1.18 and latter.
 - [gjrc](gjrc/): generic utilities to work with JSON-based RESTful API.
 - [olaf](olaf/): utility functions to generate unique ID using Twitter Snowflake algorithm.
 - [reddo](reddo/): utility functions to convert values using Golang's reflect.

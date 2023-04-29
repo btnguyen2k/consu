@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/gjrc)](https://pkg.go.dev/github.com/btnguyen2k/consu/gjrc)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/gjrc/badge.svg)](https://github.com/btnguyen2k/consu/actions)
-[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/gjrc/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/branch/gjrc)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/gjrc/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/tree/gjrc/gjrc)
 
 Package `gjrc` offers generic utilities to work with JSON-based RESTful API.
 
