@@ -1,0 +1,21 @@
+name: g18
+
+on:
+  push:
+    branches: [ g18 ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  testChecksum:
+    name: TestG18
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go env
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.18
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+    - name: Run test
+      run: cd ./g18 && go test -cover -v . && cd ..
