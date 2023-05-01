@@ -5,7 +5,7 @@ import "sort"
 
 const (
 	// Version defines version number of this package
-	Version = "0.0.1"
+	Version = "0.0.2"
 )
 
 // Sortable is an interface that is implemented by all sortable types (string and numbers).
@@ -41,4 +41,11 @@ func FindInSlice[K comparable](needle K, haystack []K) int {
 		}
 	}
 	return -1
+}
+
+// PointerTo returns a "pointer" version of the input.
+//
+// @available since v0.0.2
+func PointerOf[K any](input K) *K {
+	return &input
 }
