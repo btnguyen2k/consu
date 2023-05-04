@@ -74,7 +74,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.7"
+	Version = "0.1.8"
 )
 
 var (
@@ -548,11 +548,11 @@ func ToStruct(v interface{}, t reflect.Type) (interface{}, error) {
 }
 
 /*
-ToSlice converts a value (v) to slice of type specified by (t) (t can be a slice or array, or an element of slice/array).
-The output is guaranteed to have the same type as (t).
+ToSlice converts a value (v) to slice of type specified by (typ) (typ can be a slice or array, or an element of slice/array).
+The output is guaranteed to have the same type as (typ).
 
   - If v is nil: return nil regardless ZeroMode.
-  - If v is an array or slice: convert each element of v to the correct type (specified by t), put them into a slice, and finally return it.
+  - If v is an array or slice: convert each element of v to the correct type (specified by typ), put them into a slice, and finally return it.
   - Otherwise, return error
 
 Notes:
@@ -568,24 +568,24 @@ Examples:
 	ToSlice([]bool{true,false}, TypeString)                  return []string{"true","false"}, nil
 	ToSlice(_, nil)                                          return _,                        error
 */
-func ToSlice(v interface{}, t reflect.Type) (interface{}, error) {
+func ToSlice(v interface{}, typ reflect.Type) (interface{}, error) {
 	if v == nil {
 		return nil, nil
 	}
-	if t == nil {
+	if typ == nil {
 		return nil, errors.New("cannot detect type of target as it is [nil]")
 	}
-	if t.Kind() != reflect.Array && t.Kind() != reflect.Slice {
-		return ToSlice(v, reflect.SliceOf(t))
+	if typ.Kind() != reflect.Array && typ.Kind() != reflect.Slice {
+		return ToSlice(v, reflect.SliceOf(typ))
 	}
 	vV := reflect.ValueOf(v)
-	if t.Elem().Kind() == reflect.Uint8 && vV.Kind() == reflect.String {
+	if typ.Elem().Kind() == reflect.Uint8 && vV.Kind() == reflect.String {
 		// since v0.1.4.1: (special case) converting string to []byte
 		return []byte(v.(string)), nil
 	}
 	switch vV.Kind() {
 	case reflect.Array, reflect.Slice:
-		elementType := t.Elem()                                        // type of slice element
+		elementType := typ.Elem()                                      // type of slice element
 		slice := reflect.MakeSlice(reflect.SliceOf(elementType), 0, 0) // create an empty slice
 		for i, n := 0, vV.Len(); i < n; i++ {
 			e, err := Convert(vV.Index(i).Interface(), elementType)
@@ -593,22 +593,22 @@ func ToSlice(v interface{}, t reflect.Type) (interface{}, error) {
 				return nil, err
 			}
 			if e == nil {
-				slice = reflect.Append(slice, vV.Index(i))
+				slice = reflect.Append(slice, reflect.New(elementType).Elem())
 			} else {
 				slice = reflect.Append(slice, reflect.ValueOf(e).Convert(elementType))
 			}
 		}
 		return slice.Interface(), nil
 	}
-	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + t.String() + "]")
+	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + typ.String() + "]")
 }
 
 /*
-ToMap converts a value (v) to map where types of key & value are specified by (t) (t must be a map).
-The output is guaranteed to have the same type as (t).
+ToMap converts a value (v) to map where types of key & value are specified by (typ) (typ must be a map).
+The output is guaranteed to have the same type as (typ).
 
   - If v is nil: return nil regardless ZeroMode.
-  - If v is a map: convert each element {key:value} of v to the correct type (specified by t), put them into a map, and finally return it.
+  - If v is a map: convert each element {key:value} of v to the correct type (specified by typ), put them into a map, and finally return it.
   - Otherwise, return error
 
 Notes:
@@ -621,20 +621,21 @@ Examples:
 	ToMap(map[string]bool{"a":true,"b":false}, reflect.TypeOf(map[string]int{}))    return map[string]int{"a":1,"b":0"}, nil
 	ToMap(_, nil)                                                                   return _,                            error
 */
-func ToMap(v interface{}, t reflect.Type) (interface{}, error) {
+func ToMap(v interface{}, typ reflect.Type) (interface{}, error) {
 	if v == nil {
 		return nil, nil
 	}
-	if t == nil {
+	if typ == nil {
 		return nil, errors.New("cannot detect type of target as it is [nil]")
 	}
-	if t.Kind() != reflect.Map {
-		return nil, errors.New("target type must be a map, but received [" + t.String() + "]")
+	if typ.Kind() != reflect.Map {
+		return nil, errors.New("target type must be a map, but received [" + typ.String() + "]")
 	}
+
 	vV := reflect.ValueOf(v)
 	if vV.Kind() == reflect.Map {
-		keyType := t.Key()    // type of map's key
-		valueType := t.Elem() // type of map's value
+		keyType := typ.Key()    // type of map's key
+		valueType := typ.Elem() // type of map's value
 		m := reflect.MakeMap(reflect.MapOf(keyType, valueType))
 		for _, k := range vV.MapKeys() {
 			key, err := Convert(k.Interface(), keyType)
@@ -644,11 +645,13 @@ func ToMap(v interface{}, t reflect.Type) (interface{}, error) {
 			vkey := reflect.ValueOf(key).Convert(keyType)
 
 			vvalue := vV.MapIndex(k)
-			if vvalue.Interface() != nil {
-				value, err := Convert(vvalue.Interface(), valueType)
-				if err != nil {
-					return nil, err
-				}
+			value, err := Convert(vvalue.Interface(), valueType)
+			if err != nil {
+				return nil, err
+			}
+			if value == nil {
+				vvalue = reflect.New(valueType).Elem()
+			} else {
 				vvalue = reflect.ValueOf(value).Convert(valueType)
 			}
 
@@ -656,7 +659,7 @@ func ToMap(v interface{}, t reflect.Type) (interface{}, error) {
 		}
 		return m.Interface(), nil
 	}
-	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + t.String() + "]")
+	return nil, errors.New("cannot convert [" + fmt.Sprint(v) + "] to [" + typ.String() + "]")
 }
 
 /*
