@@ -973,20 +973,26 @@ func TestToSlice(t *testing.T) {
 		name            string
 		input, expected interface{}
 		typ             reflect.Type
+		nonZeroMode     bool
 	}{
-		{"nil", nil, nil, reflect.TypeOf([0]int{})},
-		{"[]bool to []int/type=nil", []bool{true, false}, []int{1, 0}, nil},
-		{"[]bool to []float/type=[0]float64", []bool{false, true}, []float64{0.0, 1.0}, reflect.TypeOf([0]float64{})},
-		{"string to []byte/type=[0]byte", "a string", []byte("a string"), reflect.TypeOf([0]byte{})},
-		{"[5]int to []string/type=[]string", [5]int{-2, 1, 0, 1, 2}, []string{"-2", "1", "0", "1", "2"}, reflect.TypeOf([]string{})},
-		{"[]bool to []string/type=string", []bool{true, false}, []string{"true", "false"}, TypeString},
-		{"[]interface to []string/type=string", []interface{}{"str", 1, false, nil}, []string{"str", "1", "false", ""}, TypeString},
-		{"[]interface to []int/type=[]int", []interface{}{"1", -2, true, nil}, []int{1, -2, 1, 0}, reflect.TypeOf([]int{})},
-		{"[]interface to []float/type=[]int", []interface{}{"1.2", -3.4, false, nil}, []float32{1.2, -3.4, 0.0, 0.0}, reflect.TypeOf([]float32{})},
+		{"nil", nil, nil, reflect.TypeOf([0]int{}), true},
+		{"[]bool to []int/type=nil", []bool{true, false}, []int{1, 0}, nil, true},
+		{"[]bool to []float/type=[0]float64", []bool{false, true}, []float64{0.0, 1.0}, reflect.TypeOf([0]float64{}), true},
+		{"string to []byte/type=[0]byte", "a string", []byte("a string"), reflect.TypeOf([0]byte{}), true},
+		{"[5]int to []string/type=[]string", [5]int{-2, 1, 0, 1, 2}, []string{"-2", "1", "0", "1", "2"}, reflect.TypeOf([]string{}), true},
+		{"[]bool to []string/type=string", []bool{true, false}, []string{"true", "false"}, TypeString, true},
+		{"[]interface to []string/type=string", []interface{}{"str", 1, false, nil}, []string{"str", "1", "false", ""}, TypeString, false},
+		{"[]interface to []int/type=[]int", []interface{}{"1", -2, true, nil}, []int{1, -2, 1, 0}, reflect.TypeOf([]int{}), false},
+		{"[]interface to []float/type=[]float", []interface{}{"1.2", -3.4, false, nil}, []float32{1.2, -3.4, 0.0, 0.0}, reflect.TypeOf([]float32{}), false},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			ZeroMode = true
 			testToSlice(t, tc.input, tc.expected, tc.typ)
+			if tc.nonZeroMode {
+				ZeroMode = false
+				testToSlice(t, tc.input, tc.expected, tc.typ)
+			}
 		})
 	}
 
