@@ -9,103 +9,98 @@ import (
 )
 
 func testToBool(t *testing.T, input interface{}, expected bool) {
-	name := "TestToBool"
+	testName := "TestToBool"
 	{
 		v, e := ToBool(input)
 		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
+			t.Fatalf("%s failed for input <%#v>: %e", testName, input, e)
 		} else if v != expected {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, input, expected, v)
 		}
 	}
 	if input != nil {
 		v, e := Convert(input, TypeBool)
 		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
+			t.Fatalf("%s failed for input <%#v>: %e", testName, input, e)
 		} else if v.(bool) != expected {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, input, expected, v)
+		}
+	}
+}
+
+func testToBoolError(t *testing.T, input interface{}) {
+	testName := "TestToBoolError"
+	{
+		_, e := ToBool(input)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to bool!", testName, input)
+		}
+	}
+	if input != nil {
+		_, e := Convert(input, TypeBool)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to bool!", testName, input)
 		}
 	}
 }
 
 // TestToBool tests if values are converted correctly to bool
 func TestToBool(t *testing.T) {
-	var inputList = []interface{}{false, true}
-	var expectedList = []bool{false, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)}
-	expectedList = []bool{false, true, true, false, true, true, false, true, true, false, true, true, false, true, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)}
-	expectedList = []bool{false, true, false, true, false, true, false, true, false, true, false, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)}
-	expectedList = []bool{false, true, true, true, true, false, true, true, true, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{0 + 0i, 0 - 0i, 0 + 2i, 0 - 3i, -1 + 0i, 2 + 0i, 3 - 2i, 3 + 3i, -4 + 5i, -5 + 6i}
-	expectedList = []bool{false, false, true, true, true, true, true, true, true, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
-	}
-
 	var i = 0
 	var p1 *int
 	var p2 = &i
-	inputList = []interface{}{p1, p2}
-	expectedList = []bool{false, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
+	testCases := []struct {
+		name     string
+		input    []interface{}
+		expected []bool
+	}{
+		{
+			"bool",
+			[]interface{}{false, true},
+			[]bool{false, true},
+		},
+		{
+			"int",
+			[]interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)},
+			[]bool{false, true, true, false, true, true, false, true, true, false, true, true, false, true, true},
+		},
+		{
+			"uint",
+			[]interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)},
+			[]bool{false, true, false, true, false, true, false, true, false, true, false, true},
+		},
+		{
+			"float",
+			[]interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)},
+			[]bool{false, true, true, true, true, false, true, true, true, true},
+		},
+		{
+			"complex",
+			[]interface{}{0 + 0i, 0 - 0i, 0 + 2i, 0 - 3i, -1 + 0i, 2 + 0i, 3 - 2i, 3 + 3i, -4 + 5i, -5 + 6i},
+			[]bool{false, false, true, true, true, true, true, true, true, true},
+		},
+		{
+			"string",
+			[]interface{}{"false", "true", "False", "True", "FALSE", "TRUE"},
+			[]bool{false, true, false, true, false, true},
+		},
+		{
+			"pointer",
+			[]interface{}{p1, p2},
+			[]bool{false, true},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			for i, n := 0, len(tc.input); i < n; i++ {
+				testToBool(t, tc.input[i], tc.expected[i])
+			}
+		})
 	}
 
-	inputList = []interface{}{"false", "true", "False", "True", "FALSE", "TRUE"}
-	expectedList = []bool{false, true, false, true, false, true}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToBool(t, inputList[i], expectedList[i])
-	}
-
-	{
-		input := "blabla"
-		_, e := ToBool(input)
-		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
-		}
-	}
-	{
-		input := "blabla"
-		_, e := Convert(input, TypeBool)
-		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
-		}
-	}
-
-	{
-		input := struct {
-		}{}
-		_, e := ToBool(input)
-		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
-		}
-	}
-	{
-		input := struct {
-		}{}
-		_, e := Convert(input, TypeBool)
-		if e == nil {
-			t.Fatalf("TestToBool failed: [%#v] should not be convertible to bool!", input)
-		}
-	}
+	testToBoolError(t, "blabla")
+	testToBoolError(t, struct {
+	}{})
 
 	{
 		ZeroMode = true
@@ -155,69 +150,66 @@ func testToFloat(t *testing.T, input interface{}, expected float64) {
 	}
 }
 
+func testToFloatError(t *testing.T, input interface{}) {
+	testName := "TestToFloatError"
+	{
+		_, e := ToFloat(input)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to float!", testName, input)
+		}
+	}
+	if input != nil {
+		_, e := Convert(input, TypeFloat)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to float!", testName, input)
+		}
+	}
+}
+
 // TestToFloat tests if values are converted correctly to float
 func TestToFloat(t *testing.T) {
-	var inputList = []interface{}{false, true}
-	var expectedList = []float64{0.0, 1.0}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToFloat(t, inputList[i], expectedList[i])
+	testCases := []struct {
+		name     string
+		input    []interface{}
+		expected []float64
+	}{
+		{
+			"bool",
+			[]interface{}{false, true},
+			[]float64{0.0, 1.0},
+		},
+		{
+			"int",
+			[]interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)},
+			[]float64{0.0, -1.0, 2.0, 0.0, -2.0, 3.0, 0.0, -3.0, 4.0, 0.0, -4.0, 5.0, 0.0, -5.0, 6.0},
+		},
+		{
+			"uint",
+			[]interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)},
+			[]float64{0.0, 1.0, 0.0, 2.0, 0.0, 3.0, 0.0, 4.0, 0.0, 5.0, 0.0, 6.0},
+		},
+		{
+			"float",
+			[]interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)},
+			[]float64{0.0, 0.001, -0.001, -1.2, 3.4, 0.0, 0.001, -0.001, -5.6, 7.8},
+		},
+		{
+			"string",
+			[]interface{}{"0", "0.0", "0.001", "-0.001", "-1.2", "3.4", "-1E9", "1e9", "-1e-9", "1E-9"},
+			[]float64{0.0, 0.0, 0.001, -0.001, -1.2, 3.4, -1e9, 1e9, -1e-9, 1e-9},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			for i, n := 0, len(tc.input); i < n; i++ {
+				testToFloat(t, tc.input[i], tc.expected[i])
+			}
+		})
 	}
 
-	inputList = []interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)}
-	expectedList = []float64{0.0, -1.0, 2.0, 0.0, -2.0, 3.0, 0.0, -3.0, 4.0, 0.0, -4.0, 5.0, 0.0, -5.0, 6.0}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToFloat(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)}
-	expectedList = []float64{0.0, 1.0, 0.0, 2.0, 0.0, 3.0, 0.0, 4.0, 0.0, 5.0, 0.0, 6.0}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToFloat(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)}
-	expectedList = []float64{0.0, 0.001, -0.001, -1.2, 3.4, 0.0, 0.001, -0.001, -5.6, 7.8}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToFloat(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{"0", "0.0", "0.001", "-0.001", "-1.2", "3.4", "-1E9", "1e9", "-1e-9", "1E-9"}
-	expectedList = []float64{0.0, 0.0, 0.001, -0.001, -1.2, 3.4, -1e9, 1e9, -1e-9, 1e-9}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToFloat(t, inputList[i], expectedList[i])
-	}
-
-	{
-		input := "blabla"
-		_, e := ToFloat(input)
-		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
-		}
-	}
-	{
-		input := "blabla"
-		_, e := Convert(input, TypeFloat)
-		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
-		}
-	}
-
-	{
-		input := struct {
-		}{}
-		_, e := ToFloat(input)
-		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
-		}
-	}
-	{
-		input := struct {
-		}{}
-		_, e := Convert(input, TypeFloat)
-		if e == nil {
-			t.Fatalf("TestToFloat failed: [%#v] should not be convertible to float!", input)
-		}
-	}
+	testToFloatError(t, "blabla")
+	testToFloatError(t, struct {
+	}{})
 
 	{
 		ZeroMode = true
@@ -267,84 +259,67 @@ func testToInt(t *testing.T, input interface{}, expected int64) {
 	}
 }
 
+func testToIntError(t *testing.T, input interface{}) {
+	testName := "TestToIntError"
+	{
+		_, e := ToInt(input)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to int!", testName, input)
+		}
+	}
+	if input != nil {
+		_, e := Convert(input, TypeInt)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to int!", testName, input)
+		}
+	}
+}
+
 // TestToInt tests if values are converted correctly to int
 func TestToInt(t *testing.T) {
-	var inputList = []interface{}{false, true}
-	var expectedList = []int64{0, 1}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToInt(t, inputList[i], expectedList[i])
+	testCases := []struct {
+		name     string
+		input    []interface{}
+		expected []int64
+	}{
+		{
+			"bool",
+			[]interface{}{false, true},
+			[]int64{0, 1},
+		},
+		{
+			"int",
+			[]interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)},
+			[]int64{0, -1, 2, 0, -2, 3, 0, -3, 4, 0, -4, 5, 0, -5, 6},
+		},
+		{
+			"uint",
+			[]interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)},
+			[]int64{0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6},
+		},
+		{
+			"float",
+			[]interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)},
+			[]int64{0, 0, -0, -1, 3, 0, 0, -0, -5, 7},
+		},
+		{
+			"string",
+			[]interface{}{"0", "-1", "2", "-3", "4"},
+			[]int64{0, -1, 2, -3, 4},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			for i, n := 0, len(tc.input); i < n; i++ {
+				testToInt(t, tc.input[i], tc.expected[i])
+			}
+		})
 	}
 
-	inputList = []interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)}
-	expectedList = []int64{0, -1, 2, 0, -2, 3, 0, -3, 4, 0, -4, 5, 0, -5, 6}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToInt(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)}
-	expectedList = []int64{0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToInt(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)}
-	expectedList = []int64{0, 0, -0, -1, 3, 0, 0, -0, -5, 7}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToInt(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{"0", "-1", "2", "-3", "4"}
-	expectedList = []int64{0, -1, 2, -3, 4}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToInt(t, inputList[i], expectedList[i])
-	}
-
-	{
-		input := "-1.2"
-		_, e := ToInt(input)
-		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
-		}
-	}
-	{
-		input := "3.4"
-		_, e := Convert(input, TypeInt)
-		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
-		}
-	}
-
-	{
-		input := "blabla"
-		_, e := ToInt(input)
-		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
-		}
-	}
-	{
-		input := "blabla"
-		_, e := Convert(input, TypeInt)
-		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
-		}
-	}
-
-	{
-		input := struct {
-		}{}
-		_, e := ToInt(input)
-		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
-		}
-	}
-	{
-		input := struct {
-		}{}
-		_, e := Convert(input, TypeInt)
-		if e == nil {
-			t.Fatalf("TestToInt failed: [%#v] should not be convertible to int!", input)
-		}
-	}
+	testToIntError(t, "blabla")
+	testToIntError(t, struct {
+	}{})
+	testToIntError(t, "-1.2")
 
 	{
 		ZeroMode = true
@@ -398,91 +373,68 @@ func testToUint(t *testing.T, input interface{}, expected uint64) {
 	}
 }
 
+func testToUintError(t *testing.T, input interface{}) {
+	testName := "TestToUintError"
+	{
+		_, e := ToUint(input)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to uint!", testName, input)
+		}
+	}
+	if input != nil {
+		_, e := Convert(input, TypeUint)
+		if e == nil {
+			t.Fatalf("[%s] failed: [%#v] should not be convertible to uint!", testName, input)
+		}
+	}
+}
+
 // TestToUint tests if values are converted correctly to uint
 func TestToUint(t *testing.T) {
-	var inputList = []interface{}{false, true}
-	var expectedList = []uint64{0, 1}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToUint(t, inputList[i], expectedList[i])
+	testCases := []struct {
+		name     string
+		input    []interface{}
+		expected []uint64
+	}{
+		{
+			"bool",
+			[]interface{}{false, true},
+			[]uint64{0, 1},
+		},
+		{
+			"int",
+			[]interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)},
+			[]uint64{0, MaxUint, 2, 0, MaxUint - 1, 3, 0, MaxUint - 2, 4, 0, MaxUint - 3, 5, 0, MaxUint - 4, 6},
+		},
+		{
+			"uint",
+			[]interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)},
+			[]uint64{0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6},
+		},
+		{
+			"float",
+			[]interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)},
+			[]uint64{0, 0, 0, MaxUint, 3, 0, 0, 0, MaxUint - 4, 7},
+		},
+		{
+			"string",
+			[]interface{}{"0", "1", "2", "3", "4"},
+			[]uint64{0, 1, 2, 3, 4},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			for i, n := 0, len(tc.input); i < n; i++ {
+				testToUint(t, tc.input[i], tc.expected[i])
+			}
+		})
 	}
 
-	inputList = []interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)}
-	expectedList = []uint64{0, MaxUint, 2, 0, MaxUint - 1, 3, 0, MaxUint - 2, 4, 0, MaxUint - 3, 5, 0, MaxUint - 4, 6}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToUint(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)}
-	expectedList = []uint64{0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToUint(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)}
-	expectedList = []uint64{0, 0, 0, MaxUint, 3, 0, 0, 0, MaxUint - 4, 7}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToUint(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{"0", "1", "2", "3", "4"}
-	expectedList = []uint64{0, 1, 2, 3, 4}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToUint(t, inputList[i], expectedList[i])
-	}
-
-	{
-		input := "-1"
-		_, e := ToUint(input)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
-	{
-		input := "-1.2"
-		_, e := ToUint(input)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
-	{
-		input := "3.4"
-		_, e := Convert(input, TypeUint)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
-
-	{
-		input := "blabla"
-		_, e := ToUint(input)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
-	{
-		input := "blabla"
-		_, e := Convert(input, TypeUint)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
-
-	{
-		input := struct {
-		}{}
-		_, e := ToUint(input)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
-	{
-		input := struct {
-		}{}
-		_, e := Convert(input, TypeUint)
-		if e == nil {
-			t.Fatalf("TestToUint failed: [%#v] should not be convertible to uint!", input)
-		}
-	}
+	testToUintError(t, "blabla")
+	testToUintError(t, struct {
+	}{})
+	testToUintError(t, "-2.3")
+	testToUintError(t, "-1")
 
 	{
 		ZeroMode = true
@@ -534,41 +486,48 @@ func testToString(t *testing.T, input interface{}, expected string) {
 
 // TestToString tests if values are converted correctly to string
 func TestToString(t *testing.T) {
-	var inputList = []interface{}{false, true}
-	var expectedList = []string{"false", "true"}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToString(t, inputList[i], expectedList[i])
+	testCases := []struct {
+		name     string
+		input    []interface{}
+		expected []string
+	}{
+		{
+			"bool",
+			[]interface{}{false, true},
+			[]string{"false", "true"},
+		},
+		{
+			"int",
+			[]interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)},
+			[]string{"0", "-1", "2", "0", "-2", "3", "0", "-3", "4", "0", "-4", "5", "0", "-5", "6"},
+		},
+		{
+			"uint",
+			[]interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)},
+			[]string{"0", "1", "0", "2", "0", "3", "0", "4", "0", "5", "0", "6"},
+		},
+		{
+			"float",
+			[]interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)},
+			[]string{"0", "0.001", "-0.001", "-1.2", "3.4", "0", "0.001", "-0.001", "-5.6", "7.8"},
+		},
+		{
+			"string",
+			[]interface{}{[]byte("a string"), "0", "-1", "2", "-3", "4", "a", "b", "c", ""},
+			[]string{"a string", "0", "-1", "2", "-3", "4", "a", "b", "c", ""},
+		},
 	}
-
-	inputList = []interface{}{int(0), int(-1), int(2), int8(0), int8(-2), int8(3), int16(0), int16(-3), int16(4), int32(0), int32(-4), int32(5), int64(0), int64(-5), int64(6)}
-	expectedList = []string{"0", "-1", "2", "0", "-2", "3", "0", "-3", "4", "0", "-4", "5", "0", "-5", "6"}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToString(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{uint(0), uint(1), uint8(0), uint8(2), uint16(0), uint16(3), uint32(0), uint32(4), uint64(0), uint64(5), uintptr(0), uintptr(6)}
-	expectedList = []string{"0", "1", "0", "2", "0", "3", "0", "4", "0", "5", "0", "6"}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToString(t, inputList[i], expectedList[i])
-	}
-
-	inputList = []interface{}{float32(0.0), float32(0.001), float32(-0.001), float32(-1.2), float32(3.4), float64(0.0), float64(0.001), float64(-0.001), float64(-5.6), float64(7.8)}
-	expectedList = []string{"0", "0.001", "-0.001", "-1.2", "3.4", "0", "0.001", "-0.001", "-5.6", "7.8"}
-	for i, n := 0, len(inputList); i < n; i++ {
-		var expected string
-		v := reflect.ValueOf(inputList[i])
-		if v.Kind() == reflect.Float32 {
-			expected = strconv.FormatFloat(v.Float(), 'g', -1, 64)
-		} else {
-			expected = expectedList[i]
-		}
-		testToString(t, inputList[i], expected)
-	}
-
-	inputList = []interface{}{[]byte("a string"), "0", "-1", "2", "-3", "4", "a", "b", "c", ""}
-	expectedList = []string{"a string", "0", "-1", "2", "-3", "4", "a", "b", "c", ""}
-	for i, n := 0, len(inputList); i < n; i++ {
-		testToString(t, inputList[i], expectedList[i])
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			for i, n := 0, len(tc.input); i < n; i++ {
+				expected := tc.expected[i]
+				v := reflect.ValueOf(tc.input[i])
+				if v.Kind() == reflect.Float32 {
+					expected = strconv.FormatFloat(v.Float(), 'g', -1, 64)
+				}
+				testToString(t, tc.input[i], expected)
+			}
+		})
 	}
 
 	{
@@ -604,7 +563,7 @@ func TestToString(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
-// TestToTimeError tests if values are converted correctly to time.Time
+// TestToTimeError tests if error should be raised when invalid values are being convertedto time.Time
 func TestToTimeError(t *testing.T) {
 	{
 		input := -1
@@ -640,126 +599,40 @@ func TestToTimeError(t *testing.T) {
 	}
 }
 
-// TestToTimeStruct tests if time.Time are converted correctly to time.Time
-func TestToTimeStruct(t *testing.T) {
-	name := "TestToTimeStruct"
-
-	{
-		// convert 'time.Time' to 'time.Time'
-		now := time.Now()
-		input := now
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).UnixNano() != now.UnixNano() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
+func TestToTime(t *testing.T) {
+	testName := "TestToTime"
+	now := time.Now()
+	testCases := []struct {
+		name       string
+		input      interface{}
+		expected   time.Time
+		resolution string
+	}{
+		{"struct", now, now, "nano"},
+		{"int(seconds)", now.Unix(), now, "second"},
+		{"int(milliseconds)", now.UnixMilli(), now, "milli"},
+		{"int(microseconds)", now.UnixMicro(), now, "micro"},
+		{"int(nanoseconds)", now.UnixNano(), now, "nano"},
+		{"string(seconds)", strconv.FormatInt(now.Unix(), 10), now, "second"},
+		{"string(milliseconds)", strconv.FormatInt(now.UnixMilli(), 10), now, "milli"},
+		{"string(microseconds)", strconv.FormatInt(now.UnixMicro(), 10), now, "micro"},
+		{"string(nanoseconds)", strconv.FormatInt(now.UnixNano(), 10), now, "nano"},
 	}
-}
-
-// TestToTimeInteger tests if integers are converted correctly to time.Time
-func TestToTimeInteger(t *testing.T) {
-	name := "TestToTimeInteger"
-
-	{
-		// convert 'long(seconds)' to 'time.Time'
-		now := time.Now()
-		input := now.Unix()
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(milliseconds)' to 'time.Time'
-		now := time.Now()
-		input := now.UnixNano() / 1000000
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(microseconds)' to 'time.Time'
-		now := time.Now()
-		input := now.UnixNano() / 1000
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(nanoseconds)' to 'time.Time'
-		now := time.Now()
-		input := now.UnixNano()
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-}
-
-// TestToTimeString tests if strings are converted correctly to time.Time
-func TestToTimeString(t *testing.T) {
-	name := "TestToTimeString"
-
-	{
-		// convert 'long(seconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.Unix(), 10)
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(milliseconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.UnixNano()/1000000, 10)
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(microseconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.UnixNano()/1000, 10)
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(nanoseconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.UnixNano(), 10)
-		v, e := ToStruct(input, TypeTime)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.(time.Time).Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			v, e := ToStruct(tc.input, TypeTime)
+			if e != nil {
+				t.Fatalf("%s failed for input <%#v>: %e", testName, tc.input, e)
+			} else if tc.resolution == "second" && v.(time.Time).Unix() != tc.expected.Unix() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			} else if tc.resolution == "milli" && v.(time.Time).UnixMilli() != tc.expected.UnixMilli() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			} else if tc.resolution == "micro" && v.(time.Time).UnixMicro() != tc.expected.UnixMicro() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			} else if tc.resolution == "nano" && v.(time.Time).UnixNano() != tc.expected.UnixNano() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			}
+		})
 	}
 }
 
@@ -801,113 +674,57 @@ func TestToTimeNil(t *testing.T) {
 
 // TestToTimeWithLayout tests if strings are converted correctly to time.Time using layout
 func TestToTimeWithLayout(t *testing.T) {
-	name := "TestToTimeWithLayout"
+	testName := "TestToTimeWithLayout"
+	now := time.Now()
+	loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
+	testCases := []struct {
+		name, layout string
+		input        interface{}
+		expected     time.Time
+		resolution   string
+	}{
+		{"struct", "", now, now, "nano"},
+		{"int(seconds)", "", now.Unix(), now, "second"},
+		{"int(milliseconds)", "", now.UnixMilli(), now, "milli"},
+		{"int(microseconds)", "", now.UnixMicro(), now, "micro"},
+		{"int(nanoseconds)", "", now.UnixNano(), now, "nano"},
+		{"string(seconds)", "", strconv.FormatInt(now.Unix(), 10), now, "second"},
+		{"string(milliseconds)", "", strconv.FormatInt(now.UnixMilli(), 10), now, "milli"},
+		{"string(microseconds)", "", strconv.FormatInt(now.UnixMicro(), 10), now, "micro"},
+		{"string(nanoseconds)", "", strconv.FormatInt(now.UnixNano(), 10), now, "nano"},
+		{"UTC", "2006-01-02T15:04:05", "2019-04-29T20:59:10", time.Date(2019, 04, 29, 20, 59, 10, 0, time.UTC), "nano"},
+		{"Asia/Ho_Chi_Minh", "2006-01-02 15:04:05.999999 -0700 -07", "2019-04-29 20:59:10.165067 +0700 +07", time.Date(2019, 04, 29, 20, 59, 10, 0, loc), "second"},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			v, e := ToTimeWithLayout(tc.input, tc.layout)
+			if e != nil {
+				t.Fatalf("%s failed for input <%#v>: %e", testName, tc.input, e)
+			} else if tc.resolution == "second" && v.Unix() != tc.expected.Unix() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			} else if tc.resolution == "milli" && v.UnixMilli() != tc.expected.UnixMilli() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			} else if tc.resolution == "micro" && v.UnixMicro() != tc.expected.UnixMicro() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			} else if tc.resolution == "nano" && v.UnixNano() != tc.expected.UnixNano() {
+				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
+			}
+		})
+	}
 
 	{
 		ZeroMode = true
 		v, e := ToTimeWithLayout(nil, "")
 		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", testName, e)
 		} else if v.Unix() != zeroTime.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, zeroTime, v)
+			t.Fatalf("%s failed: expected [%#v] but received [%#v]", testName, zeroTime, v)
 		}
 
 		ZeroMode = false
 		_, e = ToTimeWithLayout(nil, "")
 		if e == nil {
-			t.Fatalf("%s failed: [nil] should not be convertible to time.Time when ZeroMode=false!", name)
-		}
-	}
-
-	{
-		// convert 'long(seconds)' to 'time.Time'
-		now := time.Now()
-		input := now.Unix()
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-	{
-		// convert 'long(seconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.Unix(), 10)
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(milliseconds)' to 'time.Time'
-		now := time.Now()
-		input := now.UnixNano() / 1000000
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-	{
-		// convert 'long(milliseconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.UnixNano()/1000000, 10)
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(microseconds)' to 'time.Time'
-		now := time.Now()
-		input := now.UnixNano() / 1000
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-	{
-		// convert 'long(microseconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.UnixNano()/1000, 10)
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-
-	{
-		// convert 'long(nanoseconds)' to 'time.Time'
-		now := time.Now()
-		input := now.UnixNano()
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
-		}
-	}
-	{
-		// convert 'long(nanoseconds)' to 'time.Time'
-		now := time.Now()
-		input := strconv.FormatInt(now.UnixNano(), 10)
-		v, e := ToTimeWithLayout(input, "")
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != now.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, now, v)
+			t.Fatalf("%s failed: [nil] should not be convertible to time.Time when ZeroMode=false!", testName)
 		}
 	}
 
@@ -917,7 +734,7 @@ func TestToTimeWithLayout(t *testing.T) {
 		layout := "Jan"
 		_, e := ToTimeWithLayout(input, layout)
 		if e == nil {
-			t.Fatalf("%s failed: %e", name, e)
+			t.Fatalf("%s failed: %e", testName, e)
 		}
 	}
 	{
@@ -926,30 +743,7 @@ func TestToTimeWithLayout(t *testing.T) {
 		layout := "month"
 		_, e := ToTimeWithLayout(input, layout)
 		if e == nil {
-			t.Fatalf("%s failed: %e", name, e)
-		}
-	}
-	{
-		input := "2019-04-29T20:59:10"
-		layout := "2006-01-02T15:04:05"
-		expected := time.Date(2019, 04, 29, 20, 59, 10, 0, time.UTC)
-		v, e := ToTimeWithLayout(input, layout)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != expected.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		}
-	}
-	{
-		loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
-		input := "2019-04-29 20:59:10.165067 +0700 +07"
-		layout := "2006-01-02 15:04:05.999999 -0700 -07"
-		expected := time.Date(2019, 04, 29, 20, 59, 10, 0, loc)
-		v, e := ToTimeWithLayout(input, layout)
-		if e != nil {
-			t.Fatalf("%s failed: %e", name, e)
-		} else if v.Unix() != expected.Unix() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed: %e", testName, e)
 		}
 	}
 }
@@ -1129,30 +923,27 @@ func testToSlice(t *testing.T, input interface{}, expected interface{}, typ refl
 	v, e := ToSlice(input, typ)
 	if input == nil {
 		if v != nil || e != nil {
-			t.Fatalf("%s failed: %v - %e", name, v, e)
+			t.Fatalf("%s failed for input <nil>: %v - %e", name, v, e)
 		}
 		return
 	}
 	if typ == nil {
 		if v != nil || e == nil {
-			t.Fatalf("%s failed: %v - %e", name, v, e)
+			t.Fatalf("%s failed for type <nil>: %v - %e", name, v, e)
 		}
 		return
 	}
 
 	if e != nil {
-		t.Fatalf("%s failed: %e", name, e)
+		t.Fatalf("%s failed for input <%#v>: %e", name, input, e)
 	} else {
 		from := reflect.ValueOf(v)
 		to := reflect.ValueOf(expected)
 		if from.Len() != to.Len() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", name, input, expected, v)
 		}
-		for i, n := 0, from.Len(); i < n; i++ {
-			if from.Index(i).Interface() != to.Index(i).Interface() {
-				t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-				break
-			}
+		if !reflect.DeepEqual(from.Interface(), to.Interface()) {
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", name, input, expected, v)
 		}
 	}
 
@@ -1162,34 +953,47 @@ func testToSlice(t *testing.T, input interface{}, expected interface{}, typ refl
 		v, e = Convert(input, reflect.SliceOf(typ))
 	}
 	if e != nil {
-		t.Fatalf("%s failed: %e", name, e)
+		t.Fatalf("%s failed for input <%#v>: %e", name, input, e)
 	} else {
 		from := reflect.ValueOf(v)
 		to := reflect.ValueOf(expected)
 		if from.Len() != to.Len() {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", name, input, expected, v)
 		}
-		for i, n := 0, from.Len(); i < n; i++ {
-			if from.Index(i).Interface() != to.Index(i).Interface() {
-				t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-				break
-			}
+		if !reflect.DeepEqual(from.Interface(), to.Interface()) {
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", name, input, expected, v)
 		}
 	}
 }
 
 // TestToSlice tests if values are converted correctly to slice
 func TestToSlice(t *testing.T) {
-	name := "TestToSlice"
-
-	{
-		testToSlice(t, nil, nil, reflect.TypeOf([0]int{}))
-		testToSlice(t, []bool{true, false}, []int{1, 0}, nil)
+	testName := "TestToSlice"
+	testCases := []struct {
+		name            string
+		input, expected interface{}
+		typ             reflect.Type
+		nonZeroMode     bool
+	}{
+		{"nil", nil, nil, reflect.TypeOf([0]int{}), true},
+		{"[]bool to []int/type=nil", []bool{true, false}, []int{1, 0}, nil, true},
+		{"[]bool to []float/type=[0]float64", []bool{false, true}, []float64{0.0, 1.0}, reflect.TypeOf([0]float64{}), true},
+		{"string to []byte/type=[0]byte", "a string", []byte("a string"), reflect.TypeOf([0]byte{}), true},
+		{"[5]int to []string/type=[]string", [5]int{-2, 1, 0, 1, 2}, []string{"-2", "1", "0", "1", "2"}, reflect.TypeOf([]string{}), true},
+		{"[]bool to []string/type=string", []bool{true, false}, []string{"true", "false"}, TypeString, true},
+		{"[]interface to []string/type=string", []interface{}{"str", 1, false, nil}, []string{"str", "1", "false", ""}, TypeString, false},
+		{"[]interface to []int/type=[]int", []interface{}{"1", -2, true, nil}, []int{1, -2, 1, 0}, reflect.TypeOf([]int{}), false},
+		{"[]interface to []float/type=[]float", []interface{}{"1.2", -3.4, false, nil}, []float32{1.2, -3.4, 0.0, 0.0}, reflect.TypeOf([]float32{}), false},
 	}
-
-	{
-		input := "a string"
-		testToSlice(t, input, []byte(input), reflect.TypeOf([0]byte{}))
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ZeroMode = true
+			testToSlice(t, tc.input, tc.expected, tc.typ)
+			if tc.nonZeroMode {
+				ZeroMode = false
+				testToSlice(t, tc.input, tc.expected, tc.typ)
+			}
+		})
 	}
 
 	{
@@ -1205,7 +1009,7 @@ func TestToSlice(t *testing.T) {
 		input = []interface{}{1, "2", 3.4, false, nil}
 		_, e := ToSlice(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: input %#v should result error", name, input)
+			t.Fatalf("%s failed: input %#v should result error", testName, input)
 		}
 		// nil value can be converted to interface{}(nil)!
 		input = []interface{}{1, "2", 3.4, false, now, nil}
@@ -1213,30 +1017,17 @@ func TestToSlice(t *testing.T) {
 	}
 
 	{
-		input := []bool{true, false}
-		testToSlice(t, input, []int{1, 0}, reflect.TypeOf([0]int{}))
-	}
-	{
-		input := [5]int{-2, 1, 0, 1, 2}
-		testToSlice(t, input, []string{"-2", "1", "0", "1", "2"}, reflect.TypeOf([]string{}))
-	}
-	{
-		input := []bool{true, false}
-		testToSlice(t, input, []string{"true", "false"}, TypeString)
-	}
-
-	{
 		input := ""
 		_, e := ToSlice(input, reflect.TypeOf([0]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", testName, input)
 		}
 	}
 	{
 		input := ""
 		_, e := Convert(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", testName, input)
 		}
 	}
 
@@ -1244,15 +1035,34 @@ func TestToSlice(t *testing.T) {
 		input := []string{"a", "b", "c"}
 		_, e := ToSlice(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", testName, input)
 		}
 	}
 	{
 		input := []string{"a", "b", "c"}
 		_, e := Convert(input, reflect.TypeOf([]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to []int!", testName, input)
 		}
+	}
+}
+
+// TestToSliceNested tests ToSlice with edge/complex cases
+func TestToSliceNested(t *testing.T) {
+	testCases := []struct {
+		name            string
+		input, expected interface{}
+		typ             reflect.Type
+	}{
+		{"slice_of_slice", []interface{}{[]interface{}{1, true, "str"}, []int{1, 2, 3}, nil}, [][]string{[]string{"1", "true", "str"}, []string{"1", "2", "3"}, nil}, reflect.TypeOf([][]string{})},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ZeroMode = true
+			testToSlice(t, tc.input, tc.expected, tc.typ)
+			ZeroMode = false
+			testToSlice(t, tc.input, tc.expected, tc.typ)
+		})
 	}
 }
 
@@ -1260,89 +1070,71 @@ func TestToSlice(t *testing.T) {
 func testToMap(t *testing.T, input interface{}, expected interface{}, typ reflect.Type) {
 	name := "TestToMap"
 
-	v, e := ToMap(input, typ)
+	v, err := ToMap(input, typ)
 	if input == nil {
-		if v != nil || e != nil {
-			t.Fatalf("%s failed: %v - %e", name, v, e)
+		// if input is nil, returned value must be nil and no error
+		if v != nil || err != nil {
+			t.Fatalf("%s failed for input <nil>: %v - %err", name, v, err)
 		}
 		return
 	}
 	if typ == nil {
-		if v != nil || e == nil {
-			t.Fatalf("%s failed: %v - %e", name, v, e)
+		// if type is nil, returned value must be nil and there is error
+		if v != nil || err == nil {
+			t.Fatalf("%s failed for type <nil>: %v - %err", name, v, err)
 		}
 		return
 	}
 
-	if e != nil {
-		t.Fatalf("%s failed: %e / ZeroMode: %v / Input: %#v", name, e, ZeroMode, input)
+	if err != nil {
+		t.Fatalf("%s failed: %e / ZeroMode: %v / Input: %#v", name, err, ZeroMode, input)
 	} else {
 		if !reflect.DeepEqual(expected, v) {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", name, input, expected, v)
 		}
-		// from := reflect.ValueOf(v)
-		// to := reflect.ValueOf(expected)
-		// if from.Len() != to.Len() {
-		// 	t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		// }
-		// for _, k := range from.MapKeys() {
-		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		// 	}
-		// }
-		// for _, k := range to.MapKeys() {
-		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		// 	}
-		// }
 	}
 
-	v, e = Convert(input, typ)
-	if e != nil {
-		t.Fatalf("%s failed: %e", name, e)
+	v, err = Convert(input, typ)
+	if err != nil {
+		t.Fatalf("%s failed: %e / ZeroMode: %v / Input: %#v", name, err, ZeroMode, input)
 	} else {
 		if !reflect.DeepEqual(expected, v) {
-			t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
+			t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", name, input, expected, v)
 		}
-		// from := reflect.ValueOf(v)
-		// to := reflect.ValueOf(expected)
-		// if from.Len() != to.Len() {
-		// 	t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		// }
-		// for _, k := range from.MapKeys() {
-		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		// 	}
-		// }
-		// for _, k := range to.MapKeys() {
-		// 	if from.MapIndex(k).Interface() != to.MapIndex(k).Interface() {
-		// 		t.Fatalf("%s failed: expected [%#v] but received [%#v]", name, expected, v)
-		// 	}
-		// }
 	}
 }
 
 // TestToMap tests if values are converted correctly to map
 func TestToMap(t *testing.T) {
-	name := "TestToMap"
+	testName := "TestToMap"
 
-	{
-		typeMap := reflect.TypeOf(map[string]interface{}{})
-
-		ZeroMode = true
-		testToMap(t, nil, nil, nil)
-		testToMap(t, map[string]bool{"1": true, "0": false}, map[int]string{0: "-false-", 1: "-true-"}, nil)
-		testToMap(t, nil, nil, typeMap)
-		testToMap(t, map[int]bool{1: true, 0: false}, map[string]interface{}{"1": true, "0": false}, typeMap)
-		testToMap(t, map[int]interface{}{0: false, 1: "one", 2: 2}, map[string]interface{}{"0": false, "1": "one", "2": 2}, typeMap)
-
-		ZeroMode = false
-		testToMap(t, nil, nil, nil)
-		testToMap(t, map[string]bool{"1": true, "0": false}, map[int]string{0: "-false-", 1: "-true-"}, nil)
-		testToMap(t, nil, nil, typeMap)
-		testToMap(t, map[int]bool{1: true, 0: false}, map[string]interface{}{"1": true, "0": false}, typeMap)
-		testToMap(t, map[int]interface{}{0: false, 1: "one", 2: 2}, map[string]interface{}{"0": false, "1": "one", "2": 2}, typeMap)
+	testCases := []struct {
+		name        string
+		input       interface{}
+		expected    interface{}
+		typ         reflect.Type
+		nonZeroMode bool
+	}{
+		{"all_nil", nil, nil, nil, true},
+		{"nil_input", nil, nil, reflect.TypeOf(map[string]interface{}{}), true},
+		{"nil_type", map[string]bool{"1": true, "0": false}, nil, nil, true},
+		{"map[int]bool -> map[string]interface", map[int]bool{1: true, 0: false}, map[string]interface{}{"1": true, "0": false}, reflect.TypeOf(map[string]interface{}{}), true},
+		{"map[int]interface -> map[string]interface", map[int]interface{}{0: false, 1: "one", 2: 2}, map[string]interface{}{"0": false, "1": "one", "2": 2}, reflect.TypeOf(map[string]interface{}{}), true},
+		{"map[string]bool -> map[int]string", map[string]bool{"1": true, "0": false}, map[int]string{0: "false", 1: "true"}, reflect.TypeOf(map[int]string{}), true},
+		{"nil_value", map[string]interface{}{"k1": "value 1", "k2": 1, "k3": true, "k4": nil}, map[string]string{"k1": "value 1", "k2": "1", "k3": "true", "k4": ""}, reflect.TypeOf(map[string]string{}), false},
+		{"nil_key", map[interface{}]string{"value 1": "k1", 1.2: "k2", false: "k3", nil: "k4"}, map[string]string{"value 1": "k1", "1.2": "k2", "false": "k3", "": "k4"}, reflect.TypeOf(map[string]string{}), false},
 	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ZeroMode = true
+			testToMap(t, tc.input, tc.expected, tc.typ)
+			if tc.nonZeroMode {
+				ZeroMode = false
+				testToMap(t, tc.input, tc.expected, tc.typ)
+			}
+		})
+	}
+
 	{
 		ZeroMode = true
 		typeMap := reflect.TypeOf(map[string]interface{}{})
@@ -1362,50 +1154,70 @@ func TestToMap(t *testing.T) {
 			"list": []interface{}{1, "2", true, nil}, "listnil": nil}
 		_, err := ToMap(input, typeMap)
 		if err == nil {
-			t.Fatalf("%s failed: input %#v should result error", name, input)
+			t.Fatalf("%s failed: input %#v should result error", testName, input)
 		}
-	}
-
-	{
-		input := map[string]bool{"1": true, "0": false}
-		testToMap(t, input, map[int]string{0: "false", 1: "true"}, reflect.TypeOf(map[int]string{}))
 	}
 
 	{
 		input := map[string]bool{"one": true, "0": false}
 		_, e := ToMap(input, reflect.TypeOf(map[int]string{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to map[int]string!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map[int]string!", testName, input)
 		}
 	}
-
 	{
 		input := map[bool]string{true: "1", false: "zero"}
 		_, e := ToMap(input, reflect.TypeOf(map[bool]int{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to map[bool]int!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map[bool]int!", testName, input)
 		}
 	}
-
 	{
 		input := ""
 		_, e := ToMap(input, reflect.TypeOf(map[int]string{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to map!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map!", testName, input)
 		}
 	}
 	{
 		input := ""
 		_, e := Convert(input, reflect.TypeOf(map[int]string{}))
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to map!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to map!", testName, input)
 		}
 	}
 	{
 		input := map[string]bool{"1": true, "0": false}
 		_, e := ToMap(input, TypeString)
 		if e == nil {
-			t.Fatalf("%s failed: [%#v] should not be convertible to string!", name, input)
+			t.Fatalf("%s failed: [%#v] should not be convertible to string!", testName, input)
+		}
+	}
+}
+
+// TestToMapComplex tests ToMap with edge cases.
+func TestToMapComplex(t *testing.T) {
+	testName := "TestToMapComplex"
+	{
+		ZeroMode = true
+		typeMap := reflect.TypeOf(map[string]interface{}{})
+		now := time.Now()
+		testToMap(t,
+			map[interface{}]interface{}{0: false, "1": "one", 2: 2, "3": now, nil: "nil key",
+				"map": map[string]interface{}{"true": true, "false": "false", "nil": nil}, "mapnil": nil,
+				"list": []interface{}{1, "2", true, nil}, "listnil": nil},
+			map[string]interface{}{"0": false, "1": "one", "2": 2, "3": now, "": "nil key",
+				"map": map[string]interface{}{"true": true, "false": "false", "nil": nil}, "mapnil": nil,
+				"list": []interface{}{1, "2", true, nil}, "listnil": nil},
+			typeMap)
+
+		ZeroMode = false
+		input := map[interface{}]interface{}{0: false, "1": "one", 2: 2, "3": now, nil: "nil key",
+			"map": map[string]interface{}{"true": true, "false": "false", "nil": nil}, "mapnil": nil,
+			"list": []interface{}{1, "2", true, nil}, "listnil": nil}
+		_, err := ToMap(input, typeMap)
+		if err == nil {
+			t.Fatalf("%s failed: input %#v should result error", testName, input)
 		}
 	}
 }
