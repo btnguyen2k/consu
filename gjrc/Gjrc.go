@@ -62,7 +62,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.2.0"
+	Version = "0.2.1"
 )
 
 // NewGjrc creates a new Gjrc object.
@@ -93,7 +93,6 @@ func (rm RequestMeta) Merge(other RequestMeta) RequestMeta {
 	}
 	for k := range other.Header {
 		rm.Header[k] = other.Header[k]
-		// rm.Header.Set(k, other.Header.Get(k))
 	}
 	return rm
 }
@@ -293,14 +292,17 @@ func (r *GjrcResponse) Body() ([]byte, error) {
 		if r.rawBody == nil && r.err == nil {
 			defer r.resp.Body.Close()
 			buff, err := ioutil.ReadAll(r.resp.Body)
-			var obj interface{}
-			json.Unmarshal(buff, &obj)
-			r.rawBody = buff
-			r.objBody = obj
-			r.s = semita.NewSemita(r.objBody)
 			if err != nil && r.err == nil {
 				r.err = err
 			}
+			var obj interface{}
+			err = json.Unmarshal(buff, &obj)
+			if err != nil && r.err == nil {
+				r.err = err
+			}
+			r.rawBody = buff
+			r.objBody = obj
+			r.s = semita.NewSemita(r.objBody)
 		}
 	}
 	if r.s == nil {
@@ -321,4 +323,17 @@ func (r *GjrcResponse) ensureResponseData() {
 func (r *GjrcResponse) GetValueAsType(path string, typ reflect.Type) (interface{}, error) {
 	r.ensureResponseData()
 	return r.s.GetValueOfType(path, typ)
+}
+
+// Unmarshal parses the JSON-encoded response's body and puts the result to v.
+//
+// Note: v must be a pointer.
+//
+// Available since v0.2.1
+func (r *GjrcResponse) Unmarshal(v interface{}) error {
+	body, err := r.Body()
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(body, v)
 }

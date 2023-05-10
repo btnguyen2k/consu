@@ -665,3 +665,67 @@ func TestGjrc_Timeout_Custom2(t *testing.T) {
 	}
 	fmt.Printf("\t[DEBUG] %s\n", resp.Error())
 }
+
+/*----------------------------------------------------------------------*/
+
+func TestGjrc_Unmarshal(t *testing.T) {
+	s := newJsonHttpServer(0)
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+	defer func() {
+		if err := s.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
+
+	testName := "TestGjrc_Unmarshal"
+	client := NewGjrc(nil, 10*time.Second)
+	url := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
+	resp := client.Get(url, requestHeaders...)
+	if resp == nil {
+		t.Fatalf("%s failed: nil response", testName)
+	}
+
+	type mystruct struct {
+		Headers map[string]string `json:"headers"`
+		Method  string            `json:"method"`
+		Time    string            `json:"time"`
+		Url     string            `json:"url"`
+	}
+
+	var v1 mystruct
+	err := resp.Unmarshal(&v1)
+	if err != nil {
+		t.Fatalf("%s failed: %e", testName, err)
+	}
+	if v1.Url != url {
+		t.Fatalf("%s failed: expected %s but received %s", testName, url, v1.Url)
+	}
+	if v1.Method != "get" {
+		t.Fatalf("%s failed: expected %s but received %s", testName, "get", v1.Method)
+	}
+	if v1.Headers["Host"] != "localhost" {
+		t.Fatalf("%s failed: expected %s but received %s", testName, "localhost", v1.Headers["host"])
+	}
+
+	var v2 *mystruct
+	err = resp.Unmarshal(&v2)
+	if err != nil {
+		t.Fatalf("%s failed: %e", testName, err)
+	}
+	if v2 == nil {
+		t.Fatalf("%s failed: nil", testName)
+	}
+	if v2.Url != url {
+		t.Fatalf("%s failed: expected %s but received %s", testName, url, v2.Url)
+	}
+	if v2.Method != "get" {
+		t.Fatalf("%s failed: expected %s but received %s", testName, "get", v2.Method)
+	}
+	if v2.Headers["Host"] != "localhost" {
+		t.Fatalf("%s failed: expected %s but received %s", testName, "localhost", v2.Headers["host"])
+	}
+}
