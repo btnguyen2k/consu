@@ -14,7 +14,7 @@ import (
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.0"
+	Version = "0.1.1"
 )
 
 var (
@@ -26,7 +26,8 @@ var (
 
 // ParseSemver parses a string into a semantic version.
 func ParseSemver(input string) Semver {
-	result := Semver{preRelease: make(PreRelease, 0), build: make(BuildMeta, 0)}
+	input = strings.TrimSpace(input)
+	result := Semver{versionStr: input, preRelease: make(PreRelease, 0), build: make(BuildMeta, 0)}
 	matches := reSemver.FindAllStringSubmatch(input, -1)
 	if len(matches) == 0 {
 		result.err = ErrInvalidVersionString
@@ -59,6 +60,7 @@ type BuildMeta []string
 
 // Semver represents a semantic version number (see https://semver.org/).
 type Semver struct {
+	versionStr string
 	major      int
 	minor      int
 	patch      int
@@ -130,6 +132,13 @@ func (s Semver) Compare(other Semver) int {
 // Error returns error if any.
 func (s Semver) Error() error {
 	return s.err
+}
+
+// String returns the string representation of the semantic version.
+//
+// @Available since v0.1.1
+func (s Semver) String() string {
+	return s.versionStr
 }
 
 // Major returns the major version number.
