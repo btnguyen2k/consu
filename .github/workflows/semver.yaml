@@ -123,13 +123,15 @@ jobs:
       pull-requests: write
     steps:
     - uses: actions/github-script@v6
+      env:
+        RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}
       with:
         script: |
           github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: "Merge branch semver to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
-            body: "${{ needs.Release.outputs.RELEASE_NOTES }}",
+            body: process['env']['RELEASE_NOTES'],
             head: 'semver',
             base: 'master',
             maintainer_can_modify: true,
