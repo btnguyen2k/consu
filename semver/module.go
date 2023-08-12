@@ -6,7 +6,7 @@ Sample usage:
 	package main
 
 	import "fmt"
-	import "github.com/andriykohut/go-semver/semver"
+	import "github.com/btnguyen2k/consu/semver"
 
 	func main() {
 		v := semver.ParseSemver("1.0.0")
