@@ -71,6 +71,7 @@ jobs:
         echo "  - RELEASE_NOTES: ${RELEASE_NOTES}"
         if [ "${RESULT}" == "SUCCESS" ]; then
           echo "Syncing with branch 'master'..."
+          git config --global pull.ff only
           git pull origin master
 
           DATE=`date +%Y-%m-%d`
