@@ -63,6 +63,8 @@ jobs:
       contents: write
     outputs:
       RESULT: ${{ needs.ReleaseDryRun.outputs.RESULT }}
+      VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
+      RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
     - uses: actions/checkout@v3
     - name: Update module meta
@@ -125,7 +127,8 @@ jobs:
           github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: 'Merge branch semver to master after releasing new version',
+            title: "Merge branch semver to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
+            body: "${{ needs.Release.outputs.RELEASE_NOTES }}",
             head: 'semver',
             base: 'master',
             maintainer_can_modify: true,
