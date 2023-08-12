@@ -4,7 +4,7 @@ on:
   push:
     branches: [ 'semver', 'dev/semver', 'master' ]
   pull_request:
-    types: [ 'opened', 'closed' ]
+    types: [ 'closed' ]
     branches: [ 'semver', 'master' ]
 
 jobs:
@@ -52,6 +52,12 @@ jobs:
         tag-minor-release: false
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
+        tag-only: true
+    - name: Dummy
+      run: |
+        echo github.event.pull_request: ${{ github.event.pull_request }}
+        echo github.event.pull_request.merged: ${{ github.event.pull_request.merged }}
+        echo github.ref: ${{ github.ref }}
 
   Release:
     runs-on: ubuntu-latest
