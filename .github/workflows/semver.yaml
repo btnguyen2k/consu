@@ -46,4 +46,4 @@ jobs:
         tag-major-release: false
         tag-minor-release: false
         branches: semver,dev/semver
-        tag-prefix: 'semver/'
+        tag-prefix: 'semver/v'
