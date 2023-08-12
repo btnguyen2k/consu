@@ -52,12 +52,6 @@ jobs:
         tag-minor-release: false
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
-    - name: Dummy
-      run: |
-        VERSION='1.2.3'
-        MODULE=semver
-        sed -i -E "s/<VERSION>/v${VERSION}/" ${MODULE}/*.go
-        cat ${MODULE}/*.go
 
   Release:
     runs-on: ubuntu-latest
@@ -98,6 +92,9 @@ jobs:
           sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${VERSION}\"/" ${FILE_MODULE}
           echo ========== content of ${FILE_MODULE} ==========
           cat ${FILE_MODULE}
+
+          echo ========== update .go files ==========
+          sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.go
 
           echo ========== commit updates ==========
           git config --global user.email "<>"
