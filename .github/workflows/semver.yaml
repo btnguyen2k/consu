@@ -52,6 +52,12 @@ jobs:
         tag-minor-release: false
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
+    - name: Dummy
+      run: |
+        VERSION='1.2.3'
+        MODULE=semver
+        sed -i -E "s/<VERSION>/v${VERSION}/" ${MODULE}/*.go
+        cat ${MODULE}/*.go
 
   Release:
     runs-on: ubuntu-latest
