@@ -2,13 +2,13 @@ name: semver
 
 on:
   push:
-    branches: [ semver ]
+    branches: [ 'semver', 'dev/semver', 'master' ]
   pull_request:
-    branches: [ master ]
+    types: [ 'closed' ]
+    branches: [ 'semver' ]
 
 jobs:
-  testSemver:
-    name: TestSemver
+  TestSemver:
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go env
