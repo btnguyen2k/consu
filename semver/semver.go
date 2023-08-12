@@ -163,7 +163,7 @@ func (s Semver) Build() BuildMeta {
 
 // IncMajor increments the major version number and return new Semver instance.
 //
-// @available since <<VERSION>>
+// @available since v0.2.0
 func (s Semver) IncMajor() Semver {
 	return Semver{
 		versionStr: fmt.Sprintf("%d.%d.%d", s.major+1, 0, 0),
@@ -175,7 +175,7 @@ func (s Semver) IncMajor() Semver {
 
 // IncMinor increments the minor version number and return new Semver instance.
 //
-// @available since <<VERSION>>
+// @available since v0.2.0
 func (s Semver) IncMinor() Semver {
 	return Semver{
 		versionStr: fmt.Sprintf("%d.%d.%d", s.major, s.minor+1, 0),
@@ -187,7 +187,7 @@ func (s Semver) IncMinor() Semver {
 
 // IncPatch increments the patch version number and return new Semver instance.
 //
-// @available since <<VERSION>>
+// @available since v0.2.0
 func (s Semver) IncPatch() Semver {
 	return Semver{
 		versionStr: fmt.Sprintf("%d.%d.%d", s.major, s.minor, s.patch+1),
@@ -199,7 +199,7 @@ func (s Semver) IncPatch() Semver {
 
 // MakeRelease removes the preRelease and return new Semver instance.
 //
-// @available since <<VERSION>>
+// @available since v0.2.0
 func (s Semver) MakeRelease() Semver {
 	return Semver{
 		versionStr: fmt.Sprintf("%d.%d.%d", s.major, s.minor, s.patch),

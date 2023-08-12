@@ -52,12 +52,13 @@ jobs:
         tag-minor-release: false
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
+        tag-only: true
 
   Release:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'refs/heads/semver'
+      github.ref == 'semver'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -82,8 +83,8 @@ jobs:
           echo git pull --rebase origin master
 
           DATE=`date +%Y-%m-%d`
-          FILE_CHANGELOG='${MODULE}/CHANGELOG.md'
-          FILE_MODULE='${MODULE}/module.go'
+          FILE_CHANGELOG="${MODULE}/CHANGELOG.md"
+          FILE_MODULE="${MODULE}/module.go"
           head -1 ${FILE_CHANGELOG} > .temp.md
           echo -e "\n## ${DATE} - v${VERSION}\n\n${RELEASE_NOTES}" >> .temp.md
           tail -n +2 ${FILE_CHANGELOG} >> .temp.md
@@ -122,13 +123,15 @@ jobs:
       pull-requests: write
     steps:
     - uses: actions/github-script@v6
+      env:
+        RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}
       with:
         script: |
           github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: "Merge branch semver to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
-            body: "${{ needs.Release.outputs.RELEASE_NOTES }}",
+            body: process['env']['RELEASE_NOTES'],
             head: 'semver',
             base: 'master',
             maintainer_can_modify: true,
