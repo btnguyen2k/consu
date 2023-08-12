@@ -71,8 +71,7 @@ jobs:
         echo "  - RELEASE_NOTES: ${RELEASE_NOTES}"
         if [ "${RESULT}" == "SUCCESS" ]; then
           echo "Syncing with branch 'master'..."
-          git fetch origin master
-          git merge origin/master
+          git pull --rebase origin master
 
           DATE=`date +%Y-%m-%d`
           FILE_CHANGELOG='semver/CHANGELOG.md'
