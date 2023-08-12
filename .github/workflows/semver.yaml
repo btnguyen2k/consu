@@ -4,7 +4,7 @@ on:
   push:
     branches: [ 'semver', 'dev/semver', 'master' ]
   pull_request:
-    types: [ 'closed' ]
+    types: [ 'opened', 'closed' ]
     branches: [ 'semver', 'master' ]
 
 jobs:
@@ -53,17 +53,12 @@ jobs:
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
         tag-only: true
-    - name: Dummy
-      run: |
-        echo github.event.pull_request: ${{ github.event.pull_request }}
-        echo github.event.pull_request.merged: ${{ github.event.pull_request.merged }}
-        echo github.ref: ${{ github.ref }}
 
   Release:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'refs/heads/semver'
+      github.ref == 'semver'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
