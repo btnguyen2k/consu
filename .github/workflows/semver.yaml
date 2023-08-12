@@ -83,8 +83,8 @@ jobs:
           echo git pull --rebase origin master
 
           DATE=`date +%Y-%m-%d`
-          FILE_CHANGELOG='${MODULE}/CHANGELOG.md'
-          FILE_MODULE='${MODULE}/module.go'
+          FILE_CHANGELOG="${MODULE}/CHANGELOG.md"
+          FILE_MODULE="${MODULE}/module.go"
           head -1 ${FILE_CHANGELOG} > .temp.md
           echo -e "\n## ${DATE} - v${VERSION}\n\n${RELEASE_NOTES}" >> .temp.md
           tail -n +2 ${FILE_CHANGELOG} >> .temp.md
