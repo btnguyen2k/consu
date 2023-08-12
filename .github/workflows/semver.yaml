@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '^1.13', '^1.14', '^1.15', '^1.16', '^1.17', '^1.18', '^1.19', '^1.20', '^1.21' ]
+        go: [ '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
     name: Test with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v3
@@ -21,7 +21,11 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
     - name: Run tests
-      run: cd ./semver && go test -cover -coverprofile=../coverage_semver.txt -v . && cd ..
+      run: |
+        go version
+        cd ./semver
+        go test -cover -coverprofile=../coverage_semver.txt -v .
+        cd ..
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
