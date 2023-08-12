@@ -35,9 +35,14 @@ jobs:
   ReleaseDryRun:
     runs-on: ubuntu-latest
     needs: [ 'TestSemver' ]
+    outputs:
+      RESULT: ${{ steps.semrelease.outputs.result }}
+      VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
+      RELEASE_NOTES: ${{ steps.semrelease.outputs.releaseNotes }}
     steps:
     - uses: actions/checkout@v3
     - name: Release (dry-run)
+      id: semrelease
       uses: btnguyen2k/action-semrelease@v3
       with:
         dry-run: true
@@ -47,3 +52,22 @@ jobs:
         tag-minor-release: false
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
+
+  UpdateModuleMeta:
+    runs-on: ubuntu-latest
+    needs: [ 'ReleaseDryRun' ]
+    steps:
+    - name: Update module meta
+      run: |
+        RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
+        VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
+        RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
+        echo "Updating module meta..."
+        echo "  - RESULT: ${RESULT}"
+        echo "  - VERSION: ${VERSION}"
+        echo "  - RELEASE_NOTES: ${RELEASE_NOTES}"
+        if [ "${RESULT}" == "SUCCESS" ]; then
+          DATE=`date +%Y-%m-%d`
+        else
+          echo "SKIPPED."
+        fi
