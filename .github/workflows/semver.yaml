@@ -107,7 +107,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: 'Merge branch semver to master after releasing new version',
-            head: 'semver',
+            head: 'dev/semver',
             base: 'master',
             maintainer_can_modify: true,
           });
