@@ -169,3 +169,179 @@ func TestSemver_Compare(t *testing.T) {
 		})
 	}
 }
+
+func TestSemver_IncMajor(t *testing.T) {
+	testName := "TestSemver_IncMajor"
+	testCases := []struct {
+		input Semver
+		want  Semver
+	}{
+		{
+			Semver{versionStr: "1.2.3", major: 1, minor: 2, patch: 3, preRelease: []string{}, build: []string{}, err: nil},
+			Semver{versionStr: "2.0.0", major: 2, minor: 0, patch: 0, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "2.3.4-rc1", major: 2, minor: 3, patch: 4, preRelease: []string{"rc1"}, build: []string{}, err: nil},
+			Semver{versionStr: "3.0.0", major: 3, minor: 0, patch: 0, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "4.5.6-rc2+build1", major: 4, minor: 5, patch: 6, preRelease: []string{"rc2"}, build: []string{"build1"}, err: nil},
+			Semver{versionStr: "5.0.0", major: 5, minor: 0, patch: 0, preRelease: []string{}, build: []string{}, err: nil},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.input.versionStr, func(t *testing.T) {
+			got := tc.input.IncMajor()
+			if got.String() != tc.want.versionStr {
+				t.Fatalf(`%s("%s"): versionStr = %s, want %s`, testName, tc.input, got.String(), tc.want.versionStr)
+			}
+			if got.Major() != tc.want.major {
+				t.Fatalf(`%s("%s"): major = %d, want %d`, testName, tc.input, got.Major(), tc.want.major)
+			}
+			if got.Minor() != tc.want.minor {
+				t.Fatalf(`%s("%s"): minor = %d, want %d`, testName, tc.input, got.Minor(), tc.want.minor)
+			}
+			if got.Patch() != tc.want.patch {
+				t.Fatalf(`%s("%s"): patch = %d, want %d`, testName, tc.input, got.Patch(), tc.want.patch)
+			}
+			if !reflect.DeepEqual(got.PreRelease(), tc.want.preRelease) {
+				t.Fatalf(`%s("%s"): preRelease = %#v, want %#v`, testName, tc.input, got.PreRelease(), tc.want.preRelease)
+			}
+			if !reflect.DeepEqual(got.Build(), tc.want.build) {
+				t.Fatalf(`%s("%s"): build = %#v, want %#v`, testName, tc.input, got.Build(), tc.want.build)
+			}
+		})
+	}
+}
+
+func TestSemver_IncMinor(t *testing.T) {
+	testName := "TestSemver_IncMinor"
+	testCases := []struct {
+		input Semver
+		want  Semver
+	}{
+		{
+			Semver{versionStr: "1.2.3", major: 1, minor: 2, patch: 3, preRelease: []string{}, build: []string{}, err: nil},
+			Semver{versionStr: "1.3.0", major: 1, minor: 3, patch: 0, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "2.3.4-rc1", major: 2, minor: 3, patch: 4, preRelease: []string{"rc1"}, build: []string{}, err: nil},
+			Semver{versionStr: "2.4.0", major: 2, minor: 4, patch: 0, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "4.5.6-rc2+build1", major: 4, minor: 5, patch: 6, preRelease: []string{"rc2"}, build: []string{"build1"}, err: nil},
+			Semver{versionStr: "4.6.0", major: 4, minor: 6, patch: 0, preRelease: []string{}, build: []string{}, err: nil},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.input.versionStr, func(t *testing.T) {
+			got := tc.input.IncMinor()
+			if got.String() != tc.want.versionStr {
+				t.Fatalf(`%s("%s"): versionStr = %s, want %s`, testName, tc.input, got.String(), tc.want.versionStr)
+			}
+			if got.Major() != tc.want.major {
+				t.Fatalf(`%s("%s"): major = %d, want %d`, testName, tc.input, got.Major(), tc.want.major)
+			}
+			if got.Minor() != tc.want.minor {
+				t.Fatalf(`%s("%s"): minor = %d, want %d`, testName, tc.input, got.Minor(), tc.want.minor)
+			}
+			if got.Patch() != tc.want.patch {
+				t.Fatalf(`%s("%s"): patch = %d, want %d`, testName, tc.input, got.Patch(), tc.want.patch)
+			}
+			if !reflect.DeepEqual(got.PreRelease(), tc.want.preRelease) {
+				t.Fatalf(`%s("%s"): preRelease = %#v, want %#v`, testName, tc.input, got.PreRelease(), tc.want.preRelease)
+			}
+			if !reflect.DeepEqual(got.Build(), tc.want.build) {
+				t.Fatalf(`%s("%s"): build = %#v, want %#v`, testName, tc.input, got.Build(), tc.want.build)
+			}
+		})
+	}
+}
+
+func TestSemver_IncPatch(t *testing.T) {
+	testName := "TestSemver_IncPatch"
+	testCases := []struct {
+		input Semver
+		want  Semver
+	}{
+		{
+			Semver{versionStr: "1.2.3", major: 1, minor: 2, patch: 3, preRelease: []string{}, build: []string{}, err: nil},
+			Semver{versionStr: "1.2.4", major: 1, minor: 2, patch: 4, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "2.3.4-rc1", major: 2, minor: 3, patch: 4, preRelease: []string{"rc1"}, build: []string{}, err: nil},
+			Semver{versionStr: "2.3.5", major: 2, minor: 3, patch: 5, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "4.5.6-rc2+build1", major: 4, minor: 5, patch: 6, preRelease: []string{"rc2"}, build: []string{"build1"}, err: nil},
+			Semver{versionStr: "4.5.7", major: 4, minor: 5, patch: 7, preRelease: []string{}, build: []string{}, err: nil},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.input.versionStr, func(t *testing.T) {
+			got := tc.input.IncPatch()
+			if got.String() != tc.want.versionStr {
+				t.Fatalf(`%s("%s"): versionStr = %s, want %s`, testName, tc.input, got.String(), tc.want.versionStr)
+			}
+			if got.Major() != tc.want.major {
+				t.Fatalf(`%s("%s"): major = %d, want %d`, testName, tc.input, got.Major(), tc.want.major)
+			}
+			if got.Minor() != tc.want.minor {
+				t.Fatalf(`%s("%s"): minor = %d, want %d`, testName, tc.input, got.Minor(), tc.want.minor)
+			}
+			if got.Patch() != tc.want.patch {
+				t.Fatalf(`%s("%s"): patch = %d, want %d`, testName, tc.input, got.Patch(), tc.want.patch)
+			}
+			if !reflect.DeepEqual(got.PreRelease(), tc.want.preRelease) {
+				t.Fatalf(`%s("%s"): preRelease = %#v, want %#v`, testName, tc.input, got.PreRelease(), tc.want.preRelease)
+			}
+			if !reflect.DeepEqual(got.Build(), tc.want.build) {
+				t.Fatalf(`%s("%s"): build = %#v, want %#v`, testName, tc.input, got.Build(), tc.want.build)
+			}
+		})
+	}
+}
+
+func TestSemver_MakeRelease(t *testing.T) {
+	testName := "TestSemver_MakeRelease"
+	testCases := []struct {
+		input Semver
+		want  Semver
+	}{
+		{
+			Semver{versionStr: "1.2.3", major: 1, minor: 2, patch: 3, preRelease: []string{}, build: []string{}, err: nil},
+			Semver{versionStr: "1.2.3", major: 1, minor: 2, patch: 3, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "2.3.4-rc1", major: 2, minor: 3, patch: 4, preRelease: []string{"rc1"}, build: []string{}, err: nil},
+			Semver{versionStr: "2.3.4", major: 2, minor: 3, patch: 4, preRelease: []string{}, build: []string{}, err: nil},
+		},
+		{
+			Semver{versionStr: "4.5.6-rc2+build1", major: 4, minor: 5, patch: 6, preRelease: []string{"rc2"}, build: []string{"build1"}, err: nil},
+			Semver{versionStr: "4.5.6", major: 4, minor: 5, patch: 6, preRelease: []string{}, build: []string{}, err: nil},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.input.versionStr, func(t *testing.T) {
+			got := tc.input.MakeRelease()
+			if got.String() != tc.want.versionStr {
+				t.Fatalf(`%s("%s"): versionStr = %s, want %s`, testName, tc.input, got.String(), tc.want.versionStr)
+			}
+			if got.Major() != tc.want.major {
+				t.Fatalf(`%s("%s"): major = %d, want %d`, testName, tc.input, got.Major(), tc.want.major)
+			}
+			if got.Minor() != tc.want.minor {
+				t.Fatalf(`%s("%s"): minor = %d, want %d`, testName, tc.input, got.Minor(), tc.want.minor)
+			}
+			if got.Patch() != tc.want.patch {
+				t.Fatalf(`%s("%s"): patch = %d, want %d`, testName, tc.input, got.Patch(), tc.want.patch)
+			}
+			if !reflect.DeepEqual(got.PreRelease(), tc.want.preRelease) {
+				t.Fatalf(`%s("%s"): preRelease = %#v, want %#v`, testName, tc.input, got.PreRelease(), tc.want.preRelease)
+			}
+			if !reflect.DeepEqual(got.Build(), tc.want.build) {
+				t.Fatalf(`%s("%s"): build = %#v, want %#v`, testName, tc.input, got.Build(), tc.want.build)
+			}
+		})
+	}
+}

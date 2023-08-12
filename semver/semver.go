@@ -1,20 +1,11 @@
-/*
-Package semver provides utility functions to work with semantic versioning.
-
-Sample usage:
-*/
 package semver
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
-)
-
-const (
-	// Version defines version number of this package
-	Version = "0.1.1"
 )
 
 var (
@@ -168,4 +159,52 @@ func (s Semver) Build() BuildMeta {
 	result := make(BuildMeta, len(s.build))
 	copy(result, s.build)
 	return result
+}
+
+// IncMajor increments the major version number and return new Semver instance.
+//
+// @available since <<VERSION>>
+func (s Semver) IncMajor() Semver {
+	return Semver{
+		versionStr: fmt.Sprintf("%d.%d.%d", s.major+1, 0, 0),
+		major:      s.major + 1, minor: 0, patch: 0,
+		preRelease: make(PreRelease, 0),
+		build:      make(BuildMeta, 0),
+	}
+}
+
+// IncMinor increments the minor version number and return new Semver instance.
+//
+// @available since <<VERSION>>
+func (s Semver) IncMinor() Semver {
+	return Semver{
+		versionStr: fmt.Sprintf("%d.%d.%d", s.major, s.minor+1, 0),
+		major:      s.major, minor: s.minor + 1, patch: 0,
+		preRelease: make(PreRelease, 0),
+		build:      make(BuildMeta, 0),
+	}
+}
+
+// IncPatch increments the patch version number and return new Semver instance.
+//
+// @available since <<VERSION>>
+func (s Semver) IncPatch() Semver {
+	return Semver{
+		versionStr: fmt.Sprintf("%d.%d.%d", s.major, s.minor, s.patch+1),
+		major:      s.major, minor: s.minor, patch: s.patch + 1,
+		preRelease: make(PreRelease, 0),
+		build:      make(BuildMeta, 0),
+	}
+}
+
+// MakeRelease removes the preRelease and return new Semver instance.
+//
+// @available since <<VERSION>>
+func (s Semver) MakeRelease() Semver {
+	return Semver{
+		versionStr: fmt.Sprintf("%d.%d.%d", s.major, s.minor, s.patch),
+		major:      s.major, minor: s.minor, patch: s.patch,
+		preRelease: make(PreRelease, 0),
+		build:      make(BuildMeta, 0),
+	}
 }
