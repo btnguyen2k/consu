@@ -1,8 +1,3 @@
-/*
-Package semver provides utility functions to work with semantic versioning.
-
-Sample usage:
-*/
 package semver
 
 import (
@@ -10,11 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-)
-
-const (
-	// Version defines version number of this package
-	Version = "0.1.1"
 )
 
 var (
