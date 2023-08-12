@@ -1,5 +1,11 @@
 # consu/semver changelog
 
+## 2023-08-12 - v0.2.1
+
+### Fixed/Improvement
+
+- Fix release action
+
 ## 2023-08-12 - v0.2.0
 
 ### Added/Refactoring

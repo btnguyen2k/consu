@@ -17,5 +17,5 @@ package semver
 
 const (
 	// Version defines version number of this package
-	Version = "0.2.0"
+	Version = "0.2.1"
 )
