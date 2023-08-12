@@ -31,3 +31,18 @@ jobs:
       with:
         flags: semver
         name: semver
+  
+  ReleaseDryRun:
+    runs-on: ubuntu-latest
+    needs: [ 'TestSemver' ]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Release (dry-run)
+      uses: btnguyen2k/action-semrelease@v2
+      with:
+        dry-run: true
+        auto-mode: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        tag-major-release: false
+        tag-minor-release: false
+        branches: semver,dev/semver
