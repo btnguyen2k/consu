@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/semver)](https://pkg.go.dev/github.com/btnguyen2k/consu/semver)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/semver/badge.svg)](https://github.com/btnguyen2k/consu/actions)
-[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/semver/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/tree/semver/semver)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/semver/graph/badge.svg)](https://app.codecov.io/gh/btnguyen2k/consu/tree/semver/semver)
 
 Package `semver` provides utility functions to work with semantic versioning.
 
@@ -38,3 +38,7 @@ func main() {
 ⭐ Parse semantic versioning string, following [Semantic Versioning 2.0.0](Semantic Versioning 2.0.0) spec.
 
 ⭐ Helper method to compare two semantic versions.
+
+## License
+
+MIT - see [LICENSE](LICENSE.md).

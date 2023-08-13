@@ -21,8 +21,8 @@ jobs:
 
     - name: Test checksum
       run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v -count 1 -p 1 . && cd ..
-    - name: Test g18
-      run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
+    # - name: Test g18
+    #   run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
     - name: Test gjrc
       run: cd ./gjrc && go test -cover -coverprofile=../coverage_gjrc.txt -v -count 1 -p 1 . && cd ..
     - name: Test olaf
@@ -31,14 +31,14 @@ jobs:
       run: cd ./reddo && go test -cover -coverprofile=../coverage_reddo.txt -v -count 1 -p 1 . && cd ..
     - name: Test semita
       run: cd ./semita && go test -cover -coverprofile=../coverage_semita.txt -v -count 1 -p 1 . && cd ..
-    - name: Test semver
-      run: cd ./semver && go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 . && cd ..
+    # - name: Test semver
+    #   run: cd ./semver && go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 . && cd ..
 
-    - name: Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        flags: consu
-        name: consu
+    # - name: Codecov
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     flags: consu
+    #     name: consu
 
     # - name: Upload coverage report
     #   run: |
