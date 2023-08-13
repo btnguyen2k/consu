@@ -118,7 +118,7 @@ jobs:
   MergeToMaster:
     runs-on: ubuntu-latest
     if: |
-      "${{ needs.Release.outputs.RESULT }}" == "SUCCESS"
+      ${{ needs.Release.outputs.RESULT }} == 'SUCCESS'
     needs: [ 'Release' ]
     permissions:
       pull-requests: write
