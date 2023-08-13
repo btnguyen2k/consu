@@ -1,5 +1,5 @@
 package dummy
 
-func Dummy() {
-	// do nothing
+func Dummy() bool {
+	return true
 }
