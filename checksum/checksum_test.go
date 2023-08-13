@@ -34,6 +34,32 @@ func TestChecksum_Bool(t *testing.T) {
 	}
 }
 
+func TestChecksum_BoolVsNumber(t *testing.T) {
+	testName := "TestChecksum_BoolVsNumber"
+	v1 := true
+	v2 := int(1)
+	v3 := uint(1)
+	v4 := float32(1)
+	v5 := float64(1)
+	v6 := []byte{1}
+	v7 := byte(1)
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
+			checksum3 := fmt.Sprintf("%x", Checksum(hf, v3))
+			checksum4 := fmt.Sprintf("%x", Checksum(hf, v4))
+			checksum5 := fmt.Sprintf("%x", Checksum(hf, v5))
+			checksum6 := fmt.Sprintf("%x", Checksum(hf, v6))
+			checksum7 := fmt.Sprintf("%x", Checksum(hf, v7))
+			if checksum1 == checksum2 || checksum1 == checksum3 || checksum1 == checksum4 || checksum1 == checksum5 || checksum1 == checksum6 || checksum1 == checksum7 {
+				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v2, v3, v4, v5, v6, v7}, []interface{}{checksum1, checksum2, checksum3, checksum4, checksum5, checksum6, checksum7})
+			}
+		})
+	}
+}
+
 func TestChecksum_Int(t *testing.T) {
 	testName := "TestChecksum_Int"
 	v1 := int(103)
@@ -109,17 +135,29 @@ func TestChecksum_Float(t *testing.T) {
 				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v2, v3, v4}, []interface{}{checksum1, checksum2, checksum3, checksum4})
 			}
 
-			vi := int(103)
-			vui := uint(103)
-			checksumi := fmt.Sprintf("%x", Checksum(hf, vi))
-			checksumui := fmt.Sprintf("%x", Checksum(hf, vui))
-			if !(checksum1 != checksumi) || !(checksum1 != checksumui) {
-				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, vi, vui}, []interface{}{checksum1, checksumi, checksumui})
-			}
-
 			v := fmt.Sprintf("%x", csfList[i](v1))
 			if v != checksum1 {
 				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksum1, v)
+			}
+		})
+	}
+}
+
+func TestChecksum_FloatVsIntUint(t *testing.T) {
+	testName := "TestChecksum_FloatVsIntUint"
+	v32 := float32(103)
+	v64 := float64(103)
+	vi := int(103)
+	vui := uint(103)
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumf32 := fmt.Sprintf("%x", Checksum(hf, v32))
+			checksumf64 := fmt.Sprintf("%x", Checksum(hf, v64))
+			checksumi := fmt.Sprintf("%x", Checksum(hf, vi))
+			checksumui := fmt.Sprintf("%x", Checksum(hf, vui))
+			if checksumf32 == checksumi || checksumf32 == checksumui || checksumf64 == checksumi || checksumf64 == checksumui {
+				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v32, v64, vi, vui}, []interface{}{checksumf32, checksumf64, checksumi, checksumui})
 			}
 		})
 	}
