@@ -24,7 +24,7 @@ jobs:
       run: |
         go version
         cd ./semver
-        go test -cover -coverprofile=../coverage_semver.txt -v .
+        go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 .
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v3
