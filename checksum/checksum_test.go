@@ -62,28 +62,31 @@ func TestChecksum_BoolVsNumber(t *testing.T) {
 
 func TestChecksum_Int(t *testing.T) {
 	testName := "TestChecksum_Int"
-	v1 := int(103)
-	v2 := int32(103)
-	v3 := int64(103)
+	vArr := []interface{}{int(103), int8(103), int16(103), int32(103), int64(103)}
 	for i, name := range nameList {
 		t.Run(name, func(t *testing.T) {
 			hf := hfList[i]
-			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
-			checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
-			checksum3 := fmt.Sprintf("%x", Checksum(hf, &v3))
-			if checksum1 != checksum2 || checksum1 != checksum3 || checksum2 != checksum3 {
-				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v2, v3}, []interface{}{checksum1, checksum2, checksum3})
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] != checksumArr[k] {
+						t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, vArr, checksumArr)
+					}
+				}
 			}
 
-			v4 := int(301)
-			checksum4 := fmt.Sprintf("%x", Checksum(hf, v4))
-			if !(checksum1 != checksum4) {
-				t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v4}, []interface{}{checksum1, checksum4})
+			v0 := int(301)
+			checksum0 := fmt.Sprintf("%x", Checksum(hf, v0))
+			if !(checksumArr[0] != checksum0) {
+				t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{vArr[0], v0}, []interface{}{checksumArr[0], checksum0})
 			}
 
-			v := fmt.Sprintf("%x", csfList[i](v1))
-			if v != checksum1 {
-				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksum1, v)
+			v := fmt.Sprintf("%x", csfList[i](vArr[0]))
+			if v != checksumArr[0] {
+				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksumArr[0], v)
 			}
 		})
 	}
@@ -91,28 +94,55 @@ func TestChecksum_Int(t *testing.T) {
 
 func TestChecksum_Uint(t *testing.T) {
 	testName := "TestChecksum_Uint"
-	v1 := uint(103)
-	v2 := uint32(103)
-	v3 := uint64(103)
+	vArr := []interface{}{uint(103), uint8(103), uint16(103), uint32(103), uint64(103)}
 	for i, name := range nameList {
 		t.Run(name, func(t *testing.T) {
 			hf := hfList[i]
-			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
-			checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
-			checksum3 := fmt.Sprintf("%x", Checksum(hf, &v3))
-			if checksum1 != checksum2 || checksum1 != checksum3 || checksum2 != checksum3 {
-				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v2, v3}, []interface{}{checksum1, checksum2, checksum3})
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] != checksumArr[k] {
+						t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, vArr, checksumArr)
+					}
+				}
 			}
 
-			v4 := uint(301)
-			checksum4 := fmt.Sprintf("%x", Checksum(hf, v4))
-			if !(checksum1 != checksum4) {
-				t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v4}, []interface{}{checksum1, checksum4})
+			v0 := uint(301)
+			checksum0 := fmt.Sprintf("%x", Checksum(hf, v0))
+			if !(checksumArr[0] != checksum0) {
+				t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{vArr[0], v0}, []interface{}{checksumArr[0], checksum0})
 			}
 
-			v := fmt.Sprintf("%x", csfList[i](v1))
-			if v != checksum1 {
-				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksum1, v)
+			v := fmt.Sprintf("%x", csfList[i](vArr[0]))
+			if v != checksumArr[0] {
+				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksumArr[0], v)
+			}
+		})
+	}
+}
+
+func TestChecksum_IntVsUInt(t *testing.T) {
+	testName := "TestChecksum_IntVsUInt"
+	viArr := []interface{}{int(103), int8(103), int16(103), int32(103), int64(103)}
+	vuiArr := []interface{}{uint(103), uint8(103), uint16(103), uint32(103), uint64(103)}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumiArr := make([]string, len(viArr))
+			checksumuiArr := make([]string, len(vuiArr))
+			for j := range viArr {
+				checksumiArr[j] = fmt.Sprintf("%x", Checksum(hf, viArr[j]))
+				checksumuiArr[j] = fmt.Sprintf("%x", Checksum(hf, vuiArr[j]))
+			}
+			for j, ci := range checksumiArr {
+				for k, cui := range checksumuiArr {
+					if ci != cui {
+						t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{viArr[j], vuiArr[k]}, []interface{}{ci, cui})
+					}
+				}
 			}
 		})
 	}
@@ -244,6 +274,8 @@ func TestChecksum_Time(t *testing.T) {
 	v7 := now.Add(-3 * time.Nanosecond)
 	v0, _ := time.Parse(timeLayout, now.Format(timeLayout))
 	v0 = v0.In(loc)
+	v9, _ := time.Parse(timeLayout, now.Format(timeLayout))
+	v9 = v9.UTC()
 	for i, name := range nameList {
 		t.Run(name, func(t *testing.T) {
 			hf := hfList[i]
@@ -260,9 +292,14 @@ func TestChecksum_Time(t *testing.T) {
 				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v2, v3, v4, v5, v6, v7}, []interface{}{checksum1, checksum2, checksum3, checksum4, checksum5, checksum6, checksum7})
 			}
 
-			checksum0 := fmt.Sprintf("%x", Checksum(hf, &v0))
+			checksum0 := fmt.Sprintf("%x", Checksum(hf, v0))
 			if checksum1 != checksum0 {
 				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v0}, []interface{}{checksum1, checksum0})
+			}
+
+			checksum9 := fmt.Sprintf("%x", Checksum(hf, &v9))
+			if checksum1 != checksum9 {
+				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v9}, []interface{}{checksum1, checksum9})
 			}
 
 			v := fmt.Sprintf("%x", csfList[i](v1))
@@ -274,47 +311,75 @@ func TestChecksum_Time(t *testing.T) {
 }
 
 func TestChecksum_SliceArray(t *testing.T) {
-	name := "TestChecksum_SliceArray"
-	v1 := []int{1, 2}
-	v2 := [2]uint{1, 2}
-	v3 := []interface{}{int(1), uint(2)}
-	v4 := [2]int{2, 1}
-	v5 := []float64{1, 2}
-	for i, hf := range hfList {
-		checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
-		checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
-		checksum3 := fmt.Sprintf("%x", Checksum(hf, v3))
-		if checksum1 != checksum2 || checksum1 != checksum3 {
-			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v2, v3}, []interface{}{checksum1, checksum2, checksum3})
-		}
-
-		checksum4 := fmt.Sprintf("%x", Checksum(hf, &v4))
-		if !(checksum1 != checksum4) {
-			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v4}, []interface{}{checksum1, checksum4})
-		}
-
-		checksum5 := fmt.Sprintf("%x", Checksum(hf, &v5))
-		if !(checksum1 != checksum5) {
-			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v5}, []interface{}{checksum1, checksum5})
-		}
-
-		csf := csfList[i]
-		if checksum1 != fmt.Sprintf("%x", csf(v1)) {
-			t.Fatalf("%s failed at index %d", name, i)
-		}
+	testName := "TestChecksum_SliceArray"
+	vArr := []interface{}{
+		[]int{1, 2},
+		[3]int{1, 2, 0},
+		[]uint{2, 1},
+		[2]string{"1", "2"},
 	}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+			}
+			for j := 0; j < len(vArr)-1; j++ {
+				for k := j + 1; k < len(vArr); k++ {
+					if checksumArr[j] == checksumArr[k] {
+						t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{vArr[j], vArr[k]}, []string{checksumArr[j], checksumArr[k]})
+					}
+				}
+			}
+		})
+	}
+}
 
-	v0 := make([]interface{}, 0)
-	for _, hf := range hfList {
-		checksum := Checksum(hf, v0)
-		if checksum == nil || len(checksum) != 0 {
-			t.Fatalf("%s failed for input %#v - received %#v", name, v0, checksum)
-		}
+func TestChecksum_SliceArrayEmpty(t *testing.T) {
+	testName := "TestChecksum_SliceArrayEmpty"
+	vArr := []interface{}{[]int{}, [0]uint{}, []interface{}{}, [0]interface{}{}}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			for _, v := range vArr {
+				checksum := Checksum(hf, v)
+				if checksum == nil || len(checksum) != 0 {
+					t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, v, checksum)
+				}
+			}
+		})
+	}
+}
+
+func TestChecksum_SliceVsArray(t *testing.T) {
+	testName := "TestChecksum_SliceVsArray"
+	vArr := []interface{}{
+		[]int{1, 2},
+		[2]uint{1, 2},
+		[]interface{}{int(1), uint(2)},
+		[2]interface{}{uint(1), int(2)},
+	}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] != checksumArr[k] {
+						t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, vArr, checksumArr)
+					}
+				}
+			}
+		})
 	}
 }
 
 func TestChecksum_SliceArrayWithTime(t *testing.T) {
-	name := "TestChecksum_SliceArrayWithTime"
+	testName := "TestChecksum_SliceArrayWithTime"
 	loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
 	now := time.Now()
 	v1 := []interface{}{int(1), int32(2), int64(3), now}
@@ -322,36 +387,31 @@ func TestChecksum_SliceArrayWithTime(t *testing.T) {
 	v3 := []interface{}{int(1), uint(2), int16(3), now.In(loc)}
 	v4 := [4]interface{}{now, int64(3), int32(2), int(1)}
 	v5 := []interface{}{float32(1), float64(2), float32(3), now}
-	for i, hf := range hfList {
-		checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
-		checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
-		checksum3 := fmt.Sprintf("%x", Checksum(hf, v3))
-		if checksum1 != checksum2 || checksum1 != checksum3 {
-			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v2, v3}, []interface{}{checksum1, checksum2, checksum3})
-		}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			checksum3 := fmt.Sprintf("%x", Checksum(hf, v3))
+			if checksum1 != checksum2 || checksum1 != checksum3 || checksum2 != checksum3 {
+				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v2, v3}, []interface{}{checksum1, checksum2, checksum3})
+			}
 
-		checksum4 := fmt.Sprintf("%x", Checksum(hf, &v4))
-		if !(checksum1 != checksum4) {
-			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v4}, []interface{}{checksum1, checksum4})
-		}
+			checksum4 := fmt.Sprintf("%x", Checksum(hf, v4))
+			if !(checksum1 != checksum4) {
+				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v4}, []interface{}{checksum1, checksum4})
+			}
 
-		checksum5 := fmt.Sprintf("%x", Checksum(hf, &v5))
-		if !(checksum1 != checksum5) {
-			t.Fatalf("%s failed for input %#v - received %#v", name, []interface{}{v1, v5}, []interface{}{checksum1, checksum5})
-		}
+			checksum5 := fmt.Sprintf("%x", Checksum(hf, &v5))
+			if !(checksum1 != checksum5) {
+				t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, []interface{}{v1, v5}, []interface{}{checksum1, checksum5})
+			}
 
-		csf := csfList[i]
-		if checksum1 != fmt.Sprintf("%x", csf(v1)) {
-			t.Fatalf("%s failed at index %d", name, i)
-		}
-	}
-
-	v0 := make([]interface{}, 0)
-	for _, hf := range hfList {
-		checksum := Checksum(hf, v0)
-		if checksum == nil || len(checksum) != 0 {
-			t.Fatalf("%s failed for input %#v - received %#v", name, v0, checksum)
-		}
+			v := fmt.Sprintf("%x", csfList[i](v1))
+			if v != checksum1 {
+				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksum1, v)
+			}
+		})
 	}
 }
 
