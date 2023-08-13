@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
+        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
     name: Test with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v3
@@ -75,14 +75,11 @@ jobs:
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
         MODULE=semver
-        echo "Updating module meta..."
-        echo "  - RESULT: ${RESULT}"
-        echo "  - VERSION: ${VERSION}"
-        echo "  - RELEASE_NOTES: ${RELEASE_NOTES}"
+        echo "🕘 Updating module meta..."
+        echo "   - RESULT: ${RESULT}"
+        echo "   - VERSION: ${VERSION}"
+        echo "   - RELEASE_NOTES: ${RELEASE_NOTES}"
         if [ "${RESULT}" == "SUCCESS" ]; then
-          echo echo "Syncing with branch 'master'..."
-          echo git pull --rebase origin master
-
           DATE=`date +%Y-%m-%d`
           FILE_CHANGELOG="${MODULE}/CHANGELOG.md"
           FILE_MODULE="${MODULE}/module.go"
@@ -110,25 +107,28 @@ jobs:
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
           git push origin "${MODULE}/v${VERSION}" -f
 
-          echo "Done."
+          echo "✅ Done."
         else
-          echo "SKIPPED."
+          echo "❎ SKIPPED."
         fi
 
   MergeToMaster:
     runs-on: ubuntu-latest
-    if: |
-      ${{ needs.Release.outputs.RESULT }} == 'SUCCESS'
     needs: [ 'Release' ]
     permissions:
       pull-requests: write
     steps:
     - uses: actions/github-script@v6
       env:
+        RESULT: ${{ needs.Release.outputs.RESULT }}
         RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}
       with:
         script: |
-          github.rest.pulls.create({
+          if (process.env['RESULT'] != 'SUCCESS') {
+            console.log('❎ SKIPPED.');
+            return;
+          }
+          const {data: pr} = github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: "Merge branch semver to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
@@ -137,3 +137,4 @@ jobs:
             base: 'master',
             maintainer_can_modify: true,
           });
+          console.log('✅ Created PR: ', pr);
