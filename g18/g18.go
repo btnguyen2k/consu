@@ -1,19 +1,13 @@
-// Package g18 provides utility functions for Go v1.18 and latter.
 package g18
 
 import "sort"
-
-const (
-	// Version defines version number of this package
-	Version = "0.0.2"
-)
 
 // Sortable is an interface that is implemented by all sortable types (string and numbers).
 type Sortable interface {
 	string | int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
 }
 
-// Deduplicated removed duplicated elements from a slice.
+// Deduplicate removes duplicated elements from a slice.
 func Deduplicate[K Sortable](input []K) []K {
 	if len(input) == 0 {
 		return make([]K, 0)
@@ -43,7 +37,7 @@ func FindInSlice[K comparable](needle K, haystack []K) int {
 	return -1
 }
 
-// PointerTo returns a "pointer" version of the input.
+// PointerOf returns a "pointer" version of the input.
 //
 // @available since v0.0.2
 func PointerOf[K any](input K) *K {
