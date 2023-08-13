@@ -1,4 +1,4 @@
-// touch 1
+// touch 2
 package dummy
 
 func Dummy() bool {
