@@ -117,18 +117,21 @@ jobs:
 
   MergeToMaster:
     runs-on: ubuntu-latest
-    if: |
-      ${{ needs.Release.outputs.RESULT }} == 'SUCCESS'
     needs: [ 'Release' ]
     permissions:
       pull-requests: write
     steps:
     - uses: actions/github-script@v6
       env:
+        RESULT: ${{ needs.Release.outputs.RESULT }}
         RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}
       with:
         script: |
-          github.rest.pulls.create({
+          if (process.env['RESULT'] != 'SUCCESS') {
+            console.log('❎ SKIPPED.');
+            return;
+          }
+          const {data: pr} = github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: "Merge branch dummy to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
@@ -137,3 +140,4 @@ jobs:
             base: 'master',
             maintainer_can_modify: true,
           });
+          console.log('✅ Created PR: ', pr);
