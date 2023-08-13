@@ -53,6 +53,7 @@ jobs:
         branches: semver,dev/semver
         tag-prefix: 'semver/v'
         tag-only: true
+        path: 'semver/'
 
   Release:
     runs-on: ubuntu-latest

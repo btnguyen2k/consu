@@ -53,6 +53,7 @@ jobs:
         branches: g18,dev/g18
         tag-prefix: 'g18/v'
         tag-only: true
+        path: 'g18/'
 
   Release:
     runs-on: ubuntu-latest
