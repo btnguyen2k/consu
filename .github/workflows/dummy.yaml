@@ -1,14 +1,14 @@
-name: semver
+name: dummy
 
 on:
   push:
-    branches: [ 'semver', 'dev/semver', 'master' ]
+    branches: [ 'dummy', 'dev/dummy', 'master' ]
   pull_request:
     types: [ 'opened', 'closed' ]
-    branches: [ 'semver', 'master' ]
+    branches: [ 'dummy', 'master' ]
 
 jobs:
-  TestSemver:
+  TestDummy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,18 +23,18 @@ jobs:
     - name: Run tests
       run: |
         go version
-        cd ./semver
-        go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 .
+        cd ./dummy
+        go test -cover -coverprofile=../coverage_dummy.txt -v -count 1 -p 1 .
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
-        flags: semver
-        name: semver
+        flags: dummy
+        name: dummy
   
   ReleaseDryRun:
     runs-on: ubuntu-latest
-    needs: [ 'TestSemver' ]
+    needs: [ 'TestDummy' ]
     outputs:
       RESULT: ${{ steps.semrelease.outputs.result }}
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
@@ -50,16 +50,16 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         tag-major-release: false
         tag-minor-release: false
-        branches: semver,dev/semver
-        tag-prefix: 'semver/v'
+        branches: dummy,dev/dummy
+        tag-prefix: 'dummy/v'
         tag-only: true
-        path: 'semver/'
+        path: 'dummy/'
 
   Release:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'semver'
+      github.ref == 'dummy'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -74,7 +74,7 @@ jobs:
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
-        MODULE=semver
+        MODULE=dummy
         echo "🕘 Updating module meta..."
         echo "   - RESULT: ${RESULT}"
         echo "   - VERSION: ${VERSION}"
@@ -131,9 +131,9 @@ jobs:
           const {data: pr} = github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: "Merge branch semver to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
+            title: "Merge branch dummy to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
             body: process['env']['RELEASE_NOTES'],
-            head: 'semver',
+            head: 'dummy',
             base: 'master',
             maintainer_can_modify: true,
           });
