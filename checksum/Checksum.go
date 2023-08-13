@@ -1,34 +1,3 @@
-/*
-Package checksum provides utility functions to calculate checksum.
-
-	- A value of type integer will have the same checksum regardless it is int, int8, int16, int32, int64, uint, uint8, uint16, uint32 or uint64. E.g. checksum(int(103)) == checksum(uint64(103))
-	- A value of type float will have the same checksum regardless it is float32 or float64. E.g. checksum(float32(10.3)) == checksum(float64(10.3))
-	- Pointer to a value will have the same checksum as the value itself. E.g. checksum(myInt) == checksum(&myInt)
-	- Slice and Array: will have the same checksum. E.g. checksum([]int{1,2,3}) == checksum([3]int{1,2,3})
-	- Map and Struct: order of fields does not affect checksum, but field names do! E.g. checksum(map[string]int{"one":1,"two":2}) == checksum(map[string]int{"two":2,"one":1}), but checksum(map[string]int{"a":1,"b":2}) != checksum(map[string]int{"x":1,"y":2})
-	- Struct: be able to calculate checksum of unexported fields.
-
-Sample usage:
-
-	package main
-
-	import (
-		"fmt"
-		"github.com/btnguyen2k/consu/checksum"
-	)
-
-	func main() {
-		myValue := "any thing"
-
-		// calculate checksum using MD5 hash
-		checksum1 := Checksum(Md5HashFunc, myValue)
-		fmt.Printf("%x\n", checksum1)
-
-		// shortcut to calculate checksum using MD5 hash
-		checksum2 := Md5Checksum(myValue)
-		fmt.Printf("%x\n", checksum2)
-	}
-*/
 package checksum
 
 import (
@@ -46,14 +15,7 @@ import (
 	"unsafe"
 )
 
-const (
-	// Version defines version number of this package
-	Version = "0.1.2"
-)
-
-/*
-HashFunc defines a function that calculates hash value of a byte array.
-*/
+// HashFunc defines a function that calculates hash value of a byte array.
 type HashFunc func(input []byte) []byte
 
 func hashFunc(hf hash.Hash, input []byte) []byte {
@@ -118,13 +80,10 @@ func isExportedField(fieldName string) bool {
 /*
 Checksum calculates checksum of an input using the provided hash function.
 
-	- If v is a scalar type (bool, int*, uint*, float* or string) or pointer to scala type: checksum value is straightforward calculation.
-	- If v is a slice or array: checksum value is combination of all elements' checksums, in order. If v is empty (has 0 elements), empty []byte is returned.
-	- If v is a map: checksum value is combination of all entries' checksums, order-independent.
-	- If v is a struct:
-		- if the struct has function `Checksum()` then use it to calculate checksum value.
-		- if v is time.Time then use its nanosecond to calculate checksum value.
-		- otherwise checksum value is combination of all fields' checksums, order-independent.
+  - If v is a scalar type (bool, int*, uint*, float* or string) or pointer to scala type: checksum value is straightforward calculation.
+  - If v is a slice or array: checksum value is combination of all elements' checksums, in order. If v is empty (has 0 elements), empty []byte is returned.
+  - If v is a map: checksum value is combination of all entries' checksums, order-independent.
+  - If v is a struct: if the struct has function `Checksum()` then use it to calculate checksum value; if v is time.Time then use its nanosecond to calculate checksum value; otherwise checksum value is combination of all fields' checksums, order-independent.
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
 	var prv reflect.Value
@@ -205,37 +164,27 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 	return nil
 }
 
-/*
-Crc32Checksum is shortcut of Checksum(Crc32HashFunc, v).
-*/
+// Crc32Checksum is shortcut of Checksum(Crc32HashFunc, v).
 func Crc32Checksum(v interface{}) []byte {
 	return Checksum(Crc32HashFunc, v)
 }
 
-/*
-Md5Checksum is shortcut of Checksum(Md5HashFunc, v).
-*/
+// Md5Checksum is shortcut of Checksum(Md5HashFunc, v).
 func Md5Checksum(v interface{}) []byte {
 	return Checksum(Md5HashFunc, v)
 }
 
-/*
-Sha1Checksum is shortcut of Checksum(Sha1HashFunc, v).
-*/
+// Sha1Checksum is shortcut of Checksum(Sha1HashFunc, v).
 func Sha1Checksum(v interface{}) []byte {
 	return Checksum(Sha1HashFunc, v)
 }
 
-/*
-Sha256Checksum is shortcut of Checksum(Sha256HashFunc, v).
-*/
+// Sha256Checksum is shortcut of Checksum(Sha256HashFunc, v).
 func Sha256Checksum(v interface{}) []byte {
 	return Checksum(Sha256HashFunc, v)
 }
 
-/*
-Sha512Checksum is shortcut of Checksum(Sha512HashFunc, v).
-*/
+// Sha512Checksum is shortcut of Checksum(Sha512HashFunc, v).
 func Sha512Checksum(v interface{}) []byte {
 	return Checksum(Sha512HashFunc, v)
 }
