@@ -3,9 +3,11 @@ name: semver
 on:
   push:
     branches: [ 'semver', 'dev/semver', 'master' ]
+    paths: [ 'semver/**', '.github/workflows/semver.yaml' ]
   pull_request:
     types: [ 'opened', 'closed' ]
     branches: [ 'semver', 'master' ]
+    paths: [ 'semver/**', '.github/workflows/semver.yaml' ]
 
 jobs:
   TestSemver:

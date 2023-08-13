@@ -3,9 +3,11 @@ name: g18
 on:
   push:
     branches: [ 'g18', 'dev/g18', 'master' ]
+    paths: [ 'g18/**', '.github/workflows/g18.yaml' ]
   pull_request:
     types: [ 'opened', 'closed' ]
     branches: [ 'g18', 'master' ]
+    paths: [ 'g18/**', '.github/workflows/g18.yaml' ]
 
 jobs:
   TestG18:

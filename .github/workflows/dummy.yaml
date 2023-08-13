@@ -3,9 +3,11 @@ name: dummy
 on:
   push:
     branches: [ 'dummy', 'dev/dummy', 'master' ]
+    paths: [ 'dummy/**', '.github/workflows/dummy.yaml' ]
   pull_request:
     types: [ 'opened', 'closed' ]
     branches: [ 'dummy', 'master' ]
+    paths: [ 'dummy/**', '.github/workflows/dummy.yaml' ]
 
 jobs:
   TestDummy:
