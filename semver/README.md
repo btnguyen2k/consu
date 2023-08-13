@@ -41,4 +41,4 @@ func main() {
 
 ## License
 
-MIT - see [LICENSE](LICENSE.md).
+MIT - see [LICENSE.md](LICENSE.md).

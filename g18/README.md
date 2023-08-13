@@ -22,4 +22,4 @@ $ go get -u github.com/btnguyen2k/consu/g18
 
 ## License
 
-MIT - see [LICENSE](LICENSE.md).
+MIT - see [LICENSE.md](LICENSE.md).
