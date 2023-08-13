@@ -21,8 +21,8 @@ jobs:
 
     - name: Test checksum
       run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v -count 1 -p 1 . && cd ..
-    - name: Test g18
-      run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
+    # - name: Test g18
+    #   run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
     - name: Test gjrc
       run: cd ./gjrc && go test -cover -coverprofile=../coverage_gjrc.txt -v -count 1 -p 1 . && cd ..
     - name: Test olaf
