@@ -1,5 +1,11 @@
 # consu/dummy changelog
 
+## 2023-08-13 - v1.0.1
+
+### Fixed/Improvement
+
+- Fix: undefined PR
+
 ## 2023-08-13 - v1.0.0
 
 ### Changed
