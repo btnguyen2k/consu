@@ -128,7 +128,7 @@ jobs:
             console.log('❎ SKIPPED.');
             return;
           }
-          const {data: pr} = github.rest.pulls.create({
+          const {data: pr} = await github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: "Merge branch dummy to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
