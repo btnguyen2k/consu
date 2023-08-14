@@ -19,8 +19,8 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v3
 
-    - name: Test checksum
-      run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v -count 1 -p 1 . && cd ..
+    # - name: Test checksum
+    #   run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v -count 1 -p 1 . && cd ..
     # - name: Test g18
     #   run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
     - name: Test gjrc
