@@ -7,9 +7,11 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/binary"
+	"fmt"
 	"hash"
 	"hash/crc32"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 	"unsafe"
@@ -116,15 +118,13 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 		}
 		return buf
 	case reflect.Map:
-		buf := hf([]byte{})
+		temp := make([]string, 0)
 		for iter := rv.MapRange(); iter.Next(); {
 			// field-name is taking into account
-			temp := Checksum(hf, []interface{}{iter.Key().Interface(), iter.Value().Interface()})
-			for i, n := 0, len(buf); i < n; i++ {
-				buf[i] ^= temp[i]
-			}
+			temp = append(temp, fmt.Sprintf("%x", Checksum(hf, []interface{}{iter.Key().Interface(), iter.Value().Interface()})))
 		}
-		return buf
+		sort.Strings(temp)
+		return Checksum(hf, temp)
 	case reflect.Struct:
 		m := rv.MethodByName("Checksum")
 		if !m.IsValid() && prv.IsValid() {
