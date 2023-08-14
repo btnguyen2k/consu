@@ -1,21 +1,21 @@
-name: g18
+name: dummy
 
 on:
   push:
-    branches: [ 'g18', 'dev/g18', 'master' ]
-    paths: [ 'g18/**', '.github/workflows/g18.yaml' ]
+    branches: [ 'dummy', 'dev/dummy', 'master' ]
+    paths: [ 'dummy/**', '.github/workflows/dummy.yaml' ]
   pull_request:
     types: [ 'opened', 'closed' ]
-    branches: [ 'g18', 'master' ]
-    paths: [ 'g18/**', '.github/workflows/g18.yaml' ]
+    branches: [ 'dummy', 'master' ]
+    paths: [ 'dummy/**', '.github/workflows/dummy.yaml' ]
 
 jobs:
-  TestG18:
+  TestDummy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.18', '1.19', '1.20', '1.21', 'stable' ]
-    name: Test g18 with Go ${{ matrix.go }}
+        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
+    name: Test with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Go env
@@ -25,18 +25,18 @@ jobs:
     - name: Run tests
       run: |
         go version
-        cd ./g18
-        go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 .
+        cd ./dummy
+        go test -cover -coverprofile=../coverage_dummy.txt -v -count 1 -p 1 .
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
-        flags: g18
-        name: g18
+        flags: dummy
+        name: dummy
   
   ReleaseDryRun:
     runs-on: ubuntu-latest
-    needs: [ 'TestG18' ]
+    needs: [ 'TestDummy' ]
     outputs:
       RESULT: ${{ steps.semrelease.outputs.result }}
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
@@ -52,16 +52,16 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         tag-major-release: false
         tag-minor-release: false
-        branches: g18,dev/g18
-        tag-prefix: 'g18/v'
+        branches: dummy,dev/dummy
+        tag-prefix: 'dummy/v'
         tag-only: true
-        path: 'g18/'
+        path: 'dummy/'
 
   Release:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'g18'
+      github.ref == 'dummy'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -76,7 +76,7 @@ jobs:
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
-        MODULE=g18
+        MODULE=dummy
         echo "🕘 Updating module meta..."
         echo "   - RESULT: ${RESULT}"
         echo "   - VERSION: ${VERSION}"
@@ -133,9 +133,9 @@ jobs:
           const {data: pr} = await github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: "Merge branch g18 to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
+            title: "Merge branch dummy to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
             body: process['env']['RELEASE_NOTES'],
-            head: 'g18',
+            head: 'dummy',
             base: 'master',
             maintainer_can_modify: true,
           });
