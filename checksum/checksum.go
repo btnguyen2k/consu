@@ -77,6 +77,17 @@ func isExportedField(fieldName string) bool {
 	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
 
+func unwrap(v interface{}) (prv reflect.Value, rv reflect.Value) {
+	rv = reflect.ValueOf(v)
+	for rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface {
+		if rv.Elem().Kind() == reflect.Struct {
+			prv = rv
+		}
+		rv = rv.Elem()
+	}
+	return
+}
+
 /*
 Checksum calculates checksum of an input using the provided hash function.
 
@@ -86,14 +97,7 @@ Checksum calculates checksum of an input using the provided hash function.
   - If v is a struct: if the struct has function `Checksum()` then use it to calculate checksum value; if v is time.Time then use its nanosecond to calculate checksum value; otherwise checksum value is combination of all fields' checksums, order-independent.
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
-	var prv reflect.Value
-	rv := reflect.ValueOf(v)
-	for rv.Kind() == reflect.Ptr {
-		if rv.Elem().Kind() == reflect.Struct {
-			prv = rv
-		}
-		rv = rv.Elem()
-	}
+	prv, rv := unwrap(v)
 	switch rv.Kind() {
 	case reflect.Bool:
 		return hf(boolToBytes(rv.Bool()))
