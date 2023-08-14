@@ -118,7 +118,7 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 		}
 		return buf
 	case reflect.Map:
-		temp := make([]string, 0)
+		temp := []string{"0x10"}
 		for iter := rv.MapRange(); iter.Next(); {
 			// field-name is taking into account
 			temp = append(temp, fmt.Sprintf("%x", Checksum(hf, []interface{}{iter.Key().Interface(), iter.Value().Interface()})))
@@ -132,11 +132,11 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 		}
 		if m.IsValid() && m.Type().NumIn() == 0 {
 			result := m.Call(nil)
-			arr := make([]interface{}, 0)
+			arr := []interface{}{"0x11", rv.Type().String()}
 			for _, v := range result {
 				arr = append(arr, v.Interface())
 			}
-			if len(arr) > 0 {
+			if len(arr) > 2 {
 				return Checksum(hf, arr)
 			}
 		}
@@ -146,7 +146,7 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 			return Checksum(hf, v)
 		}
 
-		buf := hf([]byte{})
+		temp := []string{"0x11", rv.Type().String()}
 		for i, n := 0, rv.NumField(); i < n; i++ {
 			// field-name is taking into account
 			fieldName := rv.Type().Field(i).Name
@@ -158,12 +158,29 @@ func Checksum(hf HashFunc, v interface{}) []byte {
 				fieldValue = rv2.Field(i)
 				fieldValue = reflect.NewAt(fieldValue.Type(), unsafe.Pointer(fieldValue.UnsafeAddr())).Elem()
 			}
-			temp := Checksum(hf, []interface{}{fieldName, fieldValue.Interface()})
-			for i, n := 0, len(buf); i < n; i++ {
-				buf[i] ^= temp[i]
-			}
+			temp = append(temp, fmt.Sprintf("%x", Checksum(hf, []interface{}{fieldName, fieldValue.Interface()})))
 		}
-		return buf
+		sort.Strings(temp)
+		return Checksum(hf, temp)
+
+		// buf := hf([]byte{})
+		// for i, n := 0, rv.NumField(); i < n; i++ {
+		// 	// field-name is taking into account
+		// 	fieldName := rv.Type().Field(i).Name
+		// 	fieldValue := rv.Field(i)
+		// 	if !isExportedField(fieldName) {
+		// 		// handle unexported field
+		// 		rv2 := reflect.New(rv.Type()).Elem()
+		// 		rv2.Set(rv)
+		// 		fieldValue = rv2.Field(i)
+		// 		fieldValue = reflect.NewAt(fieldValue.Type(), unsafe.Pointer(fieldValue.UnsafeAddr())).Elem()
+		// 	}
+		// 	temp := Checksum(hf, []interface{}{fieldName, fieldValue.Interface()})
+		// 	for i, n := 0, len(buf); i < n; i++ {
+		// 		buf[i] ^= temp[i]
+		// 	}
+		// }
+		// return buf
 	}
 	return nil
 }
