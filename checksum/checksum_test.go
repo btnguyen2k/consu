@@ -123,7 +123,7 @@ func TestChecksum_Uint(t *testing.T) {
 
 			v0 := uint(301)
 			checksum0 := fmt.Sprintf("%x", Checksum(hf, v0))
-			if checksumArr[0] != checksum0 {
+			if checksumArr[0] == checksum0 {
 				t.Fatalf("%s failed: Checksum(%#v)=%s must be NOT the same as Checksum(%#v)=%s", testName+"/"+name, vArr[0], checksumArr[0], v0, checksum0)
 			}
 
@@ -186,9 +186,9 @@ func TestChecksum_Float(t *testing.T) {
 				}
 			}
 
-			v0 := uint(301)
+			v0 := float64(301)
 			checksum0 := fmt.Sprintf("%x", Checksum(hf, v0))
-			if checksumArr[0] != checksum0 {
+			if checksumArr[0] == checksum0 {
 				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, vArr[0], checksumArr[0], v0, checksum0)
 			}
 
@@ -655,7 +655,7 @@ func TestChecksum_StructPubPrivPointer(t *testing.T) {
 	}
 }
 
-type MyStruct struct {
+type MyStructCustom1 struct {
 	S string
 	N uint
 	F float64
@@ -664,7 +664,25 @@ type MyStruct struct {
 	f float32
 }
 
-func (s MyStruct) Checksum() interface{} {
+func (s MyStructCustom1) Checksum() interface{} {
+	h := md5.New()
+	h.Write([]byte(s.S))
+	h.Write(uintToBytes(uint64(s.N)))
+	h.Write(floatToBytes(s.F))
+	result := h.Sum(nil)
+	return result
+}
+
+type MyStructCustom2 struct {
+	S string
+	N uint
+	F float64
+	s string
+	n int
+	f float32
+}
+
+func (s MyStructCustom2) Checksum() interface{} {
 	h := md5.New()
 	h.Write([]byte(s.S))
 	h.Write(uintToBytes(uint64(s.N)))
@@ -676,25 +694,55 @@ func (s MyStruct) Checksum() interface{} {
 func TestChecksum_StructChecksum(t *testing.T) {
 	testName := "TestChecksum_StructChecksum"
 
-	v1 := MyStruct{S: "string", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
-	v2 := &MyStruct{S: "string", N: 1, F: 2.3, s: "String", n: 1, f: 2.3}
-	v3 := MyStruct{S: "String", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
+	v1 := MyStructCustom1{S: "string", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
+	v2 := &MyStructCustom1{S: "string", N: 1, F: 2.3, s: "String", n: 1, f: 2.3}
+	v3 := MyStructCustom1{S: "String", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
+	v4 := MyStructCustom2{S: "string", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
 	for i, name := range nameList {
 		t.Run(name, func(t *testing.T) {
 			hf := hfList[i]
 			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 			checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
 			checksum3 := fmt.Sprintf("%x", Checksum(hf, v3))
+			checksum4 := fmt.Sprintf("%x", Checksum(hf, v4))
 			if checksum1 != checksum2 {
 				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v2, checksum2)
 			}
 			if checksum1 == checksum3 {
 				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v3, checksum3)
 			}
+			if checksum1 == checksum4 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v4, checksum4)
+			}
 
 			v := fmt.Sprintf("%x", csfList[i](v1))
 			if v != checksum1 {
 				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksum1, v)
+			}
+		})
+	}
+}
+
+type MyStructMap struct {
+	S string
+	N uint
+	F float64
+	s string
+	n int
+	f float32
+}
+
+func TestChecksum_StructVsMap(t *testing.T) {
+	testName := "TestChecksum_StructVsMap"
+	v1 := MyStructMap{S: "string", N: 1, F: 2.3, s: "STRING", n: -1, f: -2.3}
+	v2 := map[string]interface{}{"S": "string", "N": uint(1), "F": float64(2.3), "s": "STRING", "n": int(-1), "f": float32(-2.3)}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, v2))
+			if checksum1 == checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v2, checksum2)
 			}
 		})
 	}
