@@ -44,7 +44,7 @@ func main() {
 ⭐ `Struct`:
   - If `time.Time`, its nanosecond is used to calculate checksum (since `v0.1.2`).
   - Be able to calculate checksum of unexported fields.
-  - If the struct has function `Checksum()`, use it instead of reflecting through struct's fields.
+  - If the struct has function `Checksum()`, use it instead of reflecting through struct fields.
 
 ⭐ Supported hash functions: `CRC32`, `MD5`, `SHA1`, `SHA256`, `SHA512`.
 
@@ -63,6 +63,10 @@ E.g. `checksum([]int{1,2,3}) == checksum([3]int{1,2,3})`
 ⭐ `Map` and `Struct`: order of fields does not affect checksum, but field names do!
 E.g. `checksum(map[string]int{"one":1,"two":2}) == checksum(map[string]int{"two":2,"one":1})`,
 but `checksum(map[string]int{"a":1,"b":2}) != checksum(map[string]int{"x":1,"y":2})`
+
+⭐ `Map` and `Struct` have different checksums even if they have the same fields and values.
+
+⭐ Two different `Struct`s have different checksums even if they have the same fields and values.
 
 ## License
 
