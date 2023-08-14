@@ -34,5 +34,5 @@ package checksum
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.2"
+	Version = "1.0.0"
 )

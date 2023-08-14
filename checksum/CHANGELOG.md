@@ -1,5 +1,16 @@
 # consu/checksum changelog
 
+## 2023-08-14 - v1.0.0
+
+### Changed
+
+- Changed algorithm for calculating map and struct checksum
+
+### Fixed/Improvement
+
+- Fix: value is not unwrapped correctly sometimes
+- Fix: wrongly calculate checksum for time.Time
+
 ## 2020-11-20 - v0.1.2
 
 If a struct is `time.Time`, use its nanosecond to calculate checksum.
