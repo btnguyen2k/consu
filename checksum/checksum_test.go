@@ -11,6 +11,25 @@ var nameList = []string{"CRC32", "MD5", "SHA1", "SHA256", "SHA512"}
 var hfList = []HashFunc{Crc32HashFunc, Md5HashFunc, Sha1HashFunc, Sha256HashFunc, Sha512HashFunc}
 var csfList = []func(interface{}) []byte{Crc32Checksum, Md5Checksum, Sha1Checksum, Sha256Checksum, Sha512Checksum}
 
+func TestChecksum_nil(t *testing.T) {
+	testName := "TestChecksum_nil"
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum := Checksum(hf, nil)
+			if len(checksum) == 0 {
+				t.Fatalf("%s failed: Checksum(nil)=%#v is nil/empty", testName+"/"+name, checksum)
+			}
+
+			for _, v := range checksum {
+				if v != 00 {
+					t.Fatalf("%s failed: Checksum(nil) - expecting all zeroes, but received %x", testName+"/"+name, checksum)
+				}
+			}
+		})
+	}
+}
+
 func TestChecksum_Bool(t *testing.T) {
 	testName := "TestChecksum_Bool"
 	v1 := true
@@ -476,6 +495,38 @@ func TestChecksum_SliceArrayWithTime(t *testing.T) {
 			v := fmt.Sprintf("%x", csfList[i](v1))
 			if v != checksum1 {
 				t.Fatalf("%s failed, expected %#v but received %#v", testName+"/"+name, checksum1, v)
+			}
+		})
+	}
+}
+
+func TestChecksum_SliceCircularRef(t *testing.T) {
+	testName := "TestChecksum_SliceCircularRef"
+	v1 := []interface{}{1, 2.3, true, nil}
+	v2 := []interface{}{1, nil, 2.3, true}
+
+	v1[3] = v1
+	v2[1] = v2
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+
+	v1[3] = v2
+	v2[1] = v1
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
 			}
 		})
 	}

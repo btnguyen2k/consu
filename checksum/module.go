@@ -8,6 +8,10 @@ Package checksum provides utility functions to calculate checksum.
   - Map and Struct: order of fields does not affect checksum, but field names do! E.g. checksum(map[string]int{"one":1,"two":2}) == checksum(map[string]int{"two":2,"one":1}), but checksum(map[string]int{"a":1,"b":2}) != checksum(map[string]int{"x":1,"y":2})
   - Struct: be able to calculate checksum of unexported fields.
 
+Note on special inputs:
+
+  - Checksum of `nil` is a slice where all values are zeroes.
+
 Sample usage:
 
 	package main

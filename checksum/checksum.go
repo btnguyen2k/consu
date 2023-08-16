@@ -97,12 +97,23 @@ Checksum calculates checksum of an input using the provided hash function.
   - If v is a slice or array: checksum value is combination of all elements' checksums, in order. If v is empty (has 0 elements), empty []byte is returned.
   - If v is a map: checksum value is combination of all entries' checksums, order-independent.
   - If v is a struct: if the struct has function `Checksum()` then use it to calculate checksum value; if v is time.Time then use its nanosecond to calculate checksum value; otherwise checksum value is combination of all fields' checksums, order-independent.
+
+Note on special inputs:
+
+  - Checksum of `nil` is a slice where all values are zeroes.
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
 	return checksumSafe(hf, v, make(map[interface{}]struct{}))
 }
 
 func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) []byte {
+	if v == nil {
+		result := hf(nil)
+		for i := range result {
+			result[i] = 0
+		}
+		return result
+	}
 	prv, rv := unwrap(v)
 	switch rv.Kind() {
 	case reflect.Map, reflect.Slice:
