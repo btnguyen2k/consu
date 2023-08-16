@@ -3,6 +3,7 @@ package checksum
 import (
 	"crypto/md5"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -34,11 +35,11 @@ func TestChecksum_EmptyMap(t *testing.T) {
 	testName := "TestChecksum_EmptyMap"
 	vArr := []interface{}{
 		map[string]bool{},
-		map[uint]int{},
+		&map[uint]int{},
 		map[int]uint{},
-		map[interface{}]string{},
+		&map[interface{}]string{},
 		map[bool]interface{}{},
-		map[int]float32{},
+		&map[int]float32{},
 		map[uint]float64{},
 	}
 	for i, name := range nameList {
@@ -70,17 +71,17 @@ func TestChecksum_EmptySliceArray(t *testing.T) {
 	testName := "TestChecksum_EmptySliceArray"
 	type EmptyStruct struct{}
 	vArr := []interface{}{
-		[]bool{}, [0]bool{},
-		[]int{}, [0]int{},
-		[]uint{}, [0]uint{},
-		[]byte{}, [0]byte{},
-		[]float32{}, [0]float32{},
-		[]float64{}, [0]float64{},
-		[]string{}, [0]string{},
-		[]struct{}{}, [0]struct{}{},
-		[]EmptyStruct{}, [0]EmptyStruct{},
-		[]func(){}, [0]func(){},
-		[]interface{}{}, [0]interface{}{},
+		&[]bool{}, [0]bool{},
+		[]int{}, [0]*int{},
+		&[]uint{}, [0]uint{},
+		[]*byte{}, &[0]byte{},
+		&[]float32{}, [0]float32{},
+		[]float64{}, &[0]*float64{},
+		&[]string{}, [0]string{},
+		[]struct{}{}, &[0]*struct{}{},
+		&[]*EmptyStruct{}, [0]EmptyStruct{},
+		[]func(){}, &[0]*func(){},
+		&[]*interface{}{}, [0]interface{}{},
 	}
 	for i, name := range nameList {
 		t.Run(name, func(t *testing.T) {
@@ -100,6 +101,83 @@ func TestChecksum_EmptySliceArray(t *testing.T) {
 				for k := j + 1; k < len(checksumArr); k++ {
 					if checksumArr[j] != checksumArr[k] {
 						t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, vArr[j], checksumArr[j], vArr[k], checksumArr[k])
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestChecksum_EmptyStruct(t *testing.T) {
+	testName := "TestChecksum_EmptyStruct"
+	type EmptyStruct struct{}
+	type MyStruct struct{}
+	v1 := EmptyStruct{}
+	v2 := &EmptyStruct{}
+	v3 := MyStruct{}
+	v4 := struct{}{}
+	v5 := &struct{}{}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := Checksum(hf, v1)
+			if len(checksum1) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v1, checksum1)
+			}
+
+			checksum2 := Checksum(hf, v2)
+			if len(checksum2) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v2, checksum2)
+			}
+
+			checksum3 := Checksum(hf, v3)
+			if len(checksum3) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v3, checksum3)
+			}
+
+			checksum4 := Checksum(hf, v4)
+			if len(checksum4) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v4, checksum4)
+			}
+
+			checksum5 := Checksum(hf, v5)
+			if len(checksum5) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v5, checksum5)
+			}
+
+			if !reflect.DeepEqual(checksum1, checksum2) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v2, checksum2)
+			}
+
+			if !reflect.DeepEqual(checksum4, checksum5) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, v4, checksum4, v5, checksum5)
+			}
+
+			if reflect.DeepEqual(checksum1, checksum3) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v3, checksum3)
+			}
+
+			if reflect.DeepEqual(checksum2, checksum4) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v2, checksum2, v4, checksum4)
+			}
+		})
+	}
+}
+
+func TestChecksum_EmptyMixed(t *testing.T) {
+	testName := "TestChecksum_EmptyMixed"
+	vArr := []interface{}{map[string]int{}, []bool{}, struct{}{}, func() {}}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] == checksumArr[k] {
+						t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, vArr[j], checksumArr[j], vArr[k], checksumArr[k])
 					}
 				}
 			}
@@ -560,25 +638,31 @@ func TestChecksum_SliceArrayWithTime(t *testing.T) {
 func TestChecksum_SliceCircularRef(t *testing.T) {
 	testName := "TestChecksum_SliceCircularRef"
 	v1 := []interface{}{1, 2.3, true, nil}
-	v2 := []interface{}{1, nil, 2.3, true}
+	v2 := []interface{}{1, 2.3, true, nil}
+	v3 := []interface{}{1, nil, 2.3, true}
 
 	v1[3] = v1
-	v2[1] = v2
+	v2[3] = &v2
+	v3[1] = v3
 	for i, name := range nameList {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"/Self", func(t *testing.T) {
 			hf := hfList[i]
 			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			checksum3 := fmt.Sprintf("%x", Checksum(hf, &v3))
 			if checksum1 != checksum2 {
 				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+			if checksum1 == checksum3 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v3, checksum3)
 			}
 		})
 	}
 
-	v1[3] = v2
-	v2[1] = v1
+	v1[3] = &v2
+	v2[3] = v1
 	for i, name := range nameList {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"/Cross", func(t *testing.T) {
 			hf := hfList[i]
 			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
@@ -631,9 +715,9 @@ func TestChecksum_MapCircularRef(t *testing.T) {
 	v2 := map[string]interface{}{"b": 2.3, "d": true, "c": "a string", "a": 1}
 
 	v1["m"] = v1
-	v2["m"] = v2
+	v2["m"] = &v2
 	for i, name := range nameList {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"/Self", func(t *testing.T) {
 			hf := hfList[i]
 			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
@@ -643,10 +727,10 @@ func TestChecksum_MapCircularRef(t *testing.T) {
 		})
 	}
 
-	v1["m"] = v2
+	v1["m"] = &v2
 	v2["m"] = v1
 	for i, name := range nameList {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"/Cross", func(t *testing.T) {
 			hf := hfList[i]
 			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
 			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))

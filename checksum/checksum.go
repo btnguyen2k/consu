@@ -127,7 +127,7 @@ func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) 
 	case reflect.Map, reflect.Slice:
 		ptr := rv.Pointer()
 		if _, ok := visited[ptr]; ok {
-			return nil
+			return checksumSafe(hf, nil, visited)
 		}
 		visited[ptr] = struct{}{}
 		defer delete(visited, ptr)
