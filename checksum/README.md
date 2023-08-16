@@ -70,7 +70,7 @@ but `Checksum(map[string]int{"a":1,"b":2}) != Checksum(map[string]int{"x":1,"y":
 
 Note on special inputs:
 
-⭐ `Checksum(nil)` returns a slice where all values are zeroes.
+⭐ `Checksum(nil)` returns a slice where all values are zero.
 
 ## License
 
