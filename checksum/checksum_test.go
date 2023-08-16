@@ -517,6 +517,38 @@ func TestChecksum_Map(t *testing.T) {
 	}
 }
 
+func TestChecksum_MapCircularRef(t *testing.T) {
+	testName := "TestChecksum_MapCircularRef"
+	v1 := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true}
+	v2 := map[string]interface{}{"b": 2.3, "d": true, "c": "a string", "a": 1}
+
+	v1["m"] = v1
+	v2["m"] = v2
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+
+	v1["m"] = v2
+	v2["m"] = v1
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+}
+
 type MyStructAllPublic struct {
 	S  string
 	N  int
