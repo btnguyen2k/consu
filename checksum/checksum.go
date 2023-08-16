@@ -101,10 +101,18 @@ Checksum calculates checksum of an input using the provided hash function.
 Note on special inputs:
 
   - Checksum of `nil` is a slice where all values are zero.
+  - All empty maps have the same checksum, e.g. Checksum(map[string]int{}) == Checksum(map[int]string{}).
+  - All empty slices/arrays have the same checksum, e.g. Checksum([]int{}) == Checksum([0]int{}) == Checksum([]string{}) == Checksum([0]string{}).
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
 	return checksumSafe(hf, v, make(map[interface{}]struct{}))
 }
+
+const (
+	markerMap        = "0x10"
+	markerStruct     = "0x11"
+	markerSliceArray = "0x12"
+)
 
 func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) []byte {
 	if v == nil {
@@ -136,42 +144,40 @@ func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) 
 	case reflect.String:
 		return hf([]byte(rv.String()))
 	case reflect.Array, reflect.Slice:
-		buf := make([]byte, 0)
+		buf := []byte(markerSliceArray)
 		for i, n := 0, rv.Len(); i < n; i++ {
 			buf = hf(append(buf, checksumSafe(hf, rv.Index(i).Interface(), visited)...))
 		}
 		return buf
 	case reflect.Map:
-		temp := []string{"0x10"}
+		temp := make([]string, 0)
 		for iter := rv.MapRange(); iter.Next(); {
 			// field-name is taking into account
 			fieldChecksum := checksumSafe(hf, []interface{}{iter.Key().Interface(), iter.Value().Interface()}, visited)
 			temp = append(temp, fmt.Sprintf("%x", fieldChecksum))
 		}
 		sort.Strings(temp)
-		return checksumSafe(hf, temp, visited)
+		return checksumSafe(hf, append([]string{markerMap}, temp...), visited)
 	case reflect.Struct:
 		m := rv.MethodByName("Checksum")
 		if !m.IsValid() && prv.IsValid() {
 			m = prv.MethodByName("Checksum")
 		}
 		if m.IsValid() && m.Type().NumIn() == 0 {
+			// struct has matched method Checksum
+			temp := make([]interface{}, 0)
 			result := m.Call(nil)
-			arr := []interface{}{"0x11", rv.Type().String()}
-			for _, v := range result {
-				arr = append(arr, v.Interface())
+			for _, vtemp := range result {
+				temp = append(temp, vtemp.Interface())
 			}
-			if len(arr) > 2 {
-				return Checksum(hf, arr)
-			}
+			return checksumSafe(hf, append([]interface{}{markerStruct, rv.Type().String()}, temp...), visited)
 		}
 
 		if rv.Type() == reflect.TypeOf(time.Time{}) {
-			vtemp := []interface{}{"time.Time", rv.Interface().(time.Time).UnixNano()}
-			return checksumSafe(hf, vtemp, visited)
+			return checksumSafe(hf, append([]interface{}{markerStruct, rv.Type().String()}, rv.Interface().(time.Time).UnixNano()), visited)
 		}
 
-		temp := []string{"0x11", rv.Type().String()}
+		temp := make([]string, 0)
 		for i, n := 0, rv.NumField(); i < n; i++ {
 			// field-name is taking into account
 			fieldName := rv.Type().Field(i).Name
@@ -187,7 +193,7 @@ func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) 
 			temp = append(temp, fmt.Sprintf("%x", fieldChecksum))
 		}
 		sort.Strings(temp)
-		return checksumSafe(hf, temp, visited)
+		return checksumSafe(hf, append([]string{markerStruct, rv.Type().String()}, temp...), visited)
 	}
 	return nil
 }

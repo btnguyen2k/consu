@@ -72,6 +72,10 @@ Note on special inputs:
 
 ⭐ `Checksum(nil)` returns a slice where all values are zero.
 
+⭐ All empty maps have the same checksum, e.g. `Checksum(map[string]int{}) == Checksum(map[int]string{})`. 
+
+⭐ All empty slices/arrays have the same checksum, e.g. `Checksum([]int{}) == Checksum([0]int{}) == Checksum([]string{}) == Checksum([0]string{})`.
+
 ## License
 
 MIT - see [LICENSE.md](LICENSE.md).
