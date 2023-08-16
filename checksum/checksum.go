@@ -100,7 +100,7 @@ Checksum calculates checksum of an input using the provided hash function.
 
 Note on special inputs:
 
-  - Checksum of `nil` is a slice where all values are zeroes.
+  - Checksum of `nil` is a slice where all values are zero.
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
 	return checksumSafe(hf, v, make(map[interface{}]struct{}))

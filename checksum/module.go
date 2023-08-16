@@ -10,7 +10,7 @@ Package checksum provides utility functions to calculate checksum.
 
 Note on special inputs:
 
-  - Checksum of `nil` is a slice where all values are zeroes.
+  - Checksum of `nil` is a slice where all values are zero.
 
 Sample usage:
 
