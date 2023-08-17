@@ -2,6 +2,7 @@ package gjrc
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -48,6 +49,10 @@ func TestGjrcResponse_Error(t *testing.T) {
 	}
 }
 
+func _wait() {
+	time.Sleep(100*time.Millisecond + time.Duration(rand.Intn(100))*time.Millisecond)
+}
+
 func TestGjrcResponse_StatusCode(t *testing.T) {
 	s := newJsonHttpServer(0)
 	go func() {
@@ -60,6 +65,7 @@ func TestGjrcResponse_StatusCode(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrcResponse_StatusCode"
 	client := NewGjrc(nil, 10*time.Second)
@@ -88,6 +94,7 @@ func TestGjrcResponse_Body(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrcResponse_Body"
 	client := NewGjrc(nil, 10*time.Second)
@@ -123,6 +130,7 @@ func TestGjrcResponse_HttpResponse(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrcResponse_HttpResponse"
 	client := NewGjrc(nil, 10*time.Second)
@@ -183,6 +191,7 @@ func TestGjrc_DeleteJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_DeleteJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -254,6 +263,7 @@ func TestGjrc_Get(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Get"
 	client := NewGjrc(nil, 10*time.Second)
@@ -309,6 +319,7 @@ func TestGjrc_PatchJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PatchJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -380,6 +391,7 @@ func TestGjrc_PostJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PostJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -451,6 +463,7 @@ func TestGjrc_PostForm(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PostForm"
 	client := NewGjrc(nil, 10*time.Second)
@@ -533,6 +546,7 @@ func TestGjrc_PutJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PutJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -606,6 +620,7 @@ func TestGjrc_Timeout_Default1(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_TimeoutDefault1"
 	client := NewGjrc(nil, 5*time.Second)
@@ -634,6 +649,7 @@ func TestGjrc_Timeout_Default2(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Timeout_Default2"
 	client := NewGjrc(nil, 5*time.Second)
@@ -660,6 +676,7 @@ func TestGjrc_Timeout_Custom1(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Timeout_Custom1"
 	client := NewGjrc(nil, 10*time.Second)
@@ -688,6 +705,7 @@ func TestGjrc_Timeout_Custom2(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Timeout_Custom2"
 	client := NewGjrc(nil, 10*time.Second)
@@ -716,6 +734,7 @@ func TestGjrc_Unmarshal(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Unmarshal"
 	client := NewGjrc(nil, 10*time.Second)

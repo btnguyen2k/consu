@@ -134,7 +134,6 @@ func (s *jsonHttpServer) ListenAndServe() error {
 	}
 	fmt.Printf("\t[DEBUG] running HTTP server on <%s>\n", listenHostAndPort)
 	s.server.Start()
-	time.Sleep(100*time.Millisecond + time.Duration(rand.Intn(100))*time.Millisecond)
 	return nil
 }
 
