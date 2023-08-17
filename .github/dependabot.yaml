@@ -14,14 +14,12 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
-    versioning-strategy: increase-if-necessary
 
   - package-ecosystem: "gomod"
     directory: "/g18"
     schedule:
       interval: "weekly"
       day: "sunday"
-    versioning-strategy: increase-if-necessary
 
   - package-ecosystem: "gomod"
     directory: "/gjrc"
@@ -34,11 +32,15 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
-    versioning-strategy: increase-if-necessary
+
+  - package-ecosystem: "gomod"
+    directory: "/reddo"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
 
   - package-ecosystem: "gomod"
     directory: "/semver"
     schedule:
       interval: "weekly"
       day: "sunday"
-    versioning-strategy: increase-if-necessary
