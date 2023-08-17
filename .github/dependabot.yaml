@@ -21,7 +21,6 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
-    versioning-strategy: increase-if-necessary
 
   - package-ecosystem: "gomod"
     directory: "/gjrc"
