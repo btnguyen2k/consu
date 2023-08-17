@@ -1,5 +1,18 @@
 # consu/checksum changelog
 
+## 2023-08-17 - v1.1.0
+
+### Added/Refactoring
+
+- Feature: empty maps have the same checksum; and empty slices/arrays have the same checksum
+- Feature: Checksum(nil) returns a slice where all values are zero
+- Feature: handle circular reference with map
+
+### Fixed/Improvement
+
+- Fix: circular ref is not correctly handled for arrays
+- Fix: panic if circular reference
+
 ## 2023-08-14 - v1.0.0
 
 ### Changed
