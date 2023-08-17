@@ -3,6 +3,7 @@ package checksum
 import (
 	"crypto/md5"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -10,6 +11,328 @@ import (
 var nameList = []string{"CRC32", "MD5", "SHA1", "SHA256", "SHA512"}
 var hfList = []HashFunc{Crc32HashFunc, Md5HashFunc, Sha1HashFunc, Sha256HashFunc, Sha512HashFunc}
 var csfList = []func(interface{}) []byte{Crc32Checksum, Md5Checksum, Sha1Checksum, Sha256Checksum, Sha512Checksum}
+
+func TestChecksum_nil(t *testing.T) {
+	testName := "TestChecksum_nil"
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum := Checksum(hf, nil)
+			if len(checksum) == 0 {
+				t.Fatalf("%s failed: Checksum(nil)=%#v is nil/empty", testName+"/"+name, checksum)
+			}
+
+			for _, v := range checksum {
+				if v != 00 {
+					t.Fatalf("%s failed: Checksum(nil) - expecting all zeroes, but received %x", testName+"/"+name, checksum)
+				}
+			}
+		})
+	}
+}
+
+func TestChecksum_EmptyMap(t *testing.T) {
+	testName := "TestChecksum_EmptyMap"
+	vArr := []interface{}{
+		map[string]bool{},
+		&map[uint]int{},
+		map[int]uint{},
+		&map[interface{}]string{},
+		map[bool]interface{}{},
+		&map[int]float32{},
+		map[uint]float64{},
+	}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				if j%2 == 0 {
+					checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, &v))
+				} else {
+					checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+				}
+				if len(checksumArr[j]) == 0 {
+					t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v, checksumArr[j])
+				}
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] != checksumArr[k] {
+						t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, vArr[j], checksumArr[j], vArr[k], checksumArr[k])
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestChecksum_EmptySliceArray(t *testing.T) {
+	testName := "TestChecksum_EmptySliceArray"
+	type EmptyStruct struct{}
+	vArr := []interface{}{
+		&[]bool{}, [0]bool{},
+		[]int{}, [0]*int{},
+		&[]uint{}, [0]uint{},
+		[]*byte{}, &[0]byte{},
+		&[]float32{}, [0]float32{},
+		[]float64{}, &[0]*float64{},
+		&[]string{}, [0]string{},
+		[]struct{}{}, &[0]*struct{}{},
+		&[]*EmptyStruct{}, [0]EmptyStruct{},
+		[]func(){}, &[0]*func(){},
+		&[]*interface{}{}, [0]interface{}{},
+	}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				if j%2 == 0 {
+					checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, &v))
+				} else {
+					checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+				}
+				if len(checksumArr[j]) == 0 {
+					t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v, checksumArr[j])
+				}
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] != checksumArr[k] {
+						t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, vArr[j], checksumArr[j], vArr[k], checksumArr[k])
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestChecksum_EmptyStruct(t *testing.T) {
+	testName := "TestChecksum_EmptyStruct"
+	type EmptyStruct struct{}
+	type MyStruct struct{}
+	v1 := EmptyStruct{}
+	v2 := &EmptyStruct{}
+	v3 := MyStruct{}
+	v4 := struct{}{}
+	v5 := &struct{}{}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := Checksum(hf, v1)
+			if len(checksum1) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v1, checksum1)
+			}
+
+			checksum2 := Checksum(hf, v2)
+			if len(checksum2) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v2, checksum2)
+			}
+
+			checksum3 := Checksum(hf, v3)
+			if len(checksum3) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v3, checksum3)
+			}
+
+			checksum4 := Checksum(hf, v4)
+			if len(checksum4) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v4, checksum4)
+			}
+
+			checksum5 := Checksum(hf, v5)
+			if len(checksum5) == 0 {
+				t.Fatalf("%s failed: Checksum(%#v)=%#v is nil/empty", testName+"/"+name, v5, checksum5)
+			}
+
+			if !reflect.DeepEqual(checksum1, checksum2) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v2, checksum2)
+			}
+
+			if !reflect.DeepEqual(checksum4, checksum5) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/"+name, v4, checksum4, v5, checksum5)
+			}
+
+			if reflect.DeepEqual(checksum1, checksum3) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v3, checksum3)
+			}
+
+			if reflect.DeepEqual(checksum2, checksum4) {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v2, checksum2, v4, checksum4)
+			}
+		})
+	}
+}
+
+func TestChecksum_EmptyMixed(t *testing.T) {
+	testName := "TestChecksum_EmptyMixed"
+	vArr := []interface{}{map[string]int{}, []bool{}, struct{}{}, func() {}}
+	for i, name := range nameList {
+		t.Run(name, func(t *testing.T) {
+			hf := hfList[i]
+			checksumArr := make([]string, len(vArr))
+			for j, v := range vArr {
+				checksumArr[j] = fmt.Sprintf("%x", Checksum(hf, v))
+			}
+			for j := 0; j < len(checksumArr)-1; j++ {
+				for k := j + 1; k < len(checksumArr); k++ {
+					if checksumArr[j] == checksumArr[k] {
+						t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, vArr[j], checksumArr[j], vArr[k], checksumArr[k])
+					}
+				}
+			}
+		})
+	}
+}
+
+/*----------------------------------------------------------------------*/
+
+func TestChecksum_CircularRefSlice(t *testing.T) {
+	testName := "TestChecksum_CircularRefSlice"
+	v1 := []interface{}{1, 2.3, true, nil}
+	v2 := []interface{}{1, 2.3, true, nil}
+	v3 := []interface{}{1, nil, 2.3, true}
+
+	v1[3] = v1
+	v2[3] = &v2
+	v3[1] = v3
+	for i, name := range nameList {
+		t.Run(name+"/Self", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			checksum3 := fmt.Sprintf("%x", Checksum(hf, &v3))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+			if checksum1 == checksum3 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v3, checksum3)
+			}
+		})
+	}
+
+	v1[3] = &v2
+	v2[3] = v1
+	for i, name := range nameList {
+		t.Run(name+"/Cross", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+}
+
+func TestChecksum_CircularRefArray(t *testing.T) {
+	testName := "TestChecksum_CircularRefArray"
+	v1 := [4]interface{}{1, 2.3, true, nil}
+	v2 := [4]interface{}{1, 2.3, true, nil}
+	v3 := [4]interface{}{1, nil, 2.3, true}
+
+	v1[3] = &v1
+	v2[3] = &v2
+	v3[1] = &v3
+	for i, name := range nameList {
+		t.Run(name+"/Self", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			checksum3 := fmt.Sprintf("%x", Checksum(hf, &v3))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+			if checksum1 == checksum3 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v3, checksum3)
+			}
+		})
+	}
+
+	v1[3] = &v2
+	v2[3] = &v1
+	for i, name := range nameList {
+		t.Run(name+"/Cross", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+}
+
+func TestChecksum_CircularRefMap(t *testing.T) {
+	testName := "TestChecksum_CircularRefMap"
+	v1 := map[string]interface{}{"a": 1, "b": 2.3, "c": "a string", "d": true}
+	v2 := map[string]interface{}{"b": 2.3, "d": true, "c": "a string", "a": 1}
+
+	v1["m"] = v1
+	v2["m"] = &v2
+	for i, name := range nameList {
+		t.Run(name+"/Self", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+
+	v1["m"] = &v2
+	v2["m"] = v1
+	for i, name := range nameList {
+		t.Run(name+"/Cross", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+}
+
+type Node struct {
+	Value interface{}
+	Next  *Node
+}
+
+func TestChecksum_CircularRefStruct(t *testing.T) {
+	testName := "TestChecksum_CircularRefStruct"
+	v1 := Node{Value: 1}
+	v2 := Node{Value: 1}
+
+	v1.Next = &v1
+	v2.Next = &v2
+	for i, name := range nameList {
+		t.Run(name+"/Self", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+
+	v1.Next = &v2
+	v2.Next = &v1
+	for i, name := range nameList {
+		t.Run(name+"/Cross", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+}
+
+/*----------------------------------------------------------------------*/
 
 func TestChecksum_Bool(t *testing.T) {
 	testName := "TestChecksum_Bool"
@@ -390,26 +713,6 @@ func TestChecksum_SliceArray(t *testing.T) {
 			}
 			if checksum1 == checksum4 {
 				t.Fatalf("%s failed: Checksum(%#v)=%s must NOT be the same as Checksum(%#v)=%s", testName+"/"+name, v1, checksum1, v4, checksum4)
-			}
-		})
-	}
-}
-
-func TestChecksum_SliceArrayEmpty(t *testing.T) {
-	testName := "TestChecksum_SliceArrayEmpty"
-	vArr := []interface{}{[]int{}, [0]uint{}, []interface{}{}, [0]interface{}{}, []string{}, [0]string{}, []bool{}, [0]bool{}}
-	for i, name := range nameList {
-		t.Run(name, func(t *testing.T) {
-			hf := hfList[i]
-			for _, v := range vArr {
-				checksum1 := Checksum(hf, v)
-				if checksum1 == nil || len(checksum1) != 0 {
-					t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, v, checksum1)
-				}
-				checksum2 := Checksum(hf, &v)
-				if checksum2 == nil || len(checksum2) != 0 {
-					t.Fatalf("%s failed for input %#v - received %#v", testName+"/"+name, v, checksum2)
-				}
 			}
 		})
 	}
