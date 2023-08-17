@@ -295,6 +295,43 @@ func TestChecksum_CircularRefMap(t *testing.T) {
 	}
 }
 
+type Node struct {
+	Value interface{}
+	Next  *Node
+}
+
+func TestChecksum_CircularRefStruct(t *testing.T) {
+	testName := "TestChecksum_CircularRefStruct"
+	v1 := Node{Value: 1}
+	v2 := Node{Value: 1}
+
+	v1.Next = &v1
+	v2.Next = &v2
+	for i, name := range nameList {
+		t.Run(name+"/Self", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Self/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+
+	v1.Next = &v2
+	v2.Next = &v1
+	for i, name := range nameList {
+		t.Run(name+"/Cross", func(t *testing.T) {
+			hf := hfList[i]
+			checksum1 := fmt.Sprintf("%x", Checksum(hf, v1))
+			checksum2 := fmt.Sprintf("%x", Checksum(hf, &v2))
+			if checksum1 != checksum2 {
+				t.Fatalf("%s failed: Checksum(%#v)=%s must be the same as Checksum(%#v)=%s", testName+"/Cross/"+name, v1, checksum1, v2, checksum2)
+			}
+		})
+	}
+}
+
 /*----------------------------------------------------------------------*/
 
 func TestChecksum_Bool(t *testing.T) {
