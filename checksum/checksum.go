@@ -79,7 +79,7 @@ func isExportedField(fieldName string) bool {
 	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
 
-func unwrap(v interface{}) (prv reflect.Value, rv reflect.Value) {
+func Unwrap(v interface{}) (prv reflect.Value, rv reflect.Value) {
 	rv = reflect.ValueOf(v)
 	prv = reflect.ValueOf(&v)
 	for rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface {
@@ -106,7 +106,11 @@ Note on special inputs:
   - All empty slices/arrays have the same checksum, e.g. Checksum([]int{}) == Checksum([0]int{}) == Checksum([]string{}) == Checksum([0]string{}).
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
-	return checksumSafe(hf, v, make(map[uintptr]struct{}))
+	if v == nil {
+		return checksumSafe(hf, nil, make(map[uintptr]struct{}))
+	}
+	_, rv := Unwrap(v)
+	return checksumSafe(hf, rv.Interface(), make(map[uintptr]struct{}))
 }
 
 const (
@@ -123,7 +127,7 @@ func checksumSafe(hf HashFunc, v interface{}, visited map[uintptr]struct{}) []by
 		}
 		return result
 	}
-	prv, rv := unwrap(v)
+	prv, rv := Unwrap(v)
 	var ptr *uintptr
 	switch rv.Kind() {
 	case reflect.Map, reflect.Slice:
