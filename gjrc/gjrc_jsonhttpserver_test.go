@@ -127,11 +127,14 @@ func (s *jsonHttpServer) ListenAndServe() error {
 
 	s.server = httptest.NewUnstartedServer(srvmx)
 	var err error
-	s.server.Listener, err = net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", s.listenPort))
+	listenHostAndPort := fmt.Sprintf("127.0.0.1:%d", s.listenPort)
+	s.server.Listener, err = net.Listen("tcp", listenHostAndPort)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("\t[DEBUG] running HTTP server on <%s>\n", listenHostAndPort)
 	s.server.Start()
+	time.Sleep(100*time.Millisecond + time.Duration(rand.Intn(100))*time.Millisecond)
 	return nil
 }
 
