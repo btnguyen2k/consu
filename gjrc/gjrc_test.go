@@ -2,6 +2,7 @@ package gjrc
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -48,6 +49,10 @@ func TestGjrcResponse_Error(t *testing.T) {
 	}
 }
 
+func _wait() {
+	time.Sleep(100*time.Millisecond + time.Duration(rand.Intn(100))*time.Millisecond)
+}
+
 func TestGjrcResponse_StatusCode(t *testing.T) {
 	s := newJsonHttpServer(0)
 	go func() {
@@ -60,6 +65,7 @@ func TestGjrcResponse_StatusCode(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrcResponse_StatusCode"
 	client := NewGjrc(nil, 10*time.Second)
@@ -69,7 +75,7 @@ func TestGjrcResponse_StatusCode(t *testing.T) {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() != nil {
-		t.Fatalf("%s failed: %e", testName, resp.Error())
+		t.Fatalf("%s failed: %s", testName, resp.Error())
 	}
 	if resp.StatusCode() != 404 {
 		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 404, resp.StatusCode())
@@ -88,6 +94,7 @@ func TestGjrcResponse_Body(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrcResponse_Body"
 	client := NewGjrc(nil, 10*time.Second)
@@ -97,14 +104,14 @@ func TestGjrcResponse_Body(t *testing.T) {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() != nil {
-		t.Fatalf("%s failed: %e", testName, resp.Error())
+		t.Fatalf("%s failed: %s", testName, resp.Error())
 	}
 	if resp.StatusCode() != 200 {
 		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
 	}
 	body, err := resp.Body()
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if !strings.HasPrefix(string(body), "{") {
 		t.Fatalf("%s failed: unexpected response body %s", testName, body)
@@ -123,6 +130,7 @@ func TestGjrcResponse_HttpResponse(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrcResponse_HttpResponse"
 	client := NewGjrc(nil, 10*time.Second)
@@ -132,7 +140,7 @@ func TestGjrcResponse_HttpResponse(t *testing.T) {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() != nil {
-		t.Fatalf("%s failed: %e", testName, resp.Error())
+		t.Fatalf("%s failed: %s", testName, resp.Error())
 	}
 	if resp.StatusCode() != 200 {
 		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
@@ -183,6 +191,7 @@ func TestGjrc_DeleteJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_DeleteJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -191,10 +200,16 @@ func TestGjrc_DeleteJson(t *testing.T) {
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
+	}
 
 	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if valUrl != url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
@@ -202,7 +217,7 @@ func TestGjrc_DeleteJson(t *testing.T) {
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	host := "localhost"
 	if valHost != host {
@@ -212,7 +227,7 @@ func TestGjrc_DeleteJson(t *testing.T) {
 	for _, key := range verifyKeysAll {
 		val, err := resp.GetValueAsType(key, verifyTypes[key])
 		if err != nil {
-			t.Fatalf("%s failed: %e", testName, err)
+			t.Fatalf("%s failed: %s", testName, err)
 		}
 		if val != verifyValues[key] {
 			t.Fatalf("%s failed: <%#v> expected %#v but received %#v", testName, key, verifyValues[key], val)
@@ -248,6 +263,7 @@ func TestGjrc_Get(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Get"
 	client := NewGjrc(nil, 10*time.Second)
@@ -256,10 +272,16 @@ func TestGjrc_Get(t *testing.T) {
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
+	}
 
 	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if valUrl != url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
@@ -267,7 +289,7 @@ func TestGjrc_Get(t *testing.T) {
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	host := "localhost"
 	if valHost != host {
@@ -277,7 +299,7 @@ func TestGjrc_Get(t *testing.T) {
 	for _, key := range verifyKeysHeader {
 		val, err := resp.GetValueAsType(key, verifyTypes[key])
 		if err != nil {
-			t.Fatalf("%s failed: %e", testName, err)
+			t.Fatalf("%s failed: %s", testName, err)
 		}
 		if val != verifyValues[key] {
 			t.Fatalf("%s failed: <%#v> expected %#v but received %#v", testName, key, verifyValues[key], val)
@@ -297,6 +319,7 @@ func TestGjrc_PatchJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PatchJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -305,10 +328,16 @@ func TestGjrc_PatchJson(t *testing.T) {
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
+	}
 
 	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if valUrl != url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
@@ -316,7 +345,7 @@ func TestGjrc_PatchJson(t *testing.T) {
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	host := "localhost"
 	if valHost != host {
@@ -326,7 +355,7 @@ func TestGjrc_PatchJson(t *testing.T) {
 	for _, key := range verifyKeysAll {
 		val, err := resp.GetValueAsType(key, verifyTypes[key])
 		if err != nil {
-			t.Fatalf("%s failed: %e", testName, err)
+			t.Fatalf("%s failed: %s", testName, err)
 		}
 		if val != verifyValues[key] {
 			t.Fatalf("%s failed: <%#v> expected %#v but received %#v", testName, key, verifyValues[key], val)
@@ -362,6 +391,7 @@ func TestGjrc_PostJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PostJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -370,10 +400,16 @@ func TestGjrc_PostJson(t *testing.T) {
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
+	}
 
 	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if valUrl != url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
@@ -381,7 +417,7 @@ func TestGjrc_PostJson(t *testing.T) {
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	host := "localhost"
 	if valHost != host {
@@ -391,7 +427,7 @@ func TestGjrc_PostJson(t *testing.T) {
 	for _, key := range verifyKeysAll {
 		val, err := resp.GetValueAsType(key, verifyTypes[key])
 		if err != nil {
-			t.Fatalf("%s failed: %e", testName, err)
+			t.Fatalf("%s failed: %s", testName, err)
 		}
 		if val != verifyValues[key] {
 			t.Fatalf("%s failed: <%#v> expected %#v but received %#v", testName, key, verifyValues[key], val)
@@ -427,6 +463,7 @@ func TestGjrc_PostForm(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PostForm"
 	client := NewGjrc(nil, 10*time.Second)
@@ -435,10 +472,16 @@ func TestGjrc_PostForm(t *testing.T) {
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
+	}
 
 	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if valUrl != _url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, _url, valUrl)
@@ -446,7 +489,7 @@ func TestGjrc_PostForm(t *testing.T) {
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	host := "localhost"
 	if valHost != host {
@@ -456,7 +499,7 @@ func TestGjrc_PostForm(t *testing.T) {
 	for _, key := range verifyKeysHeader {
 		val, err := resp.GetValueAsType(key, verifyTypes[key])
 		if err != nil {
-			t.Fatalf("%s failed: %e", testName, err)
+			t.Fatalf("%s failed: %s", testName, err)
 		}
 		if val != verifyValues[key] {
 			t.Fatalf("%s failed: <%#v> expected %#v but received %#v", testName, key, verifyValues[key], val)
@@ -465,7 +508,7 @@ func TestGjrc_PostForm(t *testing.T) {
 
 	val1, err := resp.GetValueAsType("form.key1", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	v1 := "value1"
 	if val1 != v1 {
@@ -474,7 +517,7 @@ func TestGjrc_PostForm(t *testing.T) {
 
 	val2, err := resp.GetValueAsType("form.key2", reddo.TypeInt)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	v2 := int64(2)
 	if val2 != v2 {
@@ -483,7 +526,7 @@ func TestGjrc_PostForm(t *testing.T) {
 
 	val3, err := resp.GetValueAsType("form.key3", reddo.TypeBool)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	v3 := true
 	if val3 != v3 {
@@ -503,6 +546,7 @@ func TestGjrc_PutJson(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_PutJson"
 	client := NewGjrc(nil, 10*time.Second)
@@ -511,10 +555,16 @@ func TestGjrc_PutJson(t *testing.T) {
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
+	}
 
 	valUrl, err := resp.GetValueAsType("url", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if valUrl != url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
@@ -522,7 +572,7 @@ func TestGjrc_PutJson(t *testing.T) {
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	host := "localhost"
 	if valHost != host {
@@ -532,7 +582,7 @@ func TestGjrc_PutJson(t *testing.T) {
 	for _, key := range verifyKeysAll {
 		val, err := resp.GetValueAsType(key, verifyTypes[key])
 		if err != nil {
-			t.Fatalf("%s failed: %e", testName, err)
+			t.Fatalf("%s failed: %s", testName, err)
 		}
 		if val != verifyValues[key] {
 			t.Fatalf("%s failed: <%#v> expected %#v but received %#v", testName, key, verifyValues[key], val)
@@ -570,6 +620,7 @@ func TestGjrc_Timeout_Default1(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_TimeoutDefault1"
 	client := NewGjrc(nil, 5*time.Second)
@@ -579,7 +630,7 @@ func TestGjrc_Timeout_Default1(t *testing.T) {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() != nil {
-		t.Fatalf("%s failed: %e", testName, resp.Error())
+		t.Fatalf("%s failed: %s", testName, resp.Error())
 	}
 	if resp.StatusCode() != 200 {
 		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
@@ -598,6 +649,7 @@ func TestGjrc_Timeout_Default2(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Timeout_Default2"
 	client := NewGjrc(nil, 5*time.Second)
@@ -624,6 +676,7 @@ func TestGjrc_Timeout_Custom1(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Timeout_Custom1"
 	client := NewGjrc(nil, 10*time.Second)
@@ -633,7 +686,7 @@ func TestGjrc_Timeout_Custom1(t *testing.T) {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() != nil {
-		t.Fatalf("%s failed: %e", testName, resp.Error())
+		t.Fatalf("%s failed: %s", testName, resp.Error())
 	}
 	if resp.StatusCode() != 200 {
 		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
@@ -652,6 +705,7 @@ func TestGjrc_Timeout_Custom2(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Timeout_Custom2"
 	client := NewGjrc(nil, 10*time.Second)
@@ -680,6 +734,7 @@ func TestGjrc_Unmarshal(t *testing.T) {
 			panic(err)
 		}
 	}()
+	_wait()
 
 	testName := "TestGjrc_Unmarshal"
 	client := NewGjrc(nil, 10*time.Second)
@@ -687,6 +742,12 @@ func TestGjrc_Unmarshal(t *testing.T) {
 	resp := client.Get(url, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
+	}
+	if resp.Error() != nil {
+		t.Fatalf("%s failed: %s", testName, resp.Error())
+	}
+	if resp.StatusCode() != 200 {
+		t.Fatalf("%s failed: expected status code %#v but received %#v", testName, 200, resp.StatusCode())
 	}
 
 	type mystruct struct {
@@ -699,7 +760,7 @@ func TestGjrc_Unmarshal(t *testing.T) {
 	var v1 mystruct
 	err := resp.Unmarshal(&v1)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if v1.Url != url {
 		t.Fatalf("%s failed: expected %s but received %s", testName, url, v1.Url)
@@ -714,7 +775,7 @@ func TestGjrc_Unmarshal(t *testing.T) {
 	var v2 *mystruct
 	err = resp.Unmarshal(&v2)
 	if err != nil {
-		t.Fatalf("%s failed: %e", testName, err)
+		t.Fatalf("%s failed: %s", testName, err)
 	}
 	if v2 == nil {
 		t.Fatalf("%s failed: nil", testName)
