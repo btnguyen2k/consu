@@ -81,8 +81,9 @@ func isExportedField(fieldName string) bool {
 
 func unwrap(v interface{}) (prv reflect.Value, rv reflect.Value) {
 	rv = reflect.ValueOf(v)
+	prv = reflect.ValueOf(&v)
 	for rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface {
-		if rv.Elem().Kind() == reflect.Struct {
+		if rv.Kind() == reflect.Ptr {
 			prv = rv
 		}
 		rv = rv.Elem()
@@ -105,7 +106,7 @@ Note on special inputs:
   - All empty slices/arrays have the same checksum, e.g. Checksum([]int{}) == Checksum([0]int{}) == Checksum([]string{}) == Checksum([0]string{}).
 */
 func Checksum(hf HashFunc, v interface{}) []byte {
-	return checksumSafe(hf, v, make(map[interface{}]struct{}))
+	return checksumSafe(hf, v, make(map[uintptr]struct{}))
 }
 
 const (
@@ -114,7 +115,7 @@ const (
 	markerSliceArray = "0x12"
 )
 
-func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) []byte {
+func checksumSafe(hf HashFunc, v interface{}, visited map[uintptr]struct{}) []byte {
 	if v == nil {
 		result := hf(nil)
 		for i := range result {
@@ -123,15 +124,25 @@ func checksumSafe(hf HashFunc, v interface{}, visited map[interface{}]struct{}) 
 		return result
 	}
 	prv, rv := unwrap(v)
+	var ptr *uintptr
 	switch rv.Kind() {
 	case reflect.Map, reflect.Slice:
-		ptr := rv.Pointer()
-		if _, ok := visited[ptr]; ok {
+		ptrTemp := rv.Pointer()
+		ptr = &ptrTemp
+	default:
+		if prv.IsValid() && !prv.IsZero() && !prv.IsNil() {
+			ptrTemp := prv.Pointer()
+			ptr = &ptrTemp
+		}
+	}
+	if ptr != nil {
+		if _, ok := visited[*ptr]; ok {
 			return checksumSafe(hf, nil, visited)
 		}
-		visited[ptr] = struct{}{}
-		defer delete(visited, ptr)
+		visited[*ptr] = struct{}{}
+		defer delete(visited, *ptr)
 	}
+
 	switch rv.Kind() {
 	case reflect.Bool:
 		return hf(boolToBytes(rv.Bool()))
