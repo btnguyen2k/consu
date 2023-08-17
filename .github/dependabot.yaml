@@ -10,7 +10,28 @@ updates:
       day: "sunday"
 
   - package-ecosystem: "gomod"
-    directory: "/"
+    directory: "/checksum"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    versioning-strategy: increase-if-necessary
+
+  - package-ecosystem: "gomod"
+    directory: "/g18"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    versioning-strategy: increase-if-necessary
+
+  - package-ecosystem: "gomod"
+    directory: "/gjrc"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    versioning-strategy: increase-if-necessary
+
+  - package-ecosystem: "gomod"
+    directory: "/semver"
     schedule:
       interval: "weekly"
       day: "sunday"
