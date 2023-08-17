@@ -26,6 +26,8 @@ jobs:
       run: |
         go version
         cd ./olaf
+        export OLAF_NUM_ITEMS=10000000
+        export OLAF_NUM_THREADS=4
         go test -cover -coverprofile=../coverage_olaf.txt -v -count 1 -p 1 .
         cd ..
     - name: Codecov
