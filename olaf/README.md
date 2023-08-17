@@ -3,17 +3,17 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/olaf)](https://pkg.go.dev/github.com/btnguyen2k/consu/olaf)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/olaf/badge.svg)](https://github.com/btnguyen2k/consu/actions)
-[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/olaf/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/tree/olaf/olaf)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/olaf/graph/badge.svg)](https://app.codecov.io/gh/btnguyen2k/consu/tree/olaf/olaf)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
-Golang implementation of Twitter Snowflake.
+Go implementation of Twitter Snowflake.
 
 ## Getting Started
 
 ### Install Package
 
 ```
-go get github.com/btnguyen2k/olaf
+go get -u github.com/btnguyen2k/olaf
 ```
 
 ### Usage
@@ -50,26 +50,6 @@ func main() {
 }
 ```
 
-## History
+## License
 
-### 2020-01-25 - v0.1.3
-
-- Bug fixes & unit tests
-
-### 2020-01-25 - v0.1.2
-
-- Bug fixes
-
-### 2019-04-10 - v0.1.1
-
-- Migrate to Go modular design.
-- Merged as a submodule of `github.com/btnguyen2k/consu`
-
-### 2019-01-03 - v0.1.0
-
-First release:
-
-- Generate 64-bit and 128-bit IDs:
-  - Support formats: `integer`, `hex-string` (base 16) and `ascii-string` (base 36).
-  - Custom epoch (64-bit ID only).
-- Extract the time metadata from generated ID.
+MIT - see [LICENSE.md](LICENSE.md).
