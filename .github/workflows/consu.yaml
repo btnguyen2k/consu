@@ -29,8 +29,8 @@ jobs:
       # run: export OLAF_NUM_ITEMS=10000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -coverprofile=../coverage_olaf.txt -v -count 1 -p 1 . && cd ..
     # - name: Test reddo
     #   run: cd ./reddo && go test -cover -coverprofile=../coverage_reddo.txt -v -count 1 -p 1 . && cd ..
-    - name: Test semita
-      run: cd ./semita && go test -cover -coverprofile=../coverage_semita.txt -v -count 1 -p 1 . && cd ..
+    # - name: Test semita
+      # run: cd ./semita && go test -cover -coverprofile=../coverage_semita.txt -v -count 1 -p 1 . && cd ..
     # - name: Test semver
     #   run: cd ./semver && go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 . && cd ..
 

@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/semita)](https://pkg.go.dev/github.com/btnguyen2k/consu/semita)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/semita/badge.svg)](https://github.com/btnguyen2k/consu/actions)
-[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/semita/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/tree/semita/semita)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/semita/graph/badge.svg)](https://app.codecov.io/gh/btnguyen2k/consu/tree/semita/semita)
 
 Package `semita` provides utility functions to access data from a hierarchy structure.
 
@@ -12,7 +12,6 @@ Package `semita` provides utility functions to access data from a hierarchy stru
 ```shell
 $ go get -u github.com/btnguyen2k/consu/semita
 ```
-
 
 ## Usage
 
@@ -26,7 +25,7 @@ Notes:
 - Supported nested arrays, slices, maps and structs.
 - Struct's un-exported fields can be read, but not written.
 - Unaddressable structs and arrays are read-only.
-- The path separator can be change via `PathSeparator` variable (default value is `.`)
+- The path separator can be changed via `semita.PathSeparator` variable (default value is `.`)
 
 Example:
 
@@ -38,12 +37,13 @@ package main
 import (
     "encoding/json"
     "fmt"
+	
     "github.com/btnguyen2k/consu/reddo"
     "github.com/btnguyen2k/consu/semita"
 )
 
 func main() {
-	fmt.Println("-========== Semina demo ==========-")
+	fmt.Println("-========== Semita demo ==========-")
 	data := map[string]interface{}{
 		"name": map[string]interface{}{
 			"first": "Thanh",
@@ -133,38 +133,6 @@ func main() {
 }
 ```
 
+## License
 
-## History
-
-### 2021-01-13 - v0.1.5
-
-- `PathSeparator` is now configurable (default value is `.`).
-
-
-### 2019-04-12 - v0.1.4.1
-
-- Upgrade to `consu/reddo-v0.1.6`:
-  - Return `zero` value when input is `nil`.
-
-
-### 2019-04-04 - v0.1.4
-
-- Migrate to Go modular design.
-
-
-### 2019-03-07 - v0.1.2
-
-- Upgrade to `consu/reddo-v0.1.3`:
-  - New functions `GetTime(path string) (time.Time, error)` and `GetTimeWithLayout(path, layout string) (time.Time, error)`
-
-
-### 2019-03-05 - v0.1.1
-
-- Compatible with `consu/reddo-v0.1.2`
-
-### 2019-02-22 - v0.1.0
-
-First release:
-- Supported nested arrays, slices, maps and structs.
-- Struct's un-exported fields can be read, but not written.
-- Unaddressable structs and arrays are read-only.
+MIT - see [LICENSE.md](LICENSE.md).
