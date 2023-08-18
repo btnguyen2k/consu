@@ -25,7 +25,7 @@ Notes:
 - Supported nested arrays, slices, maps and structs.
 - Struct's un-exported fields can be read, but not written.
 - Unaddressable structs and arrays are read-only.
-- The path separator can be change via `PathSeparator` variable (default value is `.`)
+- The path separator can be changed via `semita.PathSeparator` variable (default value is `.`)
 
 Example:
 
@@ -37,12 +37,13 @@ package main
 import (
     "encoding/json"
     "fmt"
+	
     "github.com/btnguyen2k/consu/reddo"
     "github.com/btnguyen2k/consu/semita"
 )
 
 func main() {
-	fmt.Println("-========== Semina demo ==========-")
+	fmt.Println("-========== Semita demo ==========-")
 	data := map[string]interface{}{
 		"name": map[string]interface{}{
 			"first": "Thanh",

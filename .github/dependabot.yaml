@@ -44,3 +44,9 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/semita"
+    schedule:
+      interval: "weekly"
+      day: "sunday"

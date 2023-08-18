@@ -17,7 +17,7 @@ Notes:
   - Supported nested arrays, slices, maps and structs.
   - Struct's un-exported fields can be read, but not written.
   - Unaddressable structs and arrays are read-only.
-  - The path separator can be change via semita.PathSeparator variable (default value is '.')
+  - The path separator can be changed via semita.PathSeparator variable (default value is '.')
 
 Example: (more examples at https://github.com/btnguyen2k/consu/tree/master/semita/examples)
 
