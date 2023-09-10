@@ -17,7 +17,7 @@ jobs:
         go: [ '1.18', '1.19', '1.20', '1.21', 'stable' ]
     name: Test g18 with Go ${{ matrix.go }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Go env
       uses: actions/setup-go@v4
       with:
@@ -42,7 +42,7 @@ jobs:
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
       RELEASE_NOTES: ${{ steps.semrelease.outputs.releaseNotes }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Release (dry-run)
       id: semrelease
       uses: btnguyen2k/action-semrelease@v3
@@ -70,7 +70,7 @@ jobs:
       VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
       RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Update module meta
       run: |
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
