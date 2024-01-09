@@ -3,6 +3,7 @@ package g18
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestDeduplicate_string(t *testing.T) {
@@ -85,6 +86,170 @@ func TestDeduplicate_uint(t *testing.T) {
 		}
 	}
 }
+
+func TestDeduplicate_float32(t *testing.T) {
+	testName := "TestDeduplicate_float32"
+	testData := []struct {
+		input    []float32
+		expected []float32
+	}{
+		{
+			nil, []float32{},
+		},
+		{
+			[]float32{}, []float32{},
+		},
+		{
+			[]float32{1.2, 3.4, 2.3}, []float32{1.2, 2.3, 3.4},
+		},
+		{
+			[]float32{3.4, 1.2, 3.4, 2.3}, []float32{1.2, 2.3, 3.4},
+		},
+	}
+	for _, td := range testData {
+		result := Deduplicate(td.input)
+		if !reflect.DeepEqual(result, td.expected) {
+			t.Fatalf("%s failed: {test data: %#v / expected: %#v / received: %#v}", testName, td.input, td.expected, result)
+		}
+	}
+}
+
+func TestDeduplicate_float64(t *testing.T) {
+	testName := "TestDeduplicate_float64"
+	testData := []struct {
+		input    []float64
+		expected []float64
+	}{
+		{
+			nil, []float64{},
+		},
+		{
+			[]float64{}, []float64{},
+		},
+		{
+			[]float64{1.2, 3.4, 2.3}, []float64{1.2, 2.3, 3.4},
+		},
+		{
+			[]float64{3.4, 1.2, 3.4, 2.3}, []float64{1.2, 2.3, 3.4},
+		},
+	}
+	for _, td := range testData {
+		result := Deduplicate(td.input)
+		if !reflect.DeepEqual(result, td.expected) {
+			t.Fatalf("%s failed: {test data: %#v / expected: %#v / received: %#v}", testName, td.input, td.expected, result)
+		}
+	}
+}
+
+func TestDeduplicate_byte(t *testing.T) {
+	testName := "TestDeduplicate_byte"
+	testData := []struct {
+		input    []byte
+		expected []byte
+	}{
+		{
+			nil, []byte{},
+		},
+		{
+			[]byte{}, []byte{},
+		},
+		{
+			[]byte{1, 3, 2}, []byte{1, 2, 3},
+		},
+		{
+			[]byte{3, 1, 3, 2}, []byte{1, 2, 3},
+		},
+	}
+	for _, td := range testData {
+		result := Deduplicate(td.input)
+		if !reflect.DeepEqual(result, td.expected) {
+			t.Fatalf("%s failed: {test data: %#v / expected: %#v / received: %#v}", testName, td.input, td.expected, result)
+		}
+	}
+}
+
+func TestDeduplicate_rune(t *testing.T) {
+	testName := "TestDeduplicate_rune"
+	testData := []struct {
+		input    []rune
+		expected []rune
+	}{
+		{
+			nil, []rune{},
+		},
+		{
+			[]rune{}, []rune{},
+		},
+		{
+			[]rune{'1', '3', '2'}, []rune{'1', '2', '3'},
+		},
+		{
+			[]rune{'3', '1', '3', '2'}, []rune{'1', '2', '3'},
+		},
+	}
+	for _, td := range testData {
+		result := Deduplicate(td.input)
+		if !reflect.DeepEqual(result, td.expected) {
+			t.Fatalf("%s failed: {test data: %#v / expected: %#v / received: %#v}", testName, td.input, td.expected, result)
+		}
+	}
+}
+
+func TestDeduplicate_timeDuration(t *testing.T) {
+	testName := "TestDeduplicate_timeDuration"
+	testData := []struct {
+		input    []time.Duration
+		expected []time.Duration
+	}{
+		{
+			nil, []time.Duration{},
+		},
+		{
+			[]time.Duration{}, []time.Duration{},
+		},
+		{
+			[]time.Duration{1, 3, 2}, []time.Duration{1, 2, 3},
+		},
+		{
+			[]time.Duration{3, 1, 3, 2}, []time.Duration{1, 2, 3},
+		},
+	}
+	for _, td := range testData {
+		result := Deduplicate(td.input)
+		if !reflect.DeepEqual(result, td.expected) {
+			t.Fatalf("%s failed: {test data: %#v / expected: %#v / received: %#v}", testName, td.input, td.expected, result)
+		}
+	}
+}
+
+func TestDeduplicate_uintptr(t *testing.T) {
+	testName := "TestDeduplicate_uintptr"
+	testData := []struct {
+		input    []uintptr
+		expected []uintptr
+	}{
+		{
+			nil, []uintptr{},
+		},
+		{
+			[]uintptr{}, []uintptr{},
+		},
+		{
+			[]uintptr{1, 3, 2}, []uintptr{1, 2, 3},
+		},
+		{
+			[]uintptr{3, 1, 3, 2}, []uintptr{1, 2, 3},
+		},
+	}
+	for _, td := range testData {
+		result := Deduplicate(td.input)
+		if !reflect.DeepEqual(result, td.expected) {
+			t.Fatalf("%s failed: {test data: %#v / expected: %#v / received: %#v}", testName, td.input, td.expected, result)
+		}
+	}
+}
+
+/*----------------------------------------------------------------------*/
 
 func TestFindInSlice_bool(t *testing.T) {
 	testName := "TestFindInSlice_bool"
