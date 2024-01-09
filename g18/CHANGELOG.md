@@ -7,10 +7,6 @@
 - Added new functions Min and Max
 - Added new function DeduplicateStable
 
-### Deprecated
-
-- Deprecated type Sortable, use built-in type cmp.Ordered instead
-
 ## 2023-05-01 - v0.0.2
 
 - Function `PointerOf`: returns "pointer" version of input.
