@@ -17,8 +17,9 @@ $ go get -u github.com/btnguyen2k/consu/g18
 
 - `Sortable` type.
 - Function `FindInSlice`: returns the position of needle in haystack.
-- Function `Deduplicate`: removes duplicated elements from a slice.
+- Function `Deduplicate`/`DeduplicateStable`: removes duplicated elements from a slice.
 - Function `PointerOf`: returns "pointer" version of input.
+- Function `Min`/`Max`: returns the minimum/maximum value of a slice.
 
 ## License
 
