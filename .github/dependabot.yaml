@@ -40,13 +40,13 @@ updates:
       day: "sunday"
 
   - package-ecosystem: "gomod"
-    directory: "/semver"
+    directory: "/semita"
     schedule:
       interval: "weekly"
       day: "sunday"
 
   - package-ecosystem: "gomod"
-    directory: "/semita"
+    directory: "/semver"
     schedule:
       interval: "weekly"
       day: "sunday"
