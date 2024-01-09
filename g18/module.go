@@ -3,5 +3,5 @@ package g18
 
 const (
 	// Version defines version number of this package
-	Version = "0.0.2"
+	Version = "0.1.0"
 )

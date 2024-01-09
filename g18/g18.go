@@ -35,7 +35,7 @@ func Deduplicate[K Sortable](input []K) []K {
 
 // DeduplicateStable removes duplicated elements from a slice, preserving the order of the elements.
 //
-// @Available since <<VERSION>>
+// @Available since v0.1.0
 func DeduplicateStable[K comparable](input []K) []K {
 	if len(input) == 0 {
 		return make([]K, 0)
@@ -70,7 +70,7 @@ func PointerOf[K any](input K) *K {
 //
 // Note: if Go 1.21+, use built-in operator max() instead.
 //
-// @Available since <<VERSION>>
+// @Available since v0.1.0
 func Max[K Sortable](values ...K) K {
 	if len(values) == 0 {
 		panic("empty input")
@@ -88,7 +88,7 @@ func Max[K Sortable](values ...K) K {
 //
 // Note: if Go 1.21+, use built-in operator min() instead.
 //
-// @Available since <<VERSION>>
+// @Available since v0.1.0
 func Min[K Sortable](values ...K) K {
 	if len(values) == 0 {
 		panic("empty input")
