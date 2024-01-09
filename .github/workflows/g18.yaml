@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'g18'
+      github.ref == 'refs/heads/g18'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
