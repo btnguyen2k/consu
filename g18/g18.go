@@ -34,6 +34,22 @@ func Deduplicate[K cmp.Ordered](input []K) []K {
 	return result[:prev+1]
 }
 
+// DeduplicateStable removes duplicated elements from a slice, preserving the order of the elements.
+//
+// @Available since <<VERSION>>
+func DeduplicateStable[K comparable](input []K) []K {
+	if len(input) == 0 {
+		return make([]K, 0)
+	}
+	result := make([]K, 0)
+	for _, v := range input {
+		if FindInSlice(v, result) == -1 {
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
 // FindInSlice returns the position of needle in haystack. -1 is return if not found.
 func FindInSlice[K comparable](needle K, haystack []K) int {
 	for i, v := range haystack {
