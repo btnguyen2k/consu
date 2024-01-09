@@ -610,12 +610,12 @@ func TestToTime(t *testing.T) {
 	}{
 		{"struct", now, now, "nano"},
 		{"int(seconds)", now.Unix(), now, "second"},
-		{"int(milliseconds)", now.UnixMilli(), now, "milli"},
-		{"int(microseconds)", now.UnixMicro(), now, "micro"},
+		{"int(milliseconds)", now.UnixNano() / 1000000, now, "milli"},
+		{"int(microseconds)", now.UnixNano() / 1000, now, "micro"},
 		{"int(nanoseconds)", now.UnixNano(), now, "nano"},
 		{"string(seconds)", strconv.FormatInt(now.Unix(), 10), now, "second"},
-		{"string(milliseconds)", strconv.FormatInt(now.UnixMilli(), 10), now, "milli"},
-		{"string(microseconds)", strconv.FormatInt(now.UnixMicro(), 10), now, "micro"},
+		{"string(milliseconds)", strconv.FormatInt(now.UnixNano()/1000000, 10), now, "milli"},
+		{"string(microseconds)", strconv.FormatInt(now.UnixNano()/1000, 10), now, "micro"},
 		{"string(nanoseconds)", strconv.FormatInt(now.UnixNano(), 10), now, "nano"},
 	}
 	for _, tc := range testCases {
@@ -625,9 +625,9 @@ func TestToTime(t *testing.T) {
 				t.Fatalf("%s failed for input <%#v>: %e", testName, tc.input, e)
 			} else if tc.resolution == "second" && v.(time.Time).Unix() != tc.expected.Unix() {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
-			} else if tc.resolution == "milli" && v.(time.Time).UnixMilli() != tc.expected.UnixMilli() {
+			} else if tc.resolution == "milli" && v.(time.Time).UnixNano()/1000000 != tc.expected.UnixNano()/1000000 {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
-			} else if tc.resolution == "micro" && v.(time.Time).UnixMicro() != tc.expected.UnixMicro() {
+			} else if tc.resolution == "micro" && v.(time.Time).UnixNano()/1000 != tc.expected.UnixNano()/1000 {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
 			} else if tc.resolution == "nano" && v.(time.Time).UnixNano() != tc.expected.UnixNano() {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
@@ -685,12 +685,12 @@ func TestToTimeWithLayout(t *testing.T) {
 	}{
 		{"struct", "", now, now, "nano"},
 		{"int(seconds)", "", now.Unix(), now, "second"},
-		{"int(milliseconds)", "", now.UnixMilli(), now, "milli"},
-		{"int(microseconds)", "", now.UnixMicro(), now, "micro"},
+		{"int(milliseconds)", "", now.UnixNano() / 1000000, now, "milli"},
+		{"int(microseconds)", "", now.UnixNano() / 1000, now, "micro"},
 		{"int(nanoseconds)", "", now.UnixNano(), now, "nano"},
 		{"string(seconds)", "", strconv.FormatInt(now.Unix(), 10), now, "second"},
-		{"string(milliseconds)", "", strconv.FormatInt(now.UnixMilli(), 10), now, "milli"},
-		{"string(microseconds)", "", strconv.FormatInt(now.UnixMicro(), 10), now, "micro"},
+		{"string(milliseconds)", "", strconv.FormatInt(now.UnixNano()/1000000, 10), now, "milli"},
+		{"string(microseconds)", "", strconv.FormatInt(now.UnixNano()/1000, 10), now, "micro"},
 		{"string(nanoseconds)", "", strconv.FormatInt(now.UnixNano(), 10), now, "nano"},
 		{"UTC", "2006-01-02T15:04:05", "2019-04-29T20:59:10", time.Date(2019, 04, 29, 20, 59, 10, 0, time.UTC), "nano"},
 		{"Asia/Ho_Chi_Minh", "2006-01-02 15:04:05.999999 -0700 -07", "2019-04-29 20:59:10.165067 +0700 +07", time.Date(2019, 04, 29, 20, 59, 10, 0, loc), "second"},
@@ -702,9 +702,9 @@ func TestToTimeWithLayout(t *testing.T) {
 				t.Fatalf("%s failed for input <%#v>: %e", testName, tc.input, e)
 			} else if tc.resolution == "second" && v.Unix() != tc.expected.Unix() {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
-			} else if tc.resolution == "milli" && v.UnixMilli() != tc.expected.UnixMilli() {
+			} else if tc.resolution == "milli" && v.UnixNano()/1000000 != tc.expected.UnixNano()/1000000 {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
-			} else if tc.resolution == "micro" && v.UnixMicro() != tc.expected.UnixMicro() {
+			} else if tc.resolution == "micro" && v.UnixNano()/1000 != tc.expected.UnixNano()/1000 {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)
 			} else if tc.resolution == "nano" && v.UnixNano() != tc.expected.UnixNano() {
 				t.Fatalf("%s failed for input <%#v>: expected [%#v] but received [%#v]", testName, tc.input, tc.expected, v)

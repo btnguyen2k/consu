@@ -10,11 +10,43 @@ updates:
       day: "sunday"
 
   - package-ecosystem: "gomod"
-    directory: "/"
+    directory: "/checksum"
     schedule:
       interval: "weekly"
       day: "sunday"
-    open-pull-requests-limit: 10
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"] # do not update to major version as it may contain breaking changes
+
+  - package-ecosystem: "gomod"
+    directory: "/g18"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/gjrc"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/olaf"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/reddo"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/semita"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/semver"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
