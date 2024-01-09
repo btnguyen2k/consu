@@ -8,13 +8,16 @@ on:
     types: [ 'opened', 'closed' ]
     branches: [ 'g18', 'master' ]
     paths: [ 'g18/**', '.github/workflows/g18.yaml' ]
+  schedule:
+    # run once every month (at 00:00 UTC) to make sure the lib works with latest version of Go
+    - cron: '0 0 1 * *'
 
 jobs:
   TestG18:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.18', '1.19', '1.20', '1.21', 'stable' ]
+        go: [ '1.18', 'oldstable', 'stable' ]
     name: Test g18 with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v4
@@ -26,10 +29,12 @@ jobs:
       run: |
         go version
         cd ./g18
-        go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 .
+        go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         flags: g18
         name: g18
@@ -103,7 +108,7 @@ jobs:
           git config --global user.email "<>"
           git config --global user.name "CI Build"
           git commit -am "Update ${FILE_CHANGELOG} and ${FILE_MODULE} for new version ${VERSION}"
-          git push origin ${MODULE}
+          git push origin ${MODULE} -f
 
           echo ========== tag ==========
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
