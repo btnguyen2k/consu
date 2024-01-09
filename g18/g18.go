@@ -66,3 +66,39 @@ func FindInSlice[K comparable](needle K, haystack []K) int {
 func PointerOf[K any](input K) *K {
 	return &input
 }
+
+// Max returns the maximum value of the input value list.
+//
+// Note: if Go 1.21+, use built-in operator max() instead.
+//
+// @Available since <<VERSION>>
+func Max[K cmp.Ordered](values ...K) K {
+	if len(values) == 0 {
+		panic("empty input")
+	}
+	result := values[0]
+	for _, v := range values[1:] {
+		if v > result {
+			result = v
+		}
+	}
+	return result
+}
+
+// Min returns the minimum value of the input value list.
+//
+// Note: if Go 1.21+, use built-in operator min() instead.
+//
+// @Available since <<VERSION>>
+func Min[K cmp.Ordered](values ...K) K {
+	if len(values) == 0 {
+		panic("empty input")
+	}
+	result := values[0]
+	for _, v := range values[1:] {
+		if v < result {
+			result = v
+		}
+	}
+	return result
+}

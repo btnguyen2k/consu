@@ -652,6 +652,8 @@ func TestFindInSlice_uint(t *testing.T) {
 	}
 }
 
+/*----------------------------------------------------------------------*/
+
 func TestPointerOf_bool(t *testing.T) {
 	testName := "TestPointerOf_bool"
 	v1, expected := PointerOf(false), false
@@ -773,5 +775,116 @@ func TestPointerOf_slice(t *testing.T) {
 	}
 	if !reflect.DeepEqual(*v, expected) {
 		t.Fatalf("%s failed: expected %#v but received %#v", testName, expected, v)
+	}
+}
+
+/*----------------------------------------------------------------------*/
+func TestMinMax_string(t *testing.T) {
+	testName := "TestMinMax_string"
+	testData := []struct {
+		input    []string
+		min, max string
+	}{
+		{
+			input: []string{"1", "3", "2"}, min: "1", max: "3",
+		},
+		{
+			input: []string{"3", "1", "3", "2"}, min: "1", max: "3",
+		},
+	}
+	for _, td := range testData {
+		mi := Min(td.input...)
+		ma := Max(td.input...)
+		if mi != td.min || ma != td.max {
+			t.Fatalf("%s failed: {test data: %#v / expected: (mi: %#v, ma: %#v) / received: (mi: %#v, ma: %#v)}", testName, td.input, td.min, td.max, mi, ma)
+		}
+	}
+}
+
+func TestMinMax_int(t *testing.T) {
+	testName := "TestMinMax_int"
+	testData := []struct {
+		input    []int
+		min, max int
+	}{
+		{
+			input: []int{1, 3, 2}, min: 1, max: 3,
+		},
+		{
+			input: []int{3, 1, 3, 2}, min: 1, max: 3,
+		},
+	}
+	for _, td := range testData {
+		mi := Min(td.input...)
+		ma := Max(td.input...)
+		if mi != td.min || ma != td.max {
+			t.Fatalf("%s failed: {test data: %#v / expected: (mi: %#v, ma: %#v) / received: (mi: %#v, ma: %#v)}", testName, td.input, td.min, td.max, mi, ma)
+		}
+	}
+}
+
+func TestMinMax_uint(t *testing.T) {
+	testName := "TestMinMax_uint"
+	testData := []struct {
+		input    []uint
+		min, max uint
+	}{
+		{
+			input: []uint{1, 3, 2}, min: 1, max: 3,
+		},
+		{
+			input: []uint{3, 1, 3, 2}, min: 1, max: 3,
+		},
+	}
+	for _, td := range testData {
+		mi := Min(td.input...)
+		ma := Max(td.input...)
+		if mi != td.min || ma != td.max {
+			t.Fatalf("%s failed: {test data: %#v / expected: (mi: %#v, ma: %#v) / received: (mi: %#v, ma: %#v)}", testName, td.input, td.min, td.max, mi, ma)
+		}
+	}
+}
+
+func TestMinMax_float32(t *testing.T) {
+	testName := "TestMinMax_float32"
+	testData := []struct {
+		input    []float32
+		min, max float32
+	}{
+		{
+			input: []float32{1.2, 3.4, 2.3}, min: 1.2, max: 3.4,
+		},
+		{
+			input: []float32{3.4, 1.2, 3.4, 2.3}, min: 1.2, max: 3.4,
+		},
+	}
+	for _, td := range testData {
+		mi := Min(td.input...)
+		ma := Max(td.input...)
+		if mi != td.min || ma != td.max {
+			t.Fatalf("%s failed: {test data: %#v / expected: (mi: %#v, ma: %#v) / received: (mi: %#v, ma: %#v)}", testName, td.input, td.min, td.max, mi, ma)
+		}
+	}
+}
+
+func TestMinMax_float64(t *testing.T) {
+	testName := "TestMinMax_float64"
+	testData := []struct {
+		input    []float64
+		min, max float64
+	}{
+		{
+			input: []float64{1.2, 3.4, 2.3}, min: 1.2, max: 3.4,
+		},
+		{
+			input: []float64{3.4, 1.2, 3.4, 2.3}, min: 1.2, max: 3.4,
+		},
+	}
+	for _, td := range testData {
+		mi := Min(td.input...)
+		ma := Max(td.input...)
+		if mi != td.min || ma != td.max {
+			t.Fatalf("%s failed: {test data: %#v / expected: (mi: %#v, ma: %#v) / received: (mi: %#v, ma: %#v)}", testName, td.input, td.min, td.max, mi, ma)
+		}
 	}
 }
