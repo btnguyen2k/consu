@@ -66,4 +66,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 Feel free to create [pull requests](https://github.com/btnguyen2k/consu/pulls) or [issues](https://github.com/btnguyen2k/consu/issues) to report bugs or suggest new features.
 Please search the existing issues before filing new issues to avoid duplicates. For new issues, file your bug or feature request as a new issue.
 
-If you find this project useful, please start it.
+If you find this project useful, please star it.
