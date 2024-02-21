@@ -209,8 +209,9 @@ func checksumSafe(hf HashFunc, v interface{}, visited map[uintptr]struct{}) []by
 		}
 		sort.Strings(temp)
 		return checksumSafe(hf, append([]string{markerStruct, rv.Type().String()}, temp...), visited)
+	default:
+		return nil
 	}
-	return nil
 }
 
 // Crc32Checksum is shortcut of Checksum(Crc32HashFunc, v).
