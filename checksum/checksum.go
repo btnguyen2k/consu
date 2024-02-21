@@ -59,24 +59,24 @@ func boolToBytes(v bool) []byte {
 
 func intToBytes(v int64) []byte {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, v)
+	_ = binary.Write(buf, binary.BigEndian, v)
 	return buf.Bytes()
 }
 
 func uintToBytes(v uint64) []byte {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, v)
+	_ = binary.Write(buf, binary.BigEndian, v)
 	return buf.Bytes()
 }
 
 func floatToBytes(v float64) []byte {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, v)
+	_ = binary.Write(buf, binary.BigEndian, v)
 	return buf.Bytes()
 }
 
 func isExportedField(fieldName string) bool {
-	return len(fieldName) >= 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
+	return len(fieldName) > 0 && string(fieldName[0]) == strings.ToUpper(string(fieldName[0]))
 }
 
 func Unwrap(v interface{}) (prv reflect.Value, rv reflect.Value) {
