@@ -39,8 +39,8 @@ func TestNewGjrc_PrebuiltHttpClient(t *testing.T) {
 func TestGjrcResponse_Error(t *testing.T) {
 	testName := "TestGjrcResponse_Error"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "https://mydomain.notreal"
-	resp := client.Get(url)
+	urlDest := "https://mydomain.notreal"
+	resp := client.Get(urlDest)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -69,8 +69,8 @@ func TestGjrcResponse_StatusCode(t *testing.T) {
 
 	testName := "TestGjrcResponse_StatusCode"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/notfound", s.listenPort)
-	resp := client.Get(url)
+	urlTarget := fmt.Sprintf("http://localhost:%d/notfound", s.listenPort)
+	resp := client.Get(urlTarget)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -98,8 +98,8 @@ func TestGjrcResponse_Body(t *testing.T) {
 
 	testName := "TestGjrcResponse_Body"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
-	resp := client.Get(url)
+	urlTarget := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
+	resp := client.Get(urlTarget)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -134,8 +134,8 @@ func TestGjrcResponse_HttpResponse(t *testing.T) {
 
 	testName := "TestGjrcResponse_HttpResponse"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
-	resp := client.Get(url)
+	urlTarget := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
+	resp := client.Get(urlTarget)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -151,6 +151,28 @@ func TestGjrcResponse_HttpResponse(t *testing.T) {
 }
 
 /*----------------------------------------------------------------------*/
+
+func TestGjrc_RequestError(t *testing.T) {
+	testName := "TestGjrc_RequestError"
+	client := NewGjrc(nil, 10*time.Second)
+	invalidUrlTarget := "http://localhost:invalid/"
+
+	respGet := client.Get(invalidUrlTarget)
+	if respGet == nil {
+		t.Fatalf("%s failed: nil response", testName)
+	}
+	if respGet.Error() == nil {
+		t.Fatalf("%s failed: expected error", testName)
+	}
+
+	respPost := client.Post(invalidUrlTarget, "application/json", nil)
+	if respPost == nil {
+		t.Fatalf("%s failed: nil response", testName)
+	}
+	if respPost.Error() == nil {
+		t.Fatalf("%s failed: expected error", testName)
+	}
+}
 
 var (
 	requestDataJson = map[string]interface{}{"key1": "value1", "key2": 2, "key3": true}
@@ -195,8 +217,8 @@ func TestGjrc_DeleteJson(t *testing.T) {
 
 	testName := "TestGjrc_DeleteJson"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/delete", s.listenPort)
-	resp := client.DeleteJson(url, requestDataJson, requestHeaders...)
+	urlTarget := fmt.Sprintf("http://localhost:%d/delete", s.listenPort)
+	resp := client.DeleteJson(urlTarget, requestDataJson, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -211,8 +233,8 @@ func TestGjrc_DeleteJson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s failed: %s", testName, err)
 	}
-	if valUrl != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
+	if valUrl != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, valUrl)
 	}
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
@@ -238,8 +260,8 @@ func TestGjrc_DeleteJson(t *testing.T) {
 func TestGjrc_DeleteJsonError(t *testing.T) {
 	testName := "TestGjrc_DeleteJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "://localhost/delete"
-	resp := client.DeleteJson(url, map[string]interface{}{"key1": "value1", "key2": 2, "key3": false})
+	urlTarget := "://localhost/delete"
+	resp := client.DeleteJson(urlTarget, map[string]interface{}{"key1": "value1", "key2": 2, "key3": false})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -267,8 +289,8 @@ func TestGjrc_Get(t *testing.T) {
 
 	testName := "TestGjrc_Get"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
-	resp := client.Get(url, requestHeaders...)
+	urlTarget := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
+	resp := client.Get(urlTarget, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -283,8 +305,8 @@ func TestGjrc_Get(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s failed: %s", testName, err)
 	}
-	if valUrl != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
+	if valUrl != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, valUrl)
 	}
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
@@ -323,8 +345,8 @@ func TestGjrc_PatchJson(t *testing.T) {
 
 	testName := "TestGjrc_PatchJson"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/patch", s.listenPort)
-	resp := client.PatchJson(url, requestDataJson, requestHeaders...)
+	urlTarget := fmt.Sprintf("http://localhost:%d/patch", s.listenPort)
+	resp := client.PatchJson(urlTarget, requestDataJson, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -339,8 +361,8 @@ func TestGjrc_PatchJson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s failed: %s", testName, err)
 	}
-	if valUrl != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
+	if valUrl != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, valUrl)
 	}
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
@@ -366,8 +388,8 @@ func TestGjrc_PatchJson(t *testing.T) {
 func TestGjrc_PatchJsonError(t *testing.T) {
 	testName := "TestGjrc_PatchJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "://localhost/patch"
-	resp := client.PatchJson(url, map[string]interface{}{"key1": "value1", "key2": 2, "key3": true})
+	urlTarget := "://localhost/patch"
+	resp := client.PatchJson(urlTarget, map[string]interface{}{"key1": "value1", "key2": 2, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -395,8 +417,8 @@ func TestGjrc_PostJson(t *testing.T) {
 
 	testName := "TestGjrc_PostJson"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/post", s.listenPort)
-	resp := client.PostJson(url, requestDataJson, requestHeaders...)
+	urlTarget := fmt.Sprintf("http://localhost:%d/post", s.listenPort)
+	resp := client.PostJson(urlTarget, requestDataJson, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -411,8 +433,8 @@ func TestGjrc_PostJson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s failed: %s", testName, err)
 	}
-	if valUrl != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
+	if valUrl != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, valUrl)
 	}
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
@@ -438,8 +460,8 @@ func TestGjrc_PostJson(t *testing.T) {
 func TestGjrc_PostJsonError(t *testing.T) {
 	testName := "TestGjrc_PostJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "://localhot/post"
-	resp := client.PostJson(url, map[string]interface{}{"key1": "value1", "key2": 2, "key3": true})
+	urlTarget := "://localhost/post"
+	resp := client.PostJson(urlTarget, map[string]interface{}{"key1": "value1", "key2": 2, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -550,8 +572,8 @@ func TestGjrc_PutJson(t *testing.T) {
 
 	testName := "TestGjrc_PutJson"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/put", s.listenPort)
-	resp := client.PutJson(url, requestDataJson, requestHeaders...)
+	urlTarget := fmt.Sprintf("http://localhost:%d/put", s.listenPort)
+	resp := client.PutJson(urlTarget, requestDataJson, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -566,8 +588,8 @@ func TestGjrc_PutJson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s failed: %s", testName, err)
 	}
-	if valUrl != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, valUrl)
+	if valUrl != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, valUrl)
 	}
 
 	valHost, err := resp.GetValueAsType("headers.Host", reddo.TypeString)
@@ -593,8 +615,8 @@ func TestGjrc_PutJson(t *testing.T) {
 func TestGjrc_PutJsonError(t *testing.T) {
 	testName := "TestGjrc_PutJsonError"
 	client := NewGjrc(nil, 10*time.Second)
-	url := "://localhost/put"
-	resp := client.PutJson(url, map[string]interface{}{"key1": "value1", "key2": 2, "key3": true})
+	urlTarget := "://localhost/put"
+	resp := client.PutJson(urlTarget, map[string]interface{}{"key1": "value1", "key2": 2, "key3": true})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -624,8 +646,8 @@ func TestGjrc_Timeout_Default1(t *testing.T) {
 
 	testName := "TestGjrc_TimeoutDefault1"
 	client := NewGjrc(nil, 5*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/delay?time=3", s.listenPort)
-	resp := client.Get(url)
+	urlTarget := fmt.Sprintf("http://localhost:%d/delay?time=3", s.listenPort)
+	resp := client.Get(urlTarget)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -653,15 +675,14 @@ func TestGjrc_Timeout_Default2(t *testing.T) {
 
 	testName := "TestGjrc_Timeout_Default2"
 	client := NewGjrc(nil, 5*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/delay?time=7", s.listenPort)
-	resp := client.Get(url)
+	urlTarget := fmt.Sprintf("http://localhost:%d/delay?time=7", s.listenPort)
+	resp := client.Get(urlTarget)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() == nil {
 		t.Fatalf("%s failed: expecting error", testName)
 	}
-	fmt.Printf("\t[DEBUG] %s\n", resp.Error())
 }
 
 func TestGjrc_Timeout_Custom1(t *testing.T) {
@@ -680,8 +701,8 @@ func TestGjrc_Timeout_Custom1(t *testing.T) {
 
 	testName := "TestGjrc_Timeout_Custom1"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/delay?time=3", s.listenPort)
-	resp := client.Get(url, RequestMeta{Timeout: 5 * time.Second})
+	urlTarget := fmt.Sprintf("http://localhost:%d/delay?time=3", s.listenPort)
+	resp := client.Get(urlTarget, RequestMeta{Timeout: 5 * time.Second})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -709,15 +730,14 @@ func TestGjrc_Timeout_Custom2(t *testing.T) {
 
 	testName := "TestGjrc_Timeout_Custom2"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/delay?time=7", s.listenPort)
-	resp := client.Get(url, RequestMeta{Timeout: 5 * time.Second})
+	urlTarget := fmt.Sprintf("http://localhost:%d/delay?time=7", s.listenPort)
+	resp := client.Get(urlTarget, RequestMeta{Timeout: 5 * time.Second})
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
 	if resp.Error() == nil {
 		t.Fatalf("%s failed: expecting error", testName)
 	}
-	fmt.Printf("\t[DEBUG] %s\n", resp.Error())
 }
 
 /*----------------------------------------------------------------------*/
@@ -738,8 +758,8 @@ func TestGjrc_Unmarshal(t *testing.T) {
 
 	testName := "TestGjrc_Unmarshal"
 	client := NewGjrc(nil, 10*time.Second)
-	url := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
-	resp := client.Get(url, requestHeaders...)
+	urlTarget := fmt.Sprintf("http://localhost:%d/get", s.listenPort)
+	resp := client.Get(urlTarget, requestHeaders...)
 	if resp == nil {
 		t.Fatalf("%s failed: nil response", testName)
 	}
@@ -762,8 +782,8 @@ func TestGjrc_Unmarshal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s failed: %s", testName, err)
 	}
-	if v1.Url != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, v1.Url)
+	if v1.Url != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, v1.Url)
 	}
 	if v1.Method != "get" {
 		t.Fatalf("%s failed: expected %s but received %s", testName, "get", v1.Method)
@@ -780,8 +800,8 @@ func TestGjrc_Unmarshal(t *testing.T) {
 	if v2 == nil {
 		t.Fatalf("%s failed: nil", testName)
 	}
-	if v2.Url != url {
-		t.Fatalf("%s failed: expected %s but received %s", testName, url, v2.Url)
+	if v2.Url != urlTarget {
+		t.Fatalf("%s failed: expected %s but received %s", testName, urlTarget, v2.Url)
 	}
 	if v2.Method != "get" {
 		t.Fatalf("%s failed: expected %s but received %s", testName, "get", v2.Method)
