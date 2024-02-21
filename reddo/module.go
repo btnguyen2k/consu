@@ -65,7 +65,7 @@ package reddo
 
 const (
 	// Version defines version number of this package
-	Version = "0.1.8"
+	Version = "0.1.9"
 )
 
 // This file contains module's metadata only, which is package level documentation and module Version string.

@@ -1,5 +1,11 @@
 # consu/reddo release notes
 
+## 2024-02-21 - v0.1.9
+
+### Fixed/Improvement
+
+- Fix(CodeQL): Off-by-one comparison against length.
+
 ## 2023-05-04 - v0.1.8
 
 - Bug fixes & enhancements: `ToMap` & `ToSlice` handle complex/nested/nil cases better.
