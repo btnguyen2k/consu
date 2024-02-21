@@ -1,5 +1,11 @@
 # consu/gjrc changelog
 
+## 2024-02-21 - v0.2.2
+
+### Fixed/Improvement
+
+- Improvement: Handle custom request timeout value.
+
 ## 2023-05-10 - v0.2.1
 
 - Add function `GjrcResponse.Unmarshal(interface{}) error`.

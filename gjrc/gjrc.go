@@ -75,7 +75,7 @@ func (c *Gjrc) Do(req *http.Request) *GjrcResponse {
 
 // buildContext creates is a convenience function to create a context and handle timeout.
 //
-// @Available since <<VERSION>>
+// @Available since v0.2.2
 func (c *Gjrc) buildContext(metadata RequestMeta) context.Context {
 	ctx := context.Background()
 	if metadata.Timeout > 0 {
