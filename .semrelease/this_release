@@ -1,1 +1,1 @@
-Fix(CodeQL): Off-by-one index comparison against length may lead to out-of-bounds.
+**Cleanup post releasing checksum-v1.1.1**
