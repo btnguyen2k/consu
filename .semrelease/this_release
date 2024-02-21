@@ -1,1 +1,1 @@
-**Cleanup post releasing checksum-v1.1.1**
+Fix(CodeQL): Off-by-one comparison against length.
