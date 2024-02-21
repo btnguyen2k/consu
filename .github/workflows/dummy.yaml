@@ -1,21 +1,21 @@
-name: gjrc
+name: dummy
 
 on:
   push:
-    branches: [ 'gjrc', 'dev/gjrc', 'master' ]
-    paths: [ 'gjrc/**', '.github/workflows/gjrc.yaml' ]
+    branches: [ 'dummy', 'dev/dummy', 'master' ]
+    paths: [ 'dummy/**', '.github/workflows/dummy.yaml' ]
   pull_request:
     types: [ 'opened', 'closed' ]
-    branches: [ 'gjrc', 'master' ]
-    paths: [ 'gjrc/**', '.github/workflows/gjrc.yaml' ]
+    branches: [ 'dummy', 'master' ]
+    paths: [ 'dummy/**', '.github/workflows/dummy.yaml' ]
 
 jobs:
-  TestGjrc:
+  TestDummy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.13', '1.18', 'oldstable', 'stable' ]
-    name: Test gjrc with Go ${{ matrix.go }}
+        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
+    name: Test dummy with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Go env
@@ -25,19 +25,18 @@ jobs:
     - name: Run tests
       run: |
         go version
-        cd ./gjrc
-        go test -cover -coverprofile=../coverage_gjrc.txt -timeout 9999s -v -count 1 -p 1 ./
+        cd ./dummy
+        go test -cover -coverprofile=../coverage_dummy.txt -v -count 1 -p 1 .
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v4
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        flags: gjrc
-        name: gjrc
+        flags: dummy
+        name: dummy
   
   ReleaseDryRun:
     runs-on: ubuntu-latest
-    needs: [ 'TestGjrc' ]
+    needs: [ 'TestDummy' ]
     outputs:
       RESULT: ${{ steps.semrelease.outputs.result }}
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
@@ -53,16 +52,16 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         tag-major-release: false
         tag-minor-release: false
-        branches: gjrc,dev/gjrc
-        tag-prefix: 'gjrc/v'
+        branches: dummy,dev/dummy
+        tag-prefix: 'dummy/v'
         tag-only: true
-        path: 'gjrc/'
+        path: 'dummy/'
 
   Release:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'gjrc'
+      github.ref == 'dummy'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -77,7 +76,7 @@ jobs:
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
-        MODULE=gjrc
+        MODULE=dummy
         echo "🕘 Updating module meta..."
         echo "   - RESULT: ${RESULT}"
         echo "   - VERSION: ${VERSION}"
@@ -97,15 +96,14 @@ jobs:
           echo ========== content of ${FILE_MODULE} ==========
           cat ${FILE_MODULE}
 
-          echo ========== update .go and .md files ==========
+          echo ========== update .go files ==========
           sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.go
-          sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.md
 
           echo ========== commit updates ==========
           git config --global user.email "<>"
           git config --global user.name "CI Build"
           git commit -am "Update ${FILE_CHANGELOG} and ${FILE_MODULE} for new version ${VERSION}"
-          git push origin ${MODULE} -f
+          git push origin ${MODULE}
 
           echo ========== tag ==========
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
@@ -135,9 +133,9 @@ jobs:
           const {data: pr} = await github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: "Merge branch gjrc to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
+            title: "Merge branch dummy to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
             body: process['env']['RELEASE_NOTES'],
-            head: 'gjrc',
+            head: 'dummy',
             base: 'master',
             maintainer_can_modify: true,
           });

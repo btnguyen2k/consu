@@ -111,16 +111,32 @@ type Gjrc struct {
 
 func (c *Gjrc) buildResponse(resp *http.Response, err error) *GjrcResponse {
 	result := &GjrcResponse{err: err, resp: resp}
-	go result.ensureResponseData()
+	go func() { _, _ = result.ensureResponseData() }()
 	return result
 }
 
-// Do sends a HTTP request and returns a GjrcResponse capturing the HTTP response.
+// Do sends an HTTP request and returns a GjrcResponse capturing the HTTP response.
 func (c *Gjrc) Do(req *http.Request) *GjrcResponse {
 	return c.buildResponse(c.httpClient.Do(req))
 }
 
 /*----------------------------------------------------------------------*/
+
+// buildContext creates is a convenience function to create a context and handle timeout.
+//
+// @Available since <<VERSION>>
+func (c *Gjrc) buildContext(metadata RequestMeta) context.Context {
+	ctx := context.Background()
+	if metadata.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, metadata.Timeout)
+		go func() {
+			defer cancel()
+			time.Sleep(metadata.Timeout)
+		}()
+	}
+	return ctx
+}
 
 // Post sends a POST request and returns a GjrcResponse capturing the HTTP response.
 //
@@ -129,11 +145,7 @@ func (c *Gjrc) Post(url, contentType string, body io.Reader, metadata ...Request
 	h := http.Header{}
 	h.Set("Content-Type", contentType)
 	meta := mergeMetadata(RequestMeta{Header: h}, metadata...)
-
-	ctx := context.Background()
-	if meta.Timeout > 0 {
-		ctx, _ = context.WithTimeout(ctx, meta.Timeout)
-	}
+	ctx := c.buildContext(meta)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
 	if err != nil {
 		return c.buildResponse(nil, err)
@@ -159,11 +171,7 @@ func (c *Gjrc) PostForm(url string, data url.Values, metadata ...RequestMeta) *G
 // metadata is added since v0.2.0
 func (c *Gjrc) Get(url string, metadata ...RequestMeta) *GjrcResponse {
 	meta := mergeMetadata(RequestMeta{}, metadata...)
-
-	ctx := context.Background()
-	if meta.Timeout > 0 {
-		ctx, _ = context.WithTimeout(ctx, meta.Timeout)
-	}
+	ctx := c.buildContext(meta)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return c.buildResponse(nil, err)
@@ -182,14 +190,10 @@ func (c *Gjrc) buildJsonRequest(method, url string, bodyObj interface{}, metadat
 	h := http.Header{}
 	h.Set("Content-Type", "application/json")
 	meta := mergeMetadata(RequestMeta{Header: h}, metadata...)
-
+	ctx := c.buildContext(meta)
 	buf := make([]byte, 0)
 	if bodyObj != nil {
 		buf, _ = json.Marshal(bodyObj)
-	}
-	ctx := context.Background()
-	if meta.Timeout > 0 {
-		ctx, _ = context.WithTimeout(ctx, meta.Timeout)
 	}
 	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewReader(buf))
 	if err != nil {
@@ -290,8 +294,8 @@ func (r *GjrcResponse) Body() ([]byte, error) {
 		r.mutex.Lock()
 		defer r.mutex.Unlock()
 		if r.rawBody == nil && r.err == nil {
-			defer r.resp.Body.Close()
-			buff, err := ioutil.ReadAll(r.resp.Body)
+			defer func() { _ = r.resp.Body.Close() }()
+			buff, err := ioutil.ReadAll(r.resp.Body) // leave it here as we are still supporting go v1.13
 			if err != nil && r.err == nil {
 				r.err = err
 			}
@@ -311,17 +315,18 @@ func (r *GjrcResponse) Body() ([]byte, error) {
 	return r.rawBody, r.err
 }
 
-func (r *GjrcResponse) ensureResponseData() {
+func (r *GjrcResponse) ensureResponseData() ([]byte, error) {
 	if r.s == nil {
-		r.Body()
+		return r.Body()
 	}
+	return r.rawBody, r.err
 }
 
 // GetValueAsType retrieves the value located at path and returns it casted to typ.
 //
 // Note: see semita.Semita documentation for path syntax.
 func (r *GjrcResponse) GetValueAsType(path string, typ reflect.Type) (interface{}, error) {
-	r.ensureResponseData()
+	_, _ = r.ensureResponseData()
 	return r.s.GetValueOfType(path, typ)
 }
 

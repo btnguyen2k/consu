@@ -4,7 +4,7 @@
 ## Usage:
 ##   ./release.sh <tag-name>
 
-MODULE=g18
+MODULE=semver
 
 if [ "$1" == "" ]; then
 	echo "Usage: $0 tag-name"

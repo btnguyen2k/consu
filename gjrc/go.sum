@@ -1,6 +1,5 @@
-github.com/btnguyen2k/consu/reddo v0.1.4 h1:AT3xH1f7O9R9RVOdSiGhAwu0cI0VWr5fg4io9uDTRB8=
-github.com/btnguyen2k/consu/reddo v0.1.4/go.mod h1:6L2l4rRFQlyGWlKxt9SiwYs/wB6SE70oxFcrTo/YLPY=
-github.com/btnguyen2k/consu/reddo v0.1.6 h1:NUG2Uw0HWnJjiUUzhNwpTTQheoM1JKVza+5HWd/kQtU=
-github.com/btnguyen2k/consu/reddo v0.1.6/go.mod h1:6L2l4rRFQlyGWlKxt9SiwYs/wB6SE70oxFcrTo/YLPY=
-github.com/btnguyen2k/consu/semita v0.1.4 h1:tKvH0PRcaFWumMaFFCIa+NjIotAJGGKeFhEJgm+rC6U=
-github.com/btnguyen2k/consu/semita v0.1.4/go.mod h1:EmOAKM4o+iljiR2kShq3MlIvGrzALnUW4IkgI292p10=
+github.com/btnguyen2k/consu/reddo v0.1.7/go.mod h1:pdY5oIVX3noZIaZu3nvoKZ59+seXL/taXNGWh9xJDbg=
+github.com/btnguyen2k/consu/reddo v0.1.8 h1:pEAkB6eadp/q+ONy97/JkAAyj058uIgkSu8b862Fwug=
+github.com/btnguyen2k/consu/reddo v0.1.8/go.mod h1:pdY5oIVX3noZIaZu3nvoKZ59+seXL/taXNGWh9xJDbg=
+github.com/btnguyen2k/consu/semita v0.1.5 h1:fu71xNJTbCV8T+6QPJdJu3bxtmLWvTjCepkvujF74+I=
+github.com/btnguyen2k/consu/semita v0.1.5/go.mod h1:fksCe3L4kxiJVnKKhUXKI8mcFdB9974mtedwUVVFu1M=

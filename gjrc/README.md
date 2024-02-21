@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/btnguyen2k/consu)](https://goreportcard.com/report/github.com/btnguyen2k/consu)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/btnguyen2k/consu/gjrc)](https://pkg.go.dev/github.com/btnguyen2k/consu/gjrc)
 [![Actions Status](https://github.com/btnguyen2k/consu/workflows/gjrc/badge.svg)](https://github.com/btnguyen2k/consu/actions)
-[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/gjrc/graph/badge.svg?token=PWSL21DE1D)](https://app.codecov.io/gh/btnguyen2k/consu/tree/gjrc/gjrc)
+[![codecov](https://codecov.io/gh/btnguyen2k/consu/branch/gjrc/graph/badge.svg)](https://app.codecov.io/gh/btnguyen2k/consu/tree/gjrc/gjrc)
 
 Package `gjrc` offers generic utilities to work with JSON-based RESTful API.
 
@@ -57,21 +57,13 @@ func main() {
 }
 ```
 
-## History
+## License
 
-### 2023-05-10 - v0.2.1
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-- Add function `GjrcResponse.Unmarshal(interface{}) error`.
+## Support and Contribution
 
-### 2023-03-16 - v0.2.0
+Feel free to create [pull requests](https://github.com/btnguyen2k/consu/pulls) or [issues](https://github.com/btnguyen2k/consu/issues) to report bugs or suggest new features.
+Please search the existing issues before filing new issues to avoid duplicates. For new issues, file your bug or feature request as a new issue.
 
-- New struct `RequestMeta`.
-- Add optional metadata parameters to DELETE/GET/POST/PUT/PATCH request, supporting custom headers and per-request timeout.
-
-### 2020-11-01 - v0.1.1
-
-`go.mod` fixed.
-
-### 2020-11-01 - v0.1.0
-
-First release.
+If you find this project useful, please star it.
