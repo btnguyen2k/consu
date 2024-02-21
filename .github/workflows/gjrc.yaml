@@ -117,14 +117,15 @@ jobs:
         fi
     - name: Cleanup file .semrelease/this_release
       run: |
+        MODULE=gjrc
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         if [ "${RESULT}" == "SUCCESS" ]; then
           VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
           echo "🕘 Cleaning up file .semrelease/this_release..."
-          echo "Cleanup post releasing version ${VERSION}" > .semrelease/this_release
+          echo "Cleanup post releasing ${MODULE}-v${VERSION}" > .semrelease/this_release
           git config --global user.email "<>"
           git config --global user.name "CI Build"
-          git commit -am "Cleanup file .semrelease/this_release post releasing version ${VERSION}"
+          git commit -am "Cleanup file .semrelease/this_release post releasing ${MODULE}-v${VERSION}"
           git push -f
           echo "✅ Done."
         else
