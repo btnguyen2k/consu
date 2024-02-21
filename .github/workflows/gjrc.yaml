@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'gjrc'
+      github.ref_name == 'gjrc'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
