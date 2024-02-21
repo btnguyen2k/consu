@@ -1,1 +1,1 @@
-Fix(COdeQL): Off-by-one index comparison against length may lead to out-of-bounds.
+Fix(CodeQL): Off-by-one index comparison against length may lead to out-of-bounds.
