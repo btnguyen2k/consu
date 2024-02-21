@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
+        go: [ '1.13', '1.18', 'oldstable', 'stable' ]
     name: Test reddo with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v4
@@ -26,11 +26,12 @@ jobs:
       run: |
         go version
         cd ./reddo
-        go test -cover -coverprofile=../coverage_reddo.txt -v -count 1 -p 1 .
+        go test -cover -coverprofile=../coverage_reddo.txt -timeout 9999s -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         flags: reddo
         name: reddo
   
@@ -61,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'reddo'
+      github.ref == 'refs/heads/reddo'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -71,13 +72,13 @@ jobs:
       RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
     - uses: actions/checkout@v4
-    - name: Update module meta
+    - name: Update module metadata
       run: |
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
         MODULE=reddo
-        echo "🕘 Updating module meta..."
+        echo "🕘 Updating module metadata..."
         echo "   - RESULT: ${RESULT}"
         echo "   - VERSION: ${VERSION}"
         echo "   - RELEASE_NOTES: ${RELEASE_NOTES}"
@@ -96,8 +97,9 @@ jobs:
           echo ========== content of ${FILE_MODULE} ==========
           cat ${FILE_MODULE}
 
-          echo ========== update .go files ==========
+          echo ========== update .go and .md files ==========
           sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.go
+          sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.md
 
           echo ========== commit updates ==========
           git config --global user.email "<>"
@@ -109,6 +111,22 @@ jobs:
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
           git push origin "${MODULE}/v${VERSION}" -f
 
+          echo "✅ Done."
+        else
+          echo "❎ SKIPPED."
+        fi
+    - name: Cleanup file .semrelease/this_release
+      run: |
+        MODULE=reddo
+        RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
+        if [ "${RESULT}" == "SUCCESS" ]; then
+          VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
+          echo "🕘 Cleaning up file .semrelease/this_release..."
+          echo "**Cleanup post releasing ${MODULE}-v${VERSION}**" > .semrelease/this_release
+          git config --global user.email "<>"
+          git config --global user.name "CI Build"
+          git commit -am "Cleanup file .semrelease/this_release post releasing ${MODULE}-v${VERSION}"
+          git push -f
           echo "✅ Done."
         else
           echo "❎ SKIPPED."
