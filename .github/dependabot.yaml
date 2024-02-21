@@ -1,0 +1,52 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/checksum"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/g18"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/gjrc"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/olaf"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/reddo"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/semita"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
+  - package-ecosystem: "gomod"
+    directory: "/semver"
+    schedule:
+      interval: "weekly"
+      day: "sunday"

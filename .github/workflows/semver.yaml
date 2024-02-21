@@ -1,21 +1,21 @@
-name: olaf
+name: semver
 
 on:
   push:
-    branches: [ 'olaf', 'dev/olaf', 'master' ]
-    paths: [ 'olaf/**', '.github/workflows/olaf.yaml' ]
+    branches: [ 'semver', 'dev/semver', 'master' ]
+    paths: [ 'semver/**', '.github/workflows/semver.yaml' ]
   pull_request:
     types: [ 'opened', 'closed' ]
-    branches: [ 'olaf', 'master' ]
-    paths: [ 'olaf/**', '.github/workflows/olaf.yaml' ]
+    branches: [ 'semver', 'master' ]
+    paths: [ 'semver/**', '.github/workflows/semver.yaml' ]
 
 jobs:
-  TestOlaf:
+  TestSemver:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
-    name: Test olaf with Go ${{ matrix.go }}
+        go: [ '1.13', '1.18', 'oldstable', 'stable' ]
+    name: Test semver with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Go env
@@ -25,20 +25,19 @@ jobs:
     - name: Run tests
       run: |
         go version
-        cd ./olaf
-        export OLAF_NUM_ITEMS=10000000
-        export OLAF_NUM_THREADS=4
-        go test -cover -coverprofile=../coverage_olaf.txt -v -count 1 -p 1 .
+        cd ./semver
+        go test -cover -coverprofile=../coverage_semver.txt -timeout 9999s -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v4
       with:
-        flags: olaf
-        name: olaf
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: semver
+        name: semver
   
   ReleaseDryRun:
     runs-on: ubuntu-latest
-    needs: [ 'TestOlaf' ]
+    needs: [ 'TestSemver' ]
     outputs:
       RESULT: ${{ steps.semrelease.outputs.result }}
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
@@ -54,16 +53,16 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         tag-major-release: false
         tag-minor-release: false
-        branches: olaf,dev/olaf
-        tag-prefix: 'olaf/v'
+        branches: semver,dev/semver
+        tag-prefix: 'semver/v'
         tag-only: true
-        path: 'olaf/'
+        path: 'semver/'
 
   Release:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'olaf'
+      github.ref == 'refs/heads/semver'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -73,13 +72,13 @@ jobs:
       RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
     - uses: actions/checkout@v4
-    - name: Update module meta
+    - name: Update module metadata
       run: |
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
-        MODULE=olaf
-        echo "🕘 Updating module meta..."
+        MODULE=semver
+        echo "🕘 Updating module metadata..."
         echo "   - RESULT: ${RESULT}"
         echo "   - VERSION: ${VERSION}"
         echo "   - RELEASE_NOTES: ${RELEASE_NOTES}"
@@ -98,8 +97,9 @@ jobs:
           echo ========== content of ${FILE_MODULE} ==========
           cat ${FILE_MODULE}
 
-          echo ========== update .go files ==========
+          echo ========== update .go and .md files ==========
           sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.go
+          sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.md
 
           echo ========== commit updates ==========
           git config --global user.email "<>"
@@ -111,6 +111,22 @@ jobs:
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
           git push origin "${MODULE}/v${VERSION}" -f
 
+          echo "✅ Done."
+        else
+          echo "❎ SKIPPED."
+        fi
+    - name: Cleanup file .semrelease/this_release
+      run: |
+        MODULE=semver
+        RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
+        if [ "${RESULT}" == "SUCCESS" ]; then
+          VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
+          echo "🕘 Cleaning up file .semrelease/this_release..."
+          echo "**Cleanup post releasing ${MODULE}-v${VERSION}**" > .semrelease/this_release
+          git config --global user.email "<>"
+          git config --global user.name "CI Build"
+          git commit -am "Cleanup file .semrelease/this_release post releasing ${MODULE}-v${VERSION}"
+          git push -f
           echo "✅ Done."
         else
           echo "❎ SKIPPED."
@@ -135,9 +151,9 @@ jobs:
           const {data: pr} = await github.rest.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: "Merge branch olaf to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
+            title: "Merge branch semver to master after releasing new version ${{ needs.Release.outputs.VERSION }}",
             body: process['env']['RELEASE_NOTES'],
-            head: 'olaf',
+            head: 'semver',
             base: 'master',
             maintainer_can_modify: true,
           });
