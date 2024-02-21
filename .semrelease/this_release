@@ -1,1 +1,1 @@
-Cleanup post releasing version 0.2.2
+Fix(CodeQL): Off-by-one index comparison against length may lead to out-of-bounds.
