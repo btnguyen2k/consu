@@ -5,11 +5,9 @@ import (
 	"time"
 )
 
-func BenchmarkToTime(b *testing.B) {
+func BenchmarkTimeToTime(b *testing.B) {
 	now := time.Now()
-
 	for i := 0; i < b.N; i++ {
 		_, _ = ToTime(now)
-
 	}
 }
