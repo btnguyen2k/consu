@@ -1,5 +1,11 @@
 # consu/checksum changelog
 
+## 2024-02-21 - v1.1.1
+
+### Fixed/Improvement
+
+- Fix(CodeQL): Off-by-one index comparison against length may lead to out-of-bounds.
+
 ## 2023-08-17 - v1.1.0
 
 ### Added/Refactoring
