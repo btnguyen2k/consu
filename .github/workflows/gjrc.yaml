@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
+        go: [ '1.13', '1.18', 'oldstable', 'stable' ]
     name: Test gjrc with Go ${{ matrix.go }}
     steps:
     - uses: actions/checkout@v4
@@ -26,11 +26,12 @@ jobs:
       run: |
         go version
         cd ./gjrc
-        go test -cover -coverprofile=../coverage_gjrc.txt -v -count 1 -p 1 .
+        go test -cover -coverprofile=../coverage_gjrc.txt -timeout 9999s -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         flags: gjrc
         name: gjrc
   
@@ -61,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'gjrc'
+      github.ref == 'refs/heads/gjrc'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -96,19 +97,35 @@ jobs:
           echo ========== content of ${FILE_MODULE} ==========
           cat ${FILE_MODULE}
 
-          echo ========== update .go files ==========
+          echo ========== update .go and .md files ==========
           sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.go
+          sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.md
 
           echo ========== commit updates ==========
           git config --global user.email "<>"
           git config --global user.name "CI Build"
           git commit -am "Update ${FILE_CHANGELOG} and ${FILE_MODULE} for new version ${VERSION}"
-          git push origin ${MODULE}
+          git push origin ${MODULE} -f
 
           echo ========== tag ==========
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
           git push origin "${MODULE}/v${VERSION}" -f
 
+          echo "✅ Done."
+        else
+          echo "❎ SKIPPED."
+        fi
+    - name: Cleanup file .semrelease/this_release
+      run: |
+        RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
+        if [ "${RESULT}" == "SUCCESS" ]; then
+          VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
+          echo "🕘 Cleaning up file .semrelease/this_release..."
+          echo "Cleanup post releasing version ${VERSION}" > .semrelease/this_release
+          git config --global user.email "<>"
+          git config --global user.name "CI Build"
+          git commit -am "Cleanup file .semrelease/this_release post releasing version ${VERSION}"
+          git push -f
           echo "✅ Done."
         else
           echo "❎ SKIPPED."

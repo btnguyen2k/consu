@@ -28,7 +28,7 @@ func (s *jsonHttpServer) serveDELAY(w http.ResponseWriter, r *http.Request) {
 	}
 	respData := s.commonResponse(r, r.Method)
 	js, _ := json.Marshal(respData)
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func (s *jsonHttpServer) commonResponse(r *http.Request, method string) map[string]interface{} {
@@ -47,12 +47,12 @@ func (s *jsonHttpServer) commonResponse(r *http.Request, method string) map[stri
 		respData["data"] = string(body)
 
 		var jsonData interface{}
-		json.Unmarshal(body, &jsonData)
+		_ = json.Unmarshal(body, &jsonData)
 		respData["json"] = jsonData
 	}
 	if strings.ToUpper(method) == "POST" || strings.ToUpper(method) == "PUT" || strings.ToUpper(method) == "PATCH" &&
 		strings.ToLower(headers["Content-Type"]) == "application/x-www-form-urlencoded" {
-		r.ParseForm()
+		_ = r.ParseForm()
 		respData["data"] = r.PostForm.Encode()
 
 		formData := map[string]string{}
@@ -70,7 +70,7 @@ func (s *jsonHttpServer) serveDELETE(w http.ResponseWriter, r *http.Request) {
 	}
 	respData := s.commonResponse(r, "delete")
 	js, _ := json.Marshal(respData)
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func (s *jsonHttpServer) serveGET(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func (s *jsonHttpServer) serveGET(w http.ResponseWriter, r *http.Request) {
 	}
 	respData := s.commonResponse(r, "get")
 	js, _ := json.Marshal(respData)
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func (s *jsonHttpServer) servePATCH(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +88,7 @@ func (s *jsonHttpServer) servePATCH(w http.ResponseWriter, r *http.Request) {
 	}
 	respData := s.commonResponse(r, "patch")
 	js, _ := json.Marshal(respData)
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func (s *jsonHttpServer) servePOST(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +97,7 @@ func (s *jsonHttpServer) servePOST(w http.ResponseWriter, r *http.Request) {
 	}
 	respData := s.commonResponse(r, "post")
 	js, _ := json.Marshal(respData)
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func (s *jsonHttpServer) servePUT(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +106,7 @@ func (s *jsonHttpServer) servePUT(w http.ResponseWriter, r *http.Request) {
 	}
 	respData := s.commonResponse(r, "put")
 	js, _ := json.Marshal(respData)
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 type jsonHttpServer struct {
