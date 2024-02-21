@@ -26,7 +26,7 @@ jobs:
       run: |
         go version
         cd ./reddo
-        go test -cover -coverprofile=../coverage_reddo.txt -timeout 9999s -v -count 1 -p 1 -bench ./
+        go test -cover -coverprofile=../coverage_reddo.txt -timeout 9999s -v -count 1 -p 1 -bench=. ./
         cd ..
     - name: Codecov
       uses: codecov/codecov-action@v4
