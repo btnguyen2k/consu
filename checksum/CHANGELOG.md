@@ -6,7 +6,7 @@
 
 - Feature: empty maps have the same checksum; and empty slices/arrays have the same checksum
 - Feature: Checksum(nil) returns a slice where all values are zero
-- Feature: handle circular reference with map
+- Feature: handle circular reference
 
 ### Fixed/Improvement
 

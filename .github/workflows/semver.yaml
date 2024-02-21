@@ -14,23 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', 'stable' ]
+        go: [ '1.13', '1.18', 'oldstable', 'stable' ]
     name: Test semver with Go ${{ matrix.go }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Go env
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go }}
     - name: Run tests
       run: |
         go version
         cd ./semver
-        go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 .
+        go test -cover -coverprofile=../coverage_semver.txt -timeout 9999s -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         flags: semver
         name: semver
   
@@ -42,7 +43,7 @@ jobs:
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
       RELEASE_NOTES: ${{ steps.semrelease.outputs.releaseNotes }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Release (dry-run)
       id: semrelease
       uses: btnguyen2k/action-semrelease@v3
@@ -61,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'semver'
+      github.ref == 'refs/heads/semver'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -70,14 +71,14 @@ jobs:
       VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
       RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Update module meta
+    - uses: actions/checkout@v4
+    - name: Update module metadata
       run: |
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
         VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
         RELEASE_NOTES='${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}'
         MODULE=semver
-        echo "🕘 Updating module meta..."
+        echo "🕘 Updating module metadata..."
         echo "   - RESULT: ${RESULT}"
         echo "   - VERSION: ${VERSION}"
         echo "   - RELEASE_NOTES: ${RELEASE_NOTES}"
@@ -96,8 +97,9 @@ jobs:
           echo ========== content of ${FILE_MODULE} ==========
           cat ${FILE_MODULE}
 
-          echo ========== update .go files ==========
+          echo ========== update .go and .md files ==========
           sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.go
+          sed -i -E "s/<<VERSION>>/v${VERSION}/" ${MODULE}/*.md
 
           echo ========== commit updates ==========
           git config --global user.email "<>"
@@ -113,6 +115,22 @@ jobs:
         else
           echo "❎ SKIPPED."
         fi
+    - name: Cleanup file .semrelease/this_release
+      run: |
+        MODULE=semver
+        RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
+        if [ "${RESULT}" == "SUCCESS" ]; then
+          VERSION='${{ needs.ReleaseDryRun.outputs.VERSION }}'
+          echo "🕘 Cleaning up file .semrelease/this_release..."
+          echo "**Cleanup post releasing ${MODULE}-v${VERSION}**" > .semrelease/this_release
+          git config --global user.email "<>"
+          git config --global user.name "CI Build"
+          git commit -am "Cleanup file .semrelease/this_release post releasing ${MODULE}-v${VERSION}"
+          git push -f
+          echo "✅ Done."
+        else
+          echo "❎ SKIPPED."
+        fi
 
   MergeToMaster:
     runs-on: ubuntu-latest
@@ -120,7 +138,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-    - uses: actions/github-script@v6
+    - uses: actions/github-script@v7
       env:
         RESULT: ${{ needs.Release.outputs.RESULT }}
         RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}

@@ -1,5 +1,12 @@
 # consu/g18 changelog
 
+## 2024-01-09 - v0.1.0
+
+### Added/Refactoring
+
+- Added new functions Min and Max
+- Added new function DeduplicateStable
+
 ## 2023-05-01 - v0.0.2
 
 - Function `PointerOf`: returns "pointer" version of input.

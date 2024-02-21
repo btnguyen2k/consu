@@ -42,3 +42,6 @@ const (
 	// Version defines version number of this package
 	Version = "1.1.0"
 )
+
+// This file contains module's metadata only, which is package level documentation and module Version string.
+// Module's code should go into other files.

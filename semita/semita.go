@@ -1,125 +1,3 @@
-/*
-Package semita provides utility functions to access data from a hierarchy structure.
-
-A "path" is used to specify the location of item in the hierarchy data. Sample of a path
-
-	"Employees.[1].first_name"
-
-where:
-
-	- "." (the dot character): path separator
-	- "Name": access attribute of a map/struct specified by "Name"
-	- "[i]": access i'th element of a slice/array (0-based)
-	- The dot right before "[]" can be omitted: "Employees[1].first_name" is equivalent to "Employees.[1].first_name".
-
-Notes:
-
-	- Supported nested arrays, slices, maps and structs.
-	- Struct's un-exported fields can be read, but not written.
-	- Unaddressable structs and arrays are read-only.
-	- The path separator can be change via semita.PathSeparator variable (default value is '.')
-
-Example: (more examples at https://github.com/btnguyen2k/consu/tree/master/semita/examples)
-
-	package main
-
-	import (
-		"encoding/json"
-		"fmt"
-		"github.com/btnguyen2k/consu/reddo"
-		"github.com/btnguyen2k/consu/semita"
-	)
-
-	func main() {
-		fmt.Println("-========== Semina demo ==========-")
-		data := map[string]interface{}{
-			"name": map[string]interface{}{
-				"first": "Thanh",
-				"last":  "ngn",
-			},
-			"yob":   1981,
-			"alias": []string{"btnguyen2k", "thanhnb"},
-		}
-		s := semita.NewSemita(data)
-		var err error
-		var v interface{}
-
-		// current data tree: {"alias":["btnguyen2k","thanhnb"],"name":{"first":"Thanh","last":"ngn"},"yob":1981}
-		tree := s.Unwrap()
-		js, _ := json.Marshal(tree)
-		fmt.Println("Data tree:", string(js))
-
-		// get nested value
-		v, err = s.GetValue("name.first") // v should be "Thanh"
-		if err == nil {
-			fmt.Println("Firstname:", v)
-		} else {
-			fmt.Println("Error:", err)
-		}
-
-		// set nested value
-		err = s.SetValue("name.last", "Nguyen") // v should be "Nguyen" (instead of "ngn")
-		if err == nil {
-			v, err = s.GetValue("name.last")
-			if err == nil {
-				fmt.Println("Lastname:", v)
-			} else {
-				fmt.Println("Error:", err)
-			}
-		} else {
-			fmt.Println("Error:", err)
-		}
-
-		// get a value and its type
-		yob, err := s.GetValue("yob") // yob should be int(1981)
-		if err == nil {
-			fmt.Println("YOB:", yob.(int))
-		} else {
-			fmt.Println("Error:", err)
-		}
-
-		// get a value and type
-		yob, err = s.GetValueOfType("yob", reddo.TypeUint) // yob should be uint64(1981)
-		if err == nil {
-			fmt.Println("YOB:", yob.(uint64)) // all uint types are returned as uint64
-		} else {
-			fmt.Println("Error:", err)
-		}
-
-		// append new item to end of slice
-		err = s.SetValue("alias[]", "another")
-		if err == nil {
-			// either alias[2] or alias.[2] is accepted
-			alias, err := s.GetValue("alias.[2]") // alias should be "another"
-			if err == nil {
-				fmt.Println("New Alias:", alias)
-			} else {
-				fmt.Println("Error:", err)
-			}
-
-			allAlias, err := s.GetValue("alias") // allAlias should be ["btnguyen2k","thanhnb","another"]
-			if err == nil {
-				fmt.Println("All Alias:", allAlias)
-			} else {
-				fmt.Println("Error:", err)
-			}
-		} else {
-			fmt.Println("Error:", err)
-		}
-
-		// create missing nodes along the path
-		err = s.SetValue("a.b[].c.d", true)
-		if err == nil {
-			// missing nodes should be created
-			// data tree should be: {"a":{"b":[{"c":{"d":true}}]},"alias":["btnguyen2k","thanhnb","another"],"name":{"first":"Thanh","last":"Nguyen"},"yob":1981}
-			tree := s.Unwrap()
-			js, _ := json.Marshal(tree)
-			fmt.Println("Data tree:", string(js))
-		} else {
-			fmt.Println("Error:", err)
-		}
-	}
-*/
 package semita
 
 import (
@@ -132,11 +10,6 @@ import (
 	"unsafe"
 
 	"github.com/btnguyen2k/consu/reddo"
-)
-
-const (
-	// Version defines version number of this package
-	Version = "0.1.5"
 )
 
 var (
@@ -159,10 +32,10 @@ func concreteValue(t interface{}) reflect.Value {
 }
 
 /*
-GetTypeOfMapKey returns type of map 'm''s key.
+GetTypeOfMapKey returns type of map 'm”s key.
 
-	- if 'm' is a map (or pointer to a map): type of map's key is returned
-	- otherwise, nil is returned
+  - if 'm' is a map (or pointer to a map): type of map's key is returned
+  - otherwise, nil is returned
 */
 func GetTypeOfMapKey(m interface{}) reflect.Type {
 	v := concreteValue(m)
@@ -175,8 +48,8 @@ func GetTypeOfMapKey(m interface{}) reflect.Type {
 /*
 GetTypeOfElement returns type of element of target 't'.
 
-	- if 't' is an array, slice, map or channel (or pointer to an array, slice, map or channel): element type is returned
-	- otherwise, t's type is return
+  - if 't' is an array, slice, map or channel (or pointer to an array, slice, map or channel): element type is returned
+  - otherwise, t's type is return
 */
 func GetTypeOfElement(t interface{}) reflect.Type {
 	v := concreteValue(t)
@@ -189,8 +62,8 @@ func GetTypeOfElement(t interface{}) reflect.Type {
 /*
 GetTypeOfStructAttibute returns type of a struct attribute.
 
-	- if 's' is a struct (or pointer to a struct): type of attribute 'attr' is returned
-	- if 's' is not a struct (or pointer to a struct) or attribute 'attr' does not exist: nil is returned
+  - if 's' is a struct (or pointer to a struct): type of attribute 'attr' is returned
+  - if 's' is not a struct (or pointer to a struct) or attribute 'attr' does not exist: nil is returned
 */
 func GetTypeOfStructAttibute(s interface{}, attr string) reflect.Type {
 	v := concreteValue(s)
@@ -207,11 +80,11 @@ func GetTypeOfStructAttibute(s interface{}, attr string) reflect.Type {
 /*
 CreateZero create 'zero' value of specified type
 
-	- if 't' is primitive type (bool, int, uint, float, complex, string, uintptr and unsafe-pointer): 'zero' value is created via reflect.Zero(t)
-	- if 't' is array or slice: returns empty slice of type 't'
-	- if 't' is map: returns empty map of type 't'
-	- if 't' is struct: returns empty struct of type 't'
-	- otherwise, return empty 'reflect.Value'
+  - if 't' is primitive type (bool, int, uint, float, complex, string, uintptr and unsafe-pointer): 'zero' value is created via reflect.Zero(t)
+  - if 't' is array or slice: returns empty slice of type 't'
+  - if 't' is map: returns empty map of type 't'
+  - if 't' is struct: returns empty struct of type 't'
+  - otherwise, return empty 'reflect.Value'
 */
 func CreateZero(t reflect.Type) reflect.Value {
 	if t == nil {
@@ -351,11 +224,11 @@ GetValue returns a value located at 'path'.
 
 Notes:
 
-	- Wrapped data must be either a struct, map, array or slice
-	- map's keys must be strings
-	- Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
-	- Getting value of struct's unexported field is supported
-	- If index is out-of-bound, (nil, nil) is returned
+  - Wrapped data must be either a struct, map, array or slice
+  - map's keys must be strings
+  - Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
+  - Getting value of struct's unexported field is supported
+  - If index is out-of-bound, (nil, nil) is returned
 
 Example:
 
@@ -405,11 +278,11 @@ GetValueOfType retrieves value located at 'path', converts the value to target t
 
 Notes:
 
-	- Wrapped data must be either a struct, map, array or slice
-	- map's keys must be strings
-	- Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
-	- Getting value of struct's unexported field is supported
-	- If index is out-of-bound, (nil, nil) is returned
+  - Wrapped data must be either a struct, map, array or slice
+  - map's keys must be strings
+  - Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
+  - Getting value of struct's unexported field is supported
+  - If index is out-of-bound, (nil, nil) is returned
 
 Example:
 
@@ -458,11 +331,11 @@ Availability: This function is available since v0.1.2.
 
 Notes:
 
-	- Same rules/restrictions as of GetValue function.
-	- If the value located at 'path' is 'time.Time': return it.
-	- If the value is integer: depends on how big it is, treat the value as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
-	- If the value is string and convertible to integer: depends on how big it is, treat the value as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
-	- Otherwise, return error
+  - Same rules/restrictions as of GetValue function.
+  - If the value located at 'path' is 'time.Time': return it.
+  - If the value is integer: depends on how big it is, treat the value as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+  - If the value is string and convertible to integer: depends on how big it is, treat the value as UNIX timestamp in seconds, milliseconds, microseconds or nanoseconds, convert to 'time.Time' and return the result.
+  - Otherwise, return error
 
 Example:
 
@@ -491,8 +364,8 @@ Availability: This function is available since v0.1.2.
 
 Notes:
 
-	- Same rules/restrictions as of GetTime function, plus:
-	- If the value is string and NOT convertible to integer: 'layout' is used to convert the value to 'time.Time'. Error is returned if conversion fails.
+  - Same rules/restrictions as of GetTime function, plus:
+  - If the value is string and NOT convertible to integer: 'layout' is used to convert the value to 'time.Time'. Error is returned if conversion fails.
 
 Example:
 
@@ -530,12 +403,12 @@ SetValue sets a value to position specified by 'path'.
 
 Notes:
 
-	- Wrapped data must be either a struct, map, array or slice
-	- map's keys must be strings
-	- If 'path' points to a map's key, the key must be exported
-	- Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
-	- If child nodes along the path does not exist, this function will create them
-	- If index is out-of-bound, this function returns error
+  - Wrapped data must be either a struct, map, array or slice
+  - map's keys must be strings
+  - If 'path' points to a map's key, the key must be exported
+  - Nested structure is supported (e.g. array inside a map, inside a struct, inside a slice, etc)
+  - If child nodes along the path does not exist, this function will create them
+  - If index is out-of-bound, this function returns error
 
 Example:
 

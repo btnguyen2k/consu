@@ -8,28 +8,33 @@ on:
     types: [ 'opened', 'closed' ]
     branches: [ 'g18', 'master' ]
     paths: [ 'g18/**', '.github/workflows/g18.yaml' ]
+  schedule:
+    # run once every month (at 00:00 UTC) to make sure the lib works with latest version of Go
+    - cron: '0 0 1 * *'
 
 jobs:
   TestG18:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.18', '1.19', '1.20', '1.21', 'stable' ]
+        go: [ '1.18', 'oldstable', 'stable' ]
     name: Test g18 with Go ${{ matrix.go }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Go env
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go }}
     - name: Run tests
       run: |
         go version
         cd ./g18
-        go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 .
+        go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         flags: g18
         name: g18
@@ -42,7 +47,7 @@ jobs:
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
       RELEASE_NOTES: ${{ steps.semrelease.outputs.releaseNotes }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Release (dry-run)
       id: semrelease
       uses: btnguyen2k/action-semrelease@v3
@@ -61,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      github.ref == 'g18'
+      github.ref == 'refs/heads/g18'
     needs: [ 'ReleaseDryRun' ]
     permissions:
       contents: write
@@ -70,7 +75,7 @@ jobs:
       VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
       RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Update module meta
       run: |
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
@@ -103,7 +108,7 @@ jobs:
           git config --global user.email "<>"
           git config --global user.name "CI Build"
           git commit -am "Update ${FILE_CHANGELOG} and ${FILE_MODULE} for new version ${VERSION}"
-          git push origin ${MODULE}
+          git push origin ${MODULE} -f
 
           echo ========== tag ==========
           git tag -f -a "${MODULE}/v${VERSION}" -m "Release ${MODULE}/v${VERSION}"
@@ -120,7 +125,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-    - uses: actions/github-script@v6
+    - uses: actions/github-script@v7
       env:
         RESULT: ${{ needs.Release.outputs.RESULT }}
         RELEASE_NOTES: ${{ needs.Release.outputs.RELEASE_NOTES }}

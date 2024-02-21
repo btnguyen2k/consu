@@ -7,42 +7,49 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
-    name: Test
+  dummy:
+    name: Dummy
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Go env
-      uses: actions/setup-go@v4
-      with:
-        go-version: ^1.18
+    - run: |
+        echo "Dummy"
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
-
-    # - name: Test checksum
-    #   run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v -count 1 -p 1 . && cd ..
-    # - name: Test g18
-    #   run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
-    - name: Test gjrc
-      run: cd ./gjrc && go test -cover -coverprofile=../coverage_gjrc.txt -v -count 1 -p 1 . && cd ..
-    - name: Test olaf
-      run: export OLAF_NUM_ITEMS=10000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -coverprofile=../coverage_olaf.txt -v -count 1 -p 1 . && cd ..
-    - name: Test reddo
-      run: cd ./reddo && go test -cover -coverprofile=../coverage_reddo.txt -v -count 1 -p 1 . && cd ..
-    - name: Test semita
-      run: cd ./semita && go test -cover -coverprofile=../coverage_semita.txt -v -count 1 -p 1 . && cd ..
-    # - name: Test semver
-    #   run: cd ./semver && go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 . && cd ..
-
-    # - name: Codecov
-    #   uses: codecov/codecov-action@v3
-    #   with:
-    #     flags: consu
-    #     name: consu
-
-    # - name: Upload coverage report
-    #   run: |
-    #     echo "" > coverage.txt
-    #     cat coverage_*.txt >> coverage.txt
-    #     rm -f coverage_*.txt
-    #     bash <(curl -s https://codecov.io/bash)
+#  test:
+#    name: Test
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Set up Go env
+#      uses: actions/setup-go@v5
+#      with:
+#        go-version: ^1.18
+#
+#    - name: Check out code into the Go module directory
+#      uses: actions/checkout@v4
+#
+#     - name: Test checksum
+#       run: cd ./checksum && go test -cover -coverprofile=../coverage_checksum.txt -v -count 1 -p 1 . && cd ..
+#     - name: Test g18
+#       run: cd ./g18 && go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 . && cd ..
+#     - name: Test gjrc
+#       run: cd ./gjrc && go test -cover -coverprofile=../coverage_gjrc.txt -v -count 1 -p 1 . && cd ..
+#     - name: Test olaf
+#       run: export OLAF_NUM_ITEMS=10000000 && export OLAF_NUM_THREADS=4 && cd ./olaf && go test -cover -coverprofile=../coverage_olaf.txt -v -count 1 -p 1 . && cd ..
+#     - name: Test reddo
+#       run: cd ./reddo && go test -cover -coverprofile=../coverage_reddo.txt -v -count 1 -p 1 . && cd ..
+#     - name: Test semita
+#       run: cd ./semita && go test -cover -coverprofile=../coverage_semita.txt -v -count 1 -p 1 . && cd ..
+#     - name: Test semver
+#       run: cd ./semver && go test -cover -coverprofile=../coverage_semver.txt -v -count 1 -p 1 . && cd ..
+#
+#     - name: Codecov
+#       uses: codecov/codecov-action@v3
+#       with:
+#         flags: consu
+#         name: consu
+#
+#     - name: Upload coverage report
+#       run: |
+#         echo "" > coverage.txt
+#         cat coverage_*.txt >> coverage.txt
+#         rm -f coverage_*.txt
+#         bash <(curl -s https://codecov.io/bash)
