@@ -47,7 +47,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Release (dry-run)
       id: semrelease
-      uses: btnguyen2k/action-semrelease@v3
+      uses: btnguyen2k/action-semrelease@v4
       with:
         dry-run: true
         auto-mode: true
