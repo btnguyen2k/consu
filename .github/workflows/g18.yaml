@@ -32,7 +32,7 @@ jobs:
         go test -cover -coverprofile=../coverage_g18.txt -v -count 1 -p 1 ./
         cd ..
     - name: Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
