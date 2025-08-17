@@ -17,7 +17,7 @@ jobs:
         go: [ '1.13', '1.18', 'oldstable', 'stable' ]
     name: Test checksum with Go ${{ matrix.go }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Go env
       uses: actions/setup-go@v5
       with:
@@ -43,7 +43,7 @@ jobs:
       VERSION: ${{ steps.semrelease.outputs.releaseVersion }}
       RELEASE_NOTES: ${{ steps.semrelease.outputs.releaseNotes }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Release (dry-run)
       id: semrelease
       uses: btnguyen2k/action-semrelease@v4
@@ -71,7 +71,7 @@ jobs:
       VERSION: ${{ needs.ReleaseDryRun.outputs.VERSION }}
       RELEASE_NOTES: ${{ needs.ReleaseDryRun.outputs.RELEASE_NOTES }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Update module metadata
       run: |
         RESULT='${{ needs.ReleaseDryRun.outputs.RESULT }}'
